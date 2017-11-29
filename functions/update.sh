@@ -1,1 +1,9 @@
 #!/bin/bash
+
+fetchSources() {
+
+}
+
+buildHosts() {
+
+}

@@ -6,9 +6,9 @@ Also it saves data, speeds up loading time and prevents some tracking of your br
 
 ## Usage
 
-adsorber --help
+`./adsorber.sh --help`:
 ```
-Usage: ${0} [OPERATION] {options}
+Usage: ./adsorber.sh [OPERATION] {options}
 
 A(d)sorber blocks ads by 'absorbing' and dumbing them into void.
            (with the help of the hosts file)
@@ -31,3 +31,12 @@ Options: (not required)
   -c, --cronjob  set cronjob as scheduler (use with 'setup')
   echo "  -y, --yes      answer all prompts with 'yes'
 ```
+
+## Todo
+
+* Finish script
+* Add comments
+* Add config file
+* Add testing framwork (travis etc.)
+* Create .deb
+* Integrate into package managers

@@ -1,9 +1,10 @@
 #!/bin/bash
 
-VERSION="0.1.0"
-OPERATION="${1}"
+HOSTS_PATH="/etc/hosts"
 SCRIPT_LOCATION="$(cd "$(dirname "${0}")" && pwd)"
 
+local VERSION="0.1.0"
+local OPERATION="${1}"
 
 showUsage() {
   if [ "${WRONG_OPERATION}" != "" ]; then
@@ -24,7 +25,7 @@ showHelp() {
   echo "           (with the help of the hosts file)"
   echo ""
   echo "Operations:"
-  echo "  setup   - setup necessary things needed for adsorber "
+  echo "  install - setup necessary things needed for adsorber "
   echo "              e.g., create backup file of hosts file,"
   echo "                    create a list with host sources to fetch from"
   echo "  update  - update hosts file with newest ad servers"
@@ -59,14 +60,9 @@ sourceFunctions() {
   . "${SCRIPT_LOCATION}/functions/update.sh"
   . "${SCRIPT_LOCATION}/functions/remove.sh"
   . "${SCRIPT_LOCATION}/functions/revert.sh"
+     # Home of systemd and cronjob implementation
   . "${SCRIPT_LOCATION}/functions/schedule.sh"
-    # Home of systemd and cronjob implementation
-  . "${SCRIPT_LOCATION}/functions/setup.sh"
-}
-
-cleanUp() {
-  echo "hello"
-  # Clean up leftovers
+  . "${SCRIPT_LOCATION}/functions/install.sh"
 }
 
 if [ "${#}" -ne 0 ]; then
@@ -76,36 +72,39 @@ fi
 for OPTION in "${@}"; do
   case "${OPTION}" in
     -[Ss] | --systemd )
-      SCHEDULER="sytemd"
+      local SCHEDULER="sytemd"
     ;;
     -[Cc] | --cronjob )
-      SCHEDULER="cronjob"
+      local SCHEDULER="cronjob"
     ;;
     -[Yy] | --[Yy][Es][SS] | --assume-yes )
-      ASSUME_YES="true"
+      local ASSUME_YES="true"
     ;;
     "" )
       : # Do nothing
     ;;
     * )
-      WRONG_OPTION+=("'${OPTION}'")
+      local WRONG_OPTION+=("'${OPTION}'")
     ;;
   esac
 done
 
 case "${OPERATION}" in
+  update )
+    #fetchSources
+    #buildHosts "${ASSUME_YES}"
+  ;;
   remove )
+    #revertHosts "${ASSUME_YES}"
     #remove "${ASSUME_YES}"
   ;;
   revert )
-    #revert "${ASSUME_YES}"
+    #revertHosts "${ASSUME_YES}"
   ;;
-  update )
-    #fetch
-    #build "${ASSUME_YES}"
-  ;;
-  setup )
-    #setup "${ASSUME_YES}" "${SCHEDULER}"
+  install )
+    #install "${ASSUME_YES}" "${SCHEDULER}"
+    #fetchSources
+    #buildHosts "${ASSUME_YES}"
   ;;
   -h | help | --help )
     showHelp
@@ -114,7 +113,7 @@ case "${OPERATION}" in
     showVersion
   ;;
   * )
-    WRONG_OPERATION="${OPERATION}"
+    local WRONG_OPERATION="${OPERATION}"
   ;;
 esac
 
