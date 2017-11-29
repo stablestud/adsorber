@@ -1,17 +1,35 @@
 #!/bin/bash
 
-HOSTS_PATH="/etc/hosts"
-SCRIPT_LOCATION="$(cd "$(dirname "${0}")" && pwd)"
+HOSTS_FILE="/etc/hosts"
+HOSTS_FILE_BACKUP="/etc/hosts.original"
+SCRIPT_PATH="$(cd "$(dirname "${0}")" && pwd)"
+TMP_DIR_PATH="/tmp/adsorber"
 
-local VERSION="0.1.0"
-local OPERATION="${1}"
+VERSION="0.1.0"
+
+OPERATION="${1}"
+
+checkRoot() {
+  if [ "${UID}" -ne 0 ]; then
+    echo "This script must be run as root." 1>&2
+    exit 1
+  fi
+  return 0
+}
+
+checkForWrongParameters() {
+  if [ "${WRONG_OPERATION}" != "" ] || [ "${#WRONG_OPTION[@]}" -ne 0 ]; then
+    showUsage
+  fi
+  return 0
+}
 
 showUsage() {
   if [ "${WRONG_OPERATION}" != "" ]; then
-    echo "adsorber: Invalid operation: '${WRONG_OPERATION}'"
+    echo "adsorber: Invalid operation: '${WRONG_OPERATION}'" 1>&2
   fi
   if [ "${WRONG_OPTION}" != "" ]; then
-    echo "adsorber: Invalid option: ${WRONG_OPTION[@]}"
+    echo "adsorber: Invalid option: ${WRONG_OPTION[@]}" 1>&2
   fi
   echo "Usage: ${0} [setup|update|revert|remove] {options}" 1>&2
   echo "Try '${0} --help' for more information." 1>&2
@@ -38,9 +56,10 @@ showHelp() {
   echo "  help    - show this help"
   echo ""
   echo "Options: (not required)"
-  echo "  -s, --systemd  set systemd ..."
-  echo "  -c, --cronjob  set cronjob as scheduler (use with 'setup')"
-  echo "  -y, --yes      answer all prompts with 'yes'"
+  echo "  -s, --systemd - set systemd ..."
+  echo "  -c, --cronjob - set cronjob as scheduler (use with 'install')"
+  echo "  -ns, --no-scheduler - set no scheduler (use with 'install')"
+  echo "  -y, --yes, --assume-yes - answer all prompts with 'yes'"
   exit 0
 }
 
@@ -57,66 +76,77 @@ showVersion() {
 }
 
 sourceFunctions() {
-  . "${SCRIPT_LOCATION}/functions/update.sh"
-  . "${SCRIPT_LOCATION}/functions/remove.sh"
-  . "${SCRIPT_LOCATION}/functions/revert.sh"
-     # Home of systemd and cronjob implementation
-  . "${SCRIPT_LOCATION}/functions/schedule.sh"
-  . "${SCRIPT_LOCATION}/functions/install.sh"
+  # Sourcing functions in a function? Will this break things?
+  . "${SCRIPT_PATH}/functions/install.sh"
+  . "${SCRIPT_PATH}/functions/update.sh"
+  . "${SCRIPT_PATH}/functions/revert.sh"
+  . "${SCRIPT_PATH}/functions/remove.sh"
 }
 
 if [ "${#}" -ne 0 ]; then
   shift
 fi
 
+sourceFunctions
+
 for OPTION in "${@}"; do
   case "${OPTION}" in
     -[Ss] | --systemd )
-      local SCHEDULER="sytemd"
-    ;;
+      SCHEDULER="sytemd"
+      ;;
     -[Cc] | --cronjob )
-      local SCHEDULER="cronjob"
-    ;;
-    -[Yy] | --[Yy][Es][SS] | --assume-yes )
-      local ASSUME_YES="true"
-    ;;
+      SCHEDULER="cronjob"
+      ;;
+    -[Nn][Ss] | --no-scheduler )
+      SCHEDULER="no-scheduler"
+      ;;
+    -[Yy] | --[Yy][Es][Ss] | --assume-yes )
+      ASSUME_YES="true"
+      ;;
     "" )
       : # Do nothing
-    ;;
+      ;;
     * )
-      local WRONG_OPTION+=("'${OPTION}'")
-    ;;
+      WRONG_OPTION+=("'${OPTION}'")
+      ;;
   esac
 done
 
 case "${OPERATION}" in
   update )
+    #checkForWrongParameters
+    #root
     #fetchSources
     #buildHosts "${ASSUME_YES}"
-  ;;
+    ;;
   remove )
-    #revertHosts "${ASSUME_YES}"
+    #checkForWrongParameters
+    #checkRoot
+    #revertHostsFile "${ASSUME_YES}"
     #remove "${ASSUME_YES}"
-  ;;
+    ;;
   revert )
-    #revertHosts "${ASSUME_YES}"
-  ;;
+    #checkForWrongParameters
+    checkRoot
+    revertHostsFile
+    ;;
   install )
-    #install "${ASSUME_YES}" "${SCHEDULER}"
+    checkForWrongParameters
+    checkRoot
+    install
     #fetchSources
-    #buildHosts "${ASSUME_YES}"
-  ;;
+    #buildHostsFile "${ASSUME_YES}"
+    ;;
   -h | help | --help )
     showHelp
-  ;;
+    ;;
   -v | version | --version )
     showVersion
-  ;;
+    ;;
+  "" )
+    showUsage
+    ;;
   * )
-    local WRONG_OPERATION="${OPERATION}"
-  ;;
+    WRONG_OPERATION="${OPERATION}"
+    ;;
 esac
-
-if [ "${WRONG_OPERATION}" != "" ] || [ "${#WRONG_OPTION[@]}" -ne 0 ]; then
-  showUsage
-fi
