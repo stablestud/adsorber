@@ -2,10 +2,11 @@
 
 HOSTS_FILE_PATH="/etc/hosts"
 HOSTS_FILE_BACKUP_PATH="/etc/hosts.original"
-SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
 TMP_DIR_PATH="/tmp/adsorber"
+SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
 SOURCES_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
-#CRONTAB_FILE_PATH="/etc/cron.weekly/80adsorber"
+CRONTAB_DIR_PATH="/etc/cron.weekly"
+SYSTEMD_DIR_PATH="/etc/systemd/system"
 
 VERSION="0.1.0"
 
@@ -79,10 +80,10 @@ showVersion() {
 
 sourceFiles() {
   # Sourcing functions in a function? Will this break things?
-  . "${SCRIPT_DIR_PATH}/functions/install.sh"
-  . "${SCRIPT_DIR_PATH}/functions/update.sh"
-  . "${SCRIPT_DIR_PATH}/functions/revert.sh"
-  . "${SCRIPT_DIR_PATH}/functions/remove.sh"
+  . "${SCRIPT_DIR_PATH}/bin/install.sh"
+  . "${SCRIPT_DIR_PATH}/bin/update.sh"
+  . "${SCRIPT_DIR_PATH}/bin/revert.sh"
+  . "${SCRIPT_DIR_PATH}/bin/remove.sh"
 }
 
 if [ "${#}" -ne 0 ]; then
@@ -105,6 +106,9 @@ for OPTION in "${@}"; do
     -[Yy] | --[Yy][Es][Ss] | --assume-yes )
       REPLY_TO_PROMPT="yes"
       ;;
+    -[Nn] | --[Nn][Oo] | --assume-no )
+      REPLY_TO_PROMPT="no"
+      ;;
     "" )
       : # Do nothing
       ;;
@@ -117,25 +121,25 @@ done
 case "${OPERATION}" in
   update )
     checkForWrongParameters
-    root
-    #update
+    checkRoot
+    update
     ;;
   remove )
     checkForWrongParameters
     checkRoot
-    #remove
-    #revert
+    remove
+    revert
     ;;
   revert )
     checkForWrongParameters
     checkRoot
-    #revert
+    revert
     ;;
   install )
     checkForWrongParameters
     checkRoot
-    #install
-    #update
+    install
+    update
     ;;
   -h | help | --help )
     showHelp
@@ -151,3 +155,6 @@ case "${OPERATION}" in
     showUsage
     ;;
 esac
+
+echo "Finished."
+exit 0
