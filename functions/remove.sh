@@ -9,7 +9,7 @@ removeCronjob(){
 }
 
 remove() {
-  #removeSystemd
-  #removeCronjob
+  removeSystemd
+  removeCronjob
   return 0
 }

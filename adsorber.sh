@@ -1,9 +1,11 @@
 #!/bin/bash
 
-HOSTS_FILE="/etc/hosts"
-HOSTS_FILE_BACKUP="/etc/hosts.original"
-SCRIPT_PATH="$(cd "$(dirname "${0}")" && pwd)"
+HOSTS_FILE_PATH="/etc/hosts"
+HOSTS_FILE_BACKUP_PATH="/etc/hosts.original"
+SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
 TMP_DIR_PATH="/tmp/adsorber"
+SOURCES_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
+#CRONTAB_FILE_PATH="/etc/cron.weekly/80adsorber"
 
 VERSION="0.1.0"
 
@@ -56,41 +58,41 @@ showHelp() {
   echo "  help    - show this help"
   echo ""
   echo "Options: (not required)"
-  echo "  -s, --systemd - set systemd ..."
-  echo "  -c, --cronjob - set cronjob as scheduler (use with 'install')"
+  echo "  -s, --systemd - use systemd ..."
+  echo "  -c, --cron    - use cron as scheduler (use with 'install')"
   echo "  -ns, --no-scheduler - set no scheduler (use with 'install')"
   echo "  -y, --yes, --assume-yes - answer all prompts with 'yes'"
   exit 0
 }
 
 showVersion() {
-  echo "A(d)sorber ${VERSION}"
-  echo ""
-  echo "Copyright (c) 2017 stablestud"
-  echo "License MIT"
-  echo "This is free software: you are free to change and redistribute it."
-  echo "There is NO WARRANTY, to the extent permitted by law."
-  echo ""
-  echo "Written by stablestud - and hopefully in the future with many others. ;)"
+  echo "A(d)sorber ${VERSION}
+
+  Copyright (c) 2017 stablestud
+  License MIT
+  This is free software: you are free to change and redistribute it.
+  There is NO WARRANTY, to the extent permitted by law.
+
+  Written by stablestud - and hopefully in the future with many others. ;)"
   exit 0
 }
 
-sourceFunctions() {
+sourceFiles() {
   # Sourcing functions in a function? Will this break things?
-  . "${SCRIPT_PATH}/functions/install.sh"
-  . "${SCRIPT_PATH}/functions/update.sh"
-  . "${SCRIPT_PATH}/functions/revert.sh"
-  . "${SCRIPT_PATH}/functions/remove.sh"
+  . "${SCRIPT_DIR_PATH}/functions/install.sh"
+  . "${SCRIPT_DIR_PATH}/functions/update.sh"
+  . "${SCRIPT_DIR_PATH}/functions/revert.sh"
+  . "${SCRIPT_DIR_PATH}/functions/remove.sh"
 }
 
 if [ "${#}" -ne 0 ]; then
   shift
 fi
 
-sourceFunctions
+sourceFiles
 
 for OPTION in "${@}"; do
-  case "${OPTION}" in
+  case "${OPTION}" in # FORCE option?
     -[Ss] | --systemd )
       SCHEDULER="sytemd"
       ;;
@@ -101,7 +103,7 @@ for OPTION in "${@}"; do
       SCHEDULER="no-scheduler"
       ;;
     -[Yy] | --[Yy][Es][Ss] | --assume-yes )
-      ASSUME_YES="true"
+      REPLY_TO_PROMPT="yes"
       ;;
     "" )
       : # Do nothing
@@ -114,28 +116,26 @@ done
 
 case "${OPERATION}" in
   update )
-    #checkForWrongParameters
-    #root
-    #fetchSources
-    #buildHosts "${ASSUME_YES}"
+    checkForWrongParameters
+    root
+    #update
     ;;
   remove )
-    #checkForWrongParameters
-    #checkRoot
-    #revertHostsFile "${ASSUME_YES}"
-    #remove "${ASSUME_YES}"
+    checkForWrongParameters
+    checkRoot
+    #remove
+    #revert
     ;;
   revert )
-    #checkForWrongParameters
+    checkForWrongParameters
     checkRoot
-    revertHostsFile
+    #revert
     ;;
   install )
     checkForWrongParameters
     checkRoot
-    install
-    #fetchSources
-    #buildHostsFile "${ASSUME_YES}"
+    #install
+    #update
     ;;
   -h | help | --help )
     showHelp
@@ -148,5 +148,6 @@ case "${OPERATION}" in
     ;;
   * )
     WRONG_OPERATION="${OPERATION}"
+    showUsage
     ;;
 esac

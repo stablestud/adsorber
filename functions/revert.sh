@@ -5,3 +5,7 @@ revertHostsFile() {
   mv "${HOSTS_FILE_BACKUP}" "${HOSTS_FILE}"
   return 0
 }
+
+revert() {
+  revertHostsFile
+}
