@@ -63,6 +63,7 @@ showHelp() {
   echo "  -c, --cron    - use cron as scheduler (use with 'install')"
   echo "  -ns, --no-scheduler - set no scheduler (use with 'install')"
   echo "  -y, --yes, --assume-yes - answer all prompts with 'yes'"
+  echo "  -n, --no , --assume-no  - answer all prompts with 'no'"
   exit 0
 }
 
