@@ -23,39 +23,24 @@ readSourceFile() {
     exit 1
   else
     SOURCE_CONTENT="$(sed -n '/^http.*/p' "${SOURCES_FILE_PATH}")"
+    SOURCE_CONTENT="$(sed 's/\s\+#.*//g' <<< "${SOURCE_CONTENT}")"
   fi
   return 0
 }
 
 fetchSources() {
   while read -r SOURCE; do
-    #if type -df curl 2>/dev/null 1>&2 {
-    #  OUTPUT=$(curl "${SOURCE}" --connect-timeout 30 --fail --retry 1)
-    #}
-    #if type -df wget 2>/dev/null 1>&2 {
-    #  OUTPUT=$(wget "${SOURCE}" -nv --show-progress --timeout=30 -t 1 -L -O -)
-    #}
-    echo "${OUTPUT}" \
-    # ------------------------------------------------------------------------ #
-    # The following code snippet has been copied from:
-    # [sedrubal/adaway-linux] (https://github.com/sedrubal/adaway-linux)
-      | sed 's/\r/\n/' \
-      | sed 's/^\s\+//' \
-      | sed 's/^127\.0\.0\.1/0.0.0.0/' \
-      | grep '^0\.0\.0\.0' \
-      | grep -v '\slocalhost\s*' \
-      | sed 's/\s*\#.*//g' \
-      | sed 's/\s\+/\t/g' \
-      # Download and cleanup:
-      # - replace \r\n to unix \n
-      # - remove leading whitespaces
-      # - replace 127.0.0.1 with 0.0.0.0 (shorter, unspecified)
-      # - use only host entries redirecting to 0.0.0.0 (no empty line, no comment lines, no dangerous redirects to other sites
-      # - remove additional localhost entries possibly picked up from sources
-      # - remove remaining comments
-      # - split all entries with one tab
-    # ------------------------------------------------------------------------ #
-      >> "${TMP_DIR_PATH}/hosts"
+     | sed 's/\r/\n/g' \
+     | sed 's/^\s*127\.0\.[01]\.1/0\.0\.0\.0/g' \
+     | sed -n '/^\s*0\.0\.0\.0\s\+.\+/p' \
+     | sed 's/\s\+#.*//g' \
+     | sed -n '/\s*localhost\|loopback\|localnet.*/!p' \ # SOMETHING IS BROKEN HERE
+     >> "${TMP_DIR_PATH}/hosts.fetched"
+     # replace OSX \r and MS-DOS \r\n with Unix \n (linebreak)
+     # replace 127.0.0.1 and 127.0.1.1 with 0.0.0.0
+     # only keep lines starting with 0.0.0.0
+     # remove # inline comments
+     # remove redirections to localhost/loopback/localnet
   done <<< "${SOURCES_CONTENT}"
   return 0
 }
