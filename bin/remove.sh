@@ -3,12 +3,10 @@
 # The following variables are defined in adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:---   ---default value:---
-# CRONTAB_DIR_PATH  "/etc/cron.weekly"
-# HOSTS_FILE        "/etc/hosts"
-# HOSTS_FILE_BACKUP "/etc/hosts.original"
+# CRONTAB_DIR_PATH  /etc/cron.weekly
 # REPLY_TO_PROMPT   Null (not set)
 # SCRIPT_DIR_PATH   The scripts root directory (e.g., /home/user/Downloads/adsorber)
-# SYSTEMD_DIR_PATH  "/etc/systemd/system"
+# SYSTEMD_DIR_PATH  /etc/systemd/system
 
 removeSystemd() {
   if [ -e "${SYSTEMD_DIR_PATH}/adsorber.service" ]; then

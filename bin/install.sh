@@ -2,14 +2,14 @@
 
 # The following variables are defined in adsorber.sh
 # If you run this file independently following variables need to be set:
-# ---variable:---   ---default value:---
-# CRONTAB_DIR_PATH  "/etc/cron.weekly"
-# HOSTS_FILE        "/etc/hosts"
-# HOSTS_FILE_BACKUP "/etc/hosts.original"
-# REPLY_TO_PROMPT   Null (not set)
-# SCHEDULER         Null (not set)
-# SCRIPT_DIR_PATH   The scripts root directory (e.g., /home/user/Downloads/adsorber)
-# SYSTEMD_DIR_PATH  "/etc/systemd/system"
+# ---variable:----------  ---default value:---
+# CRONTAB_DIR_PATH        /etc/cron.weekly
+# HOSTS_FILE_PATH         /etc/hosts
+# HOSTS_FILE_BACKUP_PATH  /etc/hosts.original
+# REPLY_TO_PROMPT         Null (not set)
+# SCHEDULER               Null (not set)
+# SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
+# SYSTEMD_DIR_PATH        /etc/systemd/system
 
 copySourceList() {
   cp "${SCRIPT_DIR_PATH}/bin/default/sources.list" "${SCRIPT_DIR_PATH}/sources.list"
@@ -17,7 +17,7 @@ copySourceList() {
 }
 
 backupHostsFile() {
-  cp "${HOSTS_FILE}" "${HOSTS_FILE_BACKUP}"
+  cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}"
   # Add checker if file exist afterwards and before
   return 0
 }
@@ -25,14 +25,14 @@ backupHostsFile() {
 installCronjob() {
   echo "Installing cronjob..."
   cp "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" "${CRONTAB_DIR_PATH}"
-  sed -i "s|@.*|${SCRIPT_DIR_PATH}\/adsorber.sh update|g" "${CRONTAB_DIR_PATH}/80adsorber"
+  sed -i "s|@.*|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${CRONTAB_DIR_PATH}/80adsorber"
   return 0
 }
 
 installSystemd() {
   echo "Installing systemd service..."
   cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.service"
-  sed -i "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber.sh update|g" "${SYSTEMD_DIR_PATH}/adsorber.service"
+  sed -i "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SYSTEMD_DIR_PATH}/adsorber.service"
   cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.timer"
   systemctl daemon-reload
   systemctl enable adsorber.timer

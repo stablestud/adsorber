@@ -2,13 +2,13 @@
 
 # The following variables are defined in adsorber.sh
 # If you run this file independently following variables need to be set:
-# ---variable:---   ---default value:---
-# HOSTS_FILE        "/etc/hosts"
-# HOSTS_FILE_BACKUP "/etc/hosts.original"
+# ---variable:----------  ---default value:---
+# HOSTS_FILE_PATH         "/etc/hosts"
+# HOSTS_FILE_BACKUP_PATH  "/etc/hosts.original"
 
 
 revertHostsFile() {
-  mv "${HOSTS_FILE_BACKUP}" "${HOSTS_FILE}"
+  mv "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}"
   echo "Hosts file restored."
   return 0
 }
