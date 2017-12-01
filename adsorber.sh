@@ -34,7 +34,7 @@ showUsage() {
   if [ "${WRONG_OPTION}" != "" ]; then
     echo "adsorber: Invalid option: ${WRONG_OPTION[@]}" 1>&2
   fi
-  echo "Usage: ${0} [setup|update|revert|remove] {options}" 1>&2
+  echo "Usage: ${0} [install|update|revert|remove] {options}" 1>&2
   echo "Try '${0} --help' for more information." 1>&2
   exit 1
 }
@@ -59,11 +59,14 @@ showHelp() {
   echo "  help    - show this help"
   echo ""
   echo "Options: (not required)"
-  echo "  -s, --systemd - use systemd ..."
-  echo "  -c, --cron    - use cron as scheduler (use with 'install')"
-  echo "  -ns, --no-scheduler - set no scheduler (use with 'install')"
-  echo "  -y, --yes, --assume-yes - answer all prompts with 'yes'"
-  echo "  -n, --no , --assume-no  - answer all prompts with 'no'"
+  echo "  -s,  --systemd           - use systemd ..."
+  echo "  -c,  --cron              - use cron as scheduler (use with 'install')"
+  echo "  -ns, --no-scheduler      - set no scheduler (use with 'install')"
+  echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
+  echo "  -f,  --force             - force the installation"
+  echo ""
+  echo "Documentation: https://github.com/stablestud/adsorber"
+  echo "If you encounter any issues please report them to the Github repository."
   exit 0
 }
 
@@ -96,19 +99,19 @@ sourceFiles
 for OPTION in "${@}"; do
   case "${OPTION}" in # FORCE option?
     -[Ss] | --systemd )
-      SCHEDULER="sytemd"
+      SCHEDULER="systemd"
       ;;
-    -[Cc] | --cronjob )
+    -[Cc] | --cron )
       SCHEDULER="cronjob"
       ;;
     -[Nn][Ss] | --no-scheduler )
       SCHEDULER="no-scheduler"
       ;;
-    -[Yy] | --[Yy][Es][Ss] | --assume-yes )
+    -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
       REPLY_TO_PROMPT="yes"
       ;;
-    -[Nn] | --[Nn][Oo] | --assume-no )
-      REPLY_TO_PROMPT="no"
+    -[Ff] | --force )
+      FORCE_PROMPT="yes"
       ;;
     "" )
       : # Do nothing
@@ -130,6 +133,7 @@ case "${OPERATION}" in
     checkRoot
     remove
     revert
+    removeOriginalHostsFile # Can be found in /bin/remove.sh
     ;;
   revert )
     checkForWrongParameters
@@ -142,10 +146,10 @@ case "${OPERATION}" in
     install
     update
     ;;
-  -h | help | --help )
+  -[Hh] | help | --help )
     showHelp
     ;;
-  -v | version | --version )
+  -[Vv] | version | --version )
     showVersion
     ;;
   "" )

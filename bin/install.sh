@@ -4,6 +4,7 @@
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
 # CRONTAB_DIR_PATH        /etc/cron.weekly
+# FORCE_PROMPT            Null (not set)
 # HOSTS_FILE_PATH         /etc/hosts
 # HOSTS_FILE_BACKUP_PATH  /etc/hosts.original
 # REPLY_TO_PROMPT         Null (not set)
@@ -17,8 +18,22 @@ copySourceList() {
 }
 
 backupHostsFile() {
-  cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}"
-  # Add checker if file exist afterwards and before
+  echo "Backing up hosts file."
+  if [ ! -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
+    cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}"
+  else
+    if [ -z "${FORCE_PROMPT}" ]; then
+      read -p "Backup of ${HOSTS_FILE_PATH} already exist. Continue? [Y/n] " FORCE_PROMPT
+    fi
+    case "${FORCE_PROMPT}" in
+      [Yy] | [Yy][Ee][Ss] )
+        :
+        ;;
+      * )
+        exit 1
+        ;;
+    esac
+  fi
   return 0
 }
 
@@ -34,15 +49,15 @@ installSystemd() {
   cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.service"
   sed -i "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SYSTEMD_DIR_PATH}/adsorber.service"
   cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.timer"
-  systemctl daemon-reload
-  systemctl enable adsorber.timer
-  systemctl start adsorber.timer
+  systemctl daemon-reload \
+  && systemctl enable adsorber.timer \
+  && systemctl start adsorber.timer
   return 0
 }
 
 promptInstall() {
   if [ -z "${REPLY_TO_PROMPT}" ]; then
-    read -p "Do you really want to install adsorber? [Y/n]" REPLY_TO_PROMPT
+    read -p "Do you really want to install adsorber? [Y/n] " REPLY_TO_PROMPT
   fi
   case "${REPLY_TO_PROMPT}" in
     [Yy] | [Yy][Ee][Ss] )
@@ -58,13 +73,13 @@ promptInstall() {
 
 promptScheduler() {
   if [ -z "${SCHEDULER}" ]; then
-    read -p "What scheduler should be used to update hosts file automatically? [systemd/cron/N]" SCHEDULER
+    read -p "What scheduler should be used to update hosts file automatically? [systemd/cron/None] " SCHEDULER
   fi
   case "${SCHEDULER}" in
-    [Ss]ystemd )
+    [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
       installSystemd
       ;;
-    [Cc]ron | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab )
+    [Cc] | [Cc]ron | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab )
       installCronjob
       ;;
     * )
@@ -75,9 +90,9 @@ promptScheduler() {
 }
 
 install() {
-  copySourceList
   promptInstall
   backupHostsFile
+  copySourceList
   promptScheduler
   return 0
 }

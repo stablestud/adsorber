@@ -8,8 +8,13 @@
 
 
 revertHostsFile() {
-  mv "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}"
-  echo "Hosts file restored."
+  if [ -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
+    cp "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}"
+    echo "Hosts file restored."
+  else
+    echo "Can not restore hosts file. Original hosts file does not exist."
+    exit 1
+  fi
   return 0
 }
 
