@@ -34,8 +34,7 @@ Options: (not required)
 
 ## Todo
 
-* Add --assume-yes functionality
-* Finish script
+* Add simulate option
 * Add comments
 * Add config file
 * Add proper exit codes as in [Reserved Exit Codes](http://tldp.org/LDP/abs/html/exitcodes.html#EXITCODESREF)
