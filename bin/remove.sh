@@ -63,10 +63,17 @@ removeHostsFile() {
   return 0
 }
 
+removeCleanUp() {
+  echo "Removing leftovers..."
+  rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
+  return 0
+}
+
 remove() {
   promptRemove
   removeSystemd
   removeCronjob
   removeHostsFile
+  removeCleanUp
   return 0
 }
