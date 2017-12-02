@@ -4,6 +4,12 @@ Technically speaking, it adds ad domains to the hosts file with a redirection to
 
 Also it saves data, speeds up loading time and prevents some tracking of your browsing habits. For extensive privacy, I recommend using the script along browser add-ons like  [NoScript](https://addons.mozilla.org/en-US/firefox/addon/noscript/) (for [Firefox 56 and less](https://noscript.net/getit)), [Privacy Badger](https://addons.mozilla.org/en-US/firefox/addon/privacy-badger17/) and [HTTPS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/https-everywhere/).
 
+Currently we are using the following hosts lists:
+* [adaway.org/hosts.txt](https://adaway.org/hosts.txt)
+* [pgl.yoyo.org/adservers/serverlist.php](https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext)
+* & more to come.
+
+To add your own hosts lists, just add them to the `sources.list` file.
 ## Usage
 
 `./adsorber.sh --help`:
