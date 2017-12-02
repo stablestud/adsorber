@@ -14,7 +14,7 @@ A(d)sorber blocks ads by 'absorbing' and dumbing them into void.
            (with the help of the hosts file)
 
 Operations:
-  install - setup necessary things needed for adsorber 
+  install - setup necessary things needed for adsorber
               e.g., create backup file of hosts file,
                     create a list with host sources to fetch from
   update  - update hosts file with newest ad servers
@@ -82,7 +82,7 @@ Possible options are:
 #### `-s, --systemd`
 Used with `install`.    
 It installs the systemd.timer scheduler, skipping the scheduler prompt.
-Files are placed into `/etc/systemd/system` by default. 
+Files are placed into `/etc/systemd/system` by default.
 #### `-c, --cronjob`
 Used with `install`.    
 It installs the cron scheduler, skipping the scheduler prompt.
@@ -101,11 +101,13 @@ This will force the script to continue (dangerous) the installtion/update e.g.,
 * Continue if no backup has been created, overwriting the existing one.
 
 ## Settings:
+To add or remove sources edit the `soures.list` file which is created after the installation of Adsorber.    
 You can edit e.g., the path of the crontab installation etc, in `adsorber.sh`    
 To change the content of <strong>placed</strong> files go to:
 * `bin/systemd` to edit the systemd files which are installed then as a service. <br/>You may want to run `àdsorber.sh install --systemd` afterwards.
 * `bin/cron` to edit the crontab. Run `adsorber.sh install --cron` afterwards to apply the changes.
-* `bin/components` to edit the header and the 'title' of the hosts file modified by Adsorber. 
+* `bin/components` to edit the header and the 'title' of the hosts file modified by Adsorber.
+
 ## Todo for future releases
 
 * Add simulate option
