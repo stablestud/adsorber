@@ -14,12 +14,12 @@ A(d)sorber blocks ads by 'absorbing' and dumbing them into void.
            (with the help of the hosts file)
 
 Operations:
-  setup   - setup necessary things needed for adsorber
+  install - setup necessary things needed for adsorber 
               e.g., create backup file of hosts file,
                     create a list with host sources to fetch from
   update  - update hosts file with newest ad servers
   revert  - revert hosts file to its original state
-            (it does not remove the schedule, this should be used temporary)
+            (it does not remove the schedule, so this should be used temporary)
   remove  - completely remove changes made by adsorber
               e.g., remove scheduler (if set)
                     revert hosts file (if not already done)
@@ -27,12 +27,86 @@ Operations:
   help    - show this help
 
 Options: (not required)
-  -s, --systemd  set systemd ...
-  -c, --cronjob  set cronjob as scheduler (use with 'setup')
-  echo "  -y, --yes      answer all prompts with 'yes'
-```
+  -s,  --systemd           - use systemd ...
+  -c,  --cron              - use cron as scheduler (use with 'install')
+  -ns, --no-scheduler      - set no scheduler (use with 'install')
+  -y,  --yes, --assume-yes - answer all prompts with 'yes'
+  -f,  --force             - force the installation/update (dangerous)
 
-## Todo
+Documentation: https://github.com/stablestud/adsorber
+If you encounter any issues please report them to the Github repository.
+
+```
+### Operations: (required)
+#### `adsorber.sh install {options}`:
+You should run this command first.
+The command will:
+* backup your `/etc/hosts` file to `/etc/hosts.original` (if not other specified in `adsorber.sh`)
+* install a scheduler which updates your hosts file with ad-server domains once a week. (either systemd, cronjob or none)
+* install the newest ad-server domains in your hosts file.
+
+Possible options are:
+* `-s,  --systemd`
+* `-c,  --cronjob`
+* `-ns, --no-scheduler`
+* `-y,  --yes, --assume-yes`
+* `-f,  --force`
+#### `adsorber.sh update {options}`:
+To keep the hosts file up-to-date.
+The command will:
+* install the newest ad-server domains in your hosts file.
+
+Possible option:
+* `-f, --force`
+#### `adsorber.sh revert`:
+To restore the hosts file temporary.
+The command will:
+* copy `/etc/hosts.original` to `/etc/hosts`, overwriting the modified `/etc/hosts` by adsorber.
+
+Important: If you have a scheduler installed, it'll reapply ad-server domains to your hosts file after a while.    
+For this reason this command is used to temporary disable Adsorber (if it's blocking some sites you need access for a short period of time).    
+To reapply run `asdorber.sh update`
+#### `adsorber remove {options}`:
+To completely remove changes made by Adsorber.
+The command will:
+* remove all schedulers (systemd, cronjob)
+* restore the hosts file to it's original state
+* remove all leftovers
+
+Possible options are:
+* `-y, --yes, --assume-yes`
+* `-f, --force`
+
+### Options:
+
+#### `-s, --systemd`
+Used with `install`.    
+It installs the systemd.timer scheduler, skipping the scheduler prompt.
+Files are placed into `/etc/systemd/system` by default. 
+#### `-c, --cronjob`
+Used with `install`.    
+It installs the cron scheduler, skipping the scheduler prompt.
+File is placed into `/etc/cron.weekly/` by default.    
+#### `-ns, --no-scheduler`
+Used with `install`
+It will skip the installation of a scheduler. You'll need to update adsorber manually.    
+#### `-y, --yes, --assume-yes`
+Answers all prompts with `yes` e.g.,
+* `Do you really want to install Adsorber?`
+* `Do you really want to remove Adsorber?`
+
+It'll not answer prompts which may harm your system. But `--force` will do it.
+#### `-f, --force`
+This will force the script to continue (dangerous) the installtion/update e.g.,
+* Continue if no backup has been created, overwriting the existing one.
+
+## Settings:
+You can edit e.g., the path of the crontab installation etc, in `adsorber.sh`    
+To change the content of <strong>placed</strong> files go to:
+* `bin/systemd` to edit the systemd files which are installed then as a service. <br/>You may want to run `àdsorber.sh install --systemd` afterwards.
+* `bin/cron` to edit the crontab. Run `adsorber.sh install --cron` afterwards to apply the changes.
+* `bin/components` to edit the header and the 'title' of the hosts file modified by Adsorber. 
+## Todo for future releases
 
 * Add simulate option
 * Add comments
@@ -42,3 +116,7 @@ Options: (not required)
 * Port script to shell independent
 * Create .deb
 * Integrate into package managers
+## License
+[MIT License](https://github.com/stablestud/adsorber/blob/master/LICENSE)    
+This is free software: you are free to change and redistribute it.    
+There is NO WARRANTY, to the extent permitted by law.
