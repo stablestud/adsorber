@@ -15,7 +15,7 @@ OPERATION="${1}"
 checkRoot() {
   if [ "${UID}" -ne 0 ]; then
     echo "This script must be run as root." 1>&2
-    exit 1
+    exit 126
   fi
   return 0
 }
@@ -36,7 +36,7 @@ showUsage() {
   fi
   echo "Usage: ${0} [install|update|revert|remove] {options}" 1>&2
   echo "Try '${0} --help' for more information." 1>&2
-  exit 1
+  exit 127
 }
 
 showHelp() {
@@ -63,7 +63,7 @@ showHelp() {
   echo "  -c,  --cron              - use cron as scheduler (use with 'install')"
   echo "  -ns, --no-scheduler      - set no scheduler (use with 'install')"
   echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
-  echo "  -f,  --force             - force the installation"
+  echo "  -f,  --force             - force the installation (dangerous)"
   echo ""
   echo "Documentation: https://github.com/stablestud/adsorber"
   echo "If you encounter any issues please report them to the Github repository."
@@ -83,7 +83,6 @@ showVersion() {
 }
 
 sourceFiles() {
-  # Sourcing functions in a function? Will this break things?
   . "${SCRIPT_DIR_PATH}/bin/install.sh"
   . "${SCRIPT_DIR_PATH}/bin/update.sh"
   . "${SCRIPT_DIR_PATH}/bin/revert.sh"
@@ -97,21 +96,21 @@ fi
 sourceFiles
 
 for OPTION in "${@}"; do
-  case "${OPTION}" in # FORCE option?
+  case "${OPTION}" in
     -[Ss] | --systemd )
-      SCHEDULER="systemd"
+      REPLY_TO_SCHEDULER_PROMPT="systemd"
       ;;
     -[Cc] | --cron )
-      SCHEDULER="cronjob"
+      REPLY_TO_SCHEDULER_PROMPT="cronjob"
       ;;
     -[Nn][Ss] | --no-scheduler )
-      SCHEDULER="no-scheduler"
+      REPLY_TO_SCHEDULER_PROMPT="no-scheduler"
       ;;
     -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
       REPLY_TO_PROMPT="yes"
       ;;
     -[Ff] | --force )
-      FORCE_PROMPT="yes"
+      REPLY_TO_FORCE_PROMPT="yes"
       ;;
     "" )
       : # Do nothing
@@ -132,8 +131,6 @@ case "${OPERATION}" in
     checkForWrongParameters
     checkRoot
     remove
-    revert
-    removeOriginalHostsFile # Can be found in /bin/remove.sh
     ;;
   revert )
     checkForWrongParameters

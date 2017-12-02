@@ -3,33 +3,29 @@
 # The following variables are defined in adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
-# CRONTAB_DIR_PATH        /etc/cron.weekly
-# FORCE_PROMPT            Null (not set)
-# HOSTS_FILE_PATH         /etc/hosts
-# HOSTS_FILE_BACKUP_PATH  /etc/hosts.original
-# REPLY_TO_PROMPT         Null (not set)
-# SCHEDULER               Null (not set)
-# SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
-# SYSTEMD_DIR_PATH        /etc/systemd/system
-
-copySourceList() {
-  cp "${SCRIPT_DIR_PATH}/bin/default/sources.list" "${SCRIPT_DIR_PATH}/sources.list"
-  return 0
-}
+# CRONTAB_DIR_PATH          /etc/cron.weekly
+# HOSTS_FILE_PATH           /etc/hosts
+# HOSTS_FILE_BACKUP_PATH    /etc/hosts.original
+# REPLY_TO_FORCE_PROMPT     Null (not set)
+# REPLY_TO_PROMPT           Null (not set)
+# REPLY_TO_SCHEDULER_PROMPT Null (not set)
+# SCRIPT_DIR_PATH           The scripts root directory (e.g., /home/user/Downloads/adsorber)
+# SYSTEMD_DIR_PATH          /etc/systemd/system
 
 backupHostsFile() {
-  echo "Backing up hosts file."
   if [ ! -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
-    cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}"
+    cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
+    || echo "Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
   else
-    if [ -z "${FORCE_PROMPT}" ]; then
-      read -p "Backup of ${HOSTS_FILE_PATH} already exist. Continue? [Y/n] " FORCE_PROMPT
+    if [ -z "${REPLY_TO_FORCE_PROMPT}" ]; then
+      read -p "Backup of ${HOSTS_FILE_PATH} already exist. Continue? [YES/n] " REPLY_TO_FORCE_PROMPT
     fi
-    case "${FORCE_PROMPT}" in
-      [Yy] | [Yy][Ee][Ss] )
+    case "${REPLY_TO_FORCE_PROMPT}" in
+      [Yy][Ee][Ss] )
         :
         ;;
       * )
+        echo "Aborted."
         exit 1
         ;;
     esac
@@ -51,7 +47,7 @@ installSystemd() {
   cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.timer"
   systemctl daemon-reload \
   && systemctl enable adsorber.timer \
-  && systemctl start adsorber.timer
+  && systemctl start adsorber.timer || echo "Couldn't install systemd service."
   return 0
 }
 
@@ -72,10 +68,10 @@ promptInstall() {
 }
 
 promptScheduler() {
-  if [ -z "${SCHEDULER}" ]; then
-    read -p "What scheduler should be used to update hosts file automatically? [systemd/cron/None] " SCHEDULER
+  if [ -z "${REPLY_TO_SCHEDULER_PROMPT}" ]; then
+    read -p "What scheduler should be used to update hosts file automatically? [systemd/cron/None] " REPLY_TO_SCHEDULER_PROMPT
   fi
-  case "${SCHEDULER}" in
+  case "${REPLY_TO_SCHEDULER_PROMPT}" in
     [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
       installSystemd
       ;;
@@ -92,7 +88,6 @@ promptScheduler() {
 install() {
   promptInstall
   backupHostsFile
-  copySourceList
   promptScheduler
   return 0
 }
