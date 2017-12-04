@@ -1,0 +1,6 @@
+# Whitelist
+# Use to allow domains, even if they are blocked from hosts sources.
+#
+# However the blacklist overwrites the whitelist.
+
+stablestud.org

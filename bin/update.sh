@@ -49,14 +49,6 @@ createTmpDir() {
   return 0
 }
 
-copySourceList() {
-  if [ ! -e "${SCRIPT_DIR_PATH}/sources.list" ]; then
-    cp "${SCRIPT_DIR_PATH}/bin/default/default-sources.list" "${SCRIPT_DIR_PATH}/sources.list" \
-    && echo "To add new host sources, please edit sources.list"
-  fi
-  return 0
-}
-
 readSourceFile() {
   if [ ! -s "${SOURCES_FILE_PATH}" ]; then
     echo "Run '${0} install' first." 1>&2
@@ -139,7 +131,6 @@ applyHostsFile() {
 }
 
 update() {
-  copySourceList
   checkBackupExist
   createTmpDir
   readSourceFile

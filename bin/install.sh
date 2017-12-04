@@ -12,6 +12,14 @@
 # SCRIPT_DIR_PATH           The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SYSTEMD_DIR_PATH          /etc/systemd/system
 
+copySourceList() {
+  if [ ! -e "${SCRIPT_DIR_PATH}/sources.list" ]; then
+    cp "${SCRIPT_DIR_PATH}/bin/default/default-sources.list" "${SCRIPT_DIR_PATH}/sources.list" \
+    && echo "To add new host sources, please edit sources.list"
+  fi
+  return 0
+}
+
 backupHostsFile() {
   if [ ! -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
     cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
@@ -86,6 +94,7 @@ promptScheduler() {
 }
 
 install() {
+  copySourceList
   promptInstall
   backupHostsFile
   promptScheduler

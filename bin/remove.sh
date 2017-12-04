@@ -19,7 +19,6 @@ removeSystemd() {
          return 1
        }
     systemctl daemon-reload
-    echo "Removed adsorber's systemd service."
   else
     echo "Systemd service not installed. Skipping..."
   fi
