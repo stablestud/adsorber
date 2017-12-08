@@ -131,6 +131,9 @@ sourceFiles() {
   . "${SCRIPT_DIR_PATH}/bin/update.sh"
   . "${SCRIPT_DIR_PATH}/bin/revert.sh"
   . "${SCRIPT_DIR_PATH}/bin/build.sh"
+  . "${SCRIPT_DIR_PATH}/bin/filter.sh"
+  . "${SCRIPT_DIR_PATH}/bin/pre.sh"
+  return 0
 }
 
 sourceFiles

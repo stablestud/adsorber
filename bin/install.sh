@@ -26,7 +26,7 @@ backupHostsFile() {
       || echo "Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
   else
     if [ -z "${REPLY_TO_FORCE_PROMPT}" ]; then
-      read -p "Backup of ${HOSTS_FILE_PATH} already exist. Continue? [YES/n] " REPLY_TO_FORCE_PROMPT
+      read -p "Backup of ${HOSTS_FILE_PATH} already exist. Continue? [YES/n]: " REPLY_TO_FORCE_PROMPT
     fi
     case "${REPLY_TO_FORCE_PROMPT}" in
       [Yy][Ee][Ss] )
@@ -61,7 +61,7 @@ installSystemd() {
 
 promptInstall() {
   if [ -z "${REPLY_TO_PROMPT}" ]; then
-    read -p "Do you really want to install adsorber? [Y/n] " REPLY_TO_PROMPT
+    read -p "Do you really want to install adsorber? [Y/n]: " REPLY_TO_PROMPT
   fi
   case "${REPLY_TO_PROMPT}" in
     [Yy] | [Yy][Ee][Ss] )
@@ -77,7 +77,7 @@ promptInstall() {
 
 promptScheduler() {
   if [ -z "${REPLY_TO_SCHEDULER_PROMPT}" ]; then
-    read -p "What scheduler should be used to update hosts file automatically? [systemd/cron/None] " REPLY_TO_SCHEDULER_PROMPT
+    read -p "What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
   fi
   case "${REPLY_TO_SCHEDULER_PROMPT}" in
     [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )

@@ -10,8 +10,8 @@
 
 removeSystemd() {
   if [ -e "${SYSTEMD_DIR_PATH}/adsorber.service" ]; then
-    systemctl stop adsorber.timer \
-      && systemctl disable adsorber.timer
+    systemctl stop adsorber.timer
+    systemctl disable adsorber.timer
     #systemctl stop adsorber.service 2>/dev/null 1>&2
     #systemctl disable adsorber.server 2/dev/null 1>&2 # Is not enabled by default
     rm "${SYSTEMD_DIR_PATH}/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.service" \
