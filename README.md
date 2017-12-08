@@ -12,7 +12,6 @@ Currently we are using the following hosts lists:
 To add your own hosts lists, just add them to the `sources.list` file.
 ## Usage
 
-`./adsorber.sh --help`:
 ```
 Usage: ./adsorber.sh [OPERATION] {options}
 
@@ -22,7 +21,7 @@ A(d)sorber blocks ads by 'absorbing' and dumbing them into void.
 Operations:
   install - setup necessary things needed for adsorber
               e.g., create backup file of hosts file,
-                    create a list with host sources to fetch from
+                    create scheduler which updates the host file once a week.
   update  - update hosts file with newest ad servers
   revert  - revert hosts file to its original state
             (it does not remove the schedule, so this should be used temporary)
@@ -41,7 +40,6 @@ Options: (not required)
 
 Documentation: https://github.com/stablestud/adsorber
 If you encounter any issues please report them to the Github repository.
-
 ```
 ### Operations: (required)
 #### `adsorber.sh install {options}`:

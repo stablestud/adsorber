@@ -11,13 +11,14 @@
 removeSystemd() {
   if [ -e "${SYSTEMD_DIR_PATH}/adsorber.service" ]; then
     systemctl stop adsorber.timer \
-    && systemctl disable adsorber.timer
+      && systemctl disable adsorber.timer
     #systemctl stop adsorber.service 2>/dev/null 1>&2
     #systemctl disable adsorber.server 2/dev/null 1>&2 # Is not enabled by default
     rm "${SYSTEMD_DIR_PATH}/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.service" \
-    || { echo "Couldn't remove systemd service files."
-         return 1
-       }
+      || {
+        echo "Couldn't remove systemd service files."
+        return 1
+    }
     systemctl daemon-reload
   else
     echo "Systemd service not installed. Skipping..."
@@ -28,7 +29,7 @@ removeSystemd() {
 removeCronjob(){
   if [ -e "${CRONTAB_DIR_PATH}/80adsorber" ]; then
     rm "${CRONTAB_DIR_PATH}/80adsorber" \
-    && echo "Removed adsorber's cronjob."
+      && echo "Removed adsorber's cronjob."
   else
     echo "Cronjob not installed. Skipping..."
   fi
@@ -54,10 +55,10 @@ promptRemove() {
 removeHostsFile() {
   if [ -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
     mv "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
-    && echo "Successfully restored ${HOSTS_FILE_PATH}"
+      && echo "Successfully restored ${HOSTS_FILE_PATH}"
   else
     echo "Can not restore hosts file. Original hosts file does not exist." 1>&2
-    echo "Maybe already removed?"
+    echo "Maybe already removed?" 1>&2
   fi
   return 0
 }
@@ -65,14 +66,5 @@ removeHostsFile() {
 removeCleanUp() {
   echo "Removing leftovers..."
   rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
-  return 0
-}
-
-remove() {
-  promptRemove
-  removeSystemd
-  removeCronjob
-  removeHostsFile
-  removeCleanUp
   return 0
 }

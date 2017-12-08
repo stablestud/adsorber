@@ -1,16 +1,20 @@
 #!/bin/bash
 
-HOSTS_FILE_PATH="/etc/hosts"
-HOSTS_FILE_BACKUP_PATH="/etc/hosts.original"
-TMP_DIR_PATH="/tmp/adsorber"
-SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
-SOURCES_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
-CRONTAB_DIR_PATH="/etc/cron.weekly"
-SYSTEMD_DIR_PATH="/etc/systemd/system"
+readonly HOSTS_FILE_PATH="/etc/hosts"
+readonly HOSTS_FILE_BACKUP_PATH="/etc/hosts.original"
+readonly TMP_DIR_PATH="/tmp/adsorber"
+readonly SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
+readonly SOURCE_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
+readonly CRONTAB_DIR_PATH="/etc/cron.weekly"
+readonly SYSTEMD_DIR_PATH="/etc/systemd/system"
 
-VERSION="0.1.0"
+readonly VERSION="0.1.0"
 
-OPERATION="${1}"
+readonly OPERATION="${1}"
+
+if [ "${#}" -ne 0 ]; then
+  shift
+fi
 
 checkRoot() {
   if [ "${UID}" -ne 0 ]; then
@@ -34,8 +38,8 @@ showUsage() {
   if [ "${WRONG_OPTION}" != "" ]; then
     echo "adsorber: Invalid option: ${WRONG_OPTION[@]}" 1>&2
   fi
-  echo "Usage: ${0} [install|update|revert|remove] {options}" 1>&2
-  echo "Try '${0} --help' for more information." 1>&2
+  echo "Usage: ${0} [install|remove|update|revert] {options}" 1>&2
+  echo "Try --help for more information." 1>&2
   exit 127
 }
 
@@ -82,49 +86,86 @@ showVersion() {
   exit 0
 }
 
-sourceFiles() {
-  . "${SCRIPT_DIR_PATH}/bin/install.sh"
-  . "${SCRIPT_DIR_PATH}/bin/update.sh"
-  . "${SCRIPT_DIR_PATH}/bin/revert.sh"
-  . "${SCRIPT_DIR_PATH}/bin/remove.sh"
+install() {
+  echo "Installing Adsorber..."
+  copySourceList
+  promptInstall
+  backupHostsFile
+  promptScheduler
+  return 0
 }
 
-if [ "${#}" -ne 0 ]; then
-  shift
-fi
+remove() {
+  echo "Removing Adsorber..."
+  promptRemove
+  removeSystemd
+  removeCronjob
+  removeHostsFile
+  removeCleanUp
+  return 0
+}
+
+update() {
+  echo "Updating ${HOSTS_FILE_PATH}..."
+  readSourceList
+  checkBackupExist
+  createTmpDir
+  fetchSources
+  filterDomains
+  sortDomains
+  buildHostsFile
+  applyHostsFile
+  updateCleanUp
+  return 0
+}
+
+revert() {
+  echo "Reverting ${HOSTS_FILE_PATH}..."
+  revertHostsFile
+  return 0
+}
+
+sourceFiles() {
+  . "${SCRIPT_DIR_PATH}/bin/install.sh"
+  . "${SCRIPT_DIR_PATH}/bin/remove.sh"
+  . "${SCRIPT_DIR_PATH}/bin/update.sh"
+  . "${SCRIPT_DIR_PATH}/bin/revert.sh"
+  . "${SCRIPT_DIR_PATH}/bin/build.sh"
+}
 
 sourceFiles
 
-for OPTION in "${@}"; do
-  case "${OPTION}" in
+for option in "${@}"; do
+  case "${option}" in
     -[Ss] | --systemd )
-      REPLY_TO_SCHEDULER_PROMPT="systemd"
+      readonly REPLY_TO_SCHEDULER_PROMPT="systemd"
       ;;
     -[Cc] | --cron )
-      REPLY_TO_SCHEDULER_PROMPT="cronjob"
+      readonly REPLY_TO_SCHEDULER_PROMPT="cronjob"
       ;;
     -[Nn][Ss] | --no-scheduler )
-      REPLY_TO_SCHEDULER_PROMPT="no-scheduler"
+      readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler"
       ;;
     -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
-      REPLY_TO_PROMPT="yes"
+      readonly REPLY_TO_PROMPT="yes"
       ;;
     -[Ff] | --force )
-      REPLY_TO_FORCE_PROMPT="yes"
+      readonly REPLY_TO_FORCE_PROMPT="yes"
       ;;
     "" )
       : # Do nothing
       ;;
     * )
-      WRONG_OPTION+=("'${OPTION}'")
+      readonly WRONG_OPTION+=("'${option}'")
       ;;
   esac
 done
 
 case "${OPERATION}" in
-  update )
+  install )
     checkForWrongParameters
     checkRoot
+    install
     update
     ;;
   remove )
@@ -132,16 +173,15 @@ case "${OPERATION}" in
     checkRoot
     remove
     ;;
+  update )
+    checkForWrongParameters
+    checkRoot
+    update
+    ;;
   revert )
     checkForWrongParameters
     checkRoot
     revert
-    ;;
-  install )
-    checkForWrongParameters
-    checkRoot
-    install
-    update
     ;;
   -[Hh] | help | --help )
     showHelp
@@ -153,7 +193,7 @@ case "${OPERATION}" in
     showUsage
     ;;
   * )
-    WRONG_OPERATION="${OPERATION}"
+    readonly WRONG_OPERATION="${OPERATION}"
     showUsage
     ;;
 esac

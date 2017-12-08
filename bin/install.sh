@@ -15,7 +15,7 @@
 copySourceList() {
   if [ ! -e "${SCRIPT_DIR_PATH}/sources.list" ]; then
     cp "${SCRIPT_DIR_PATH}/bin/default/default-sources.list" "${SCRIPT_DIR_PATH}/sources.list" \
-    && echo "To add new host sources, please edit sources.list"
+      && echo "To add new host sources, please edit sources.list"
   fi
   return 0
 }
@@ -23,7 +23,7 @@ copySourceList() {
 backupHostsFile() {
   if [ ! -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
     cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
-    || echo "Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
+      || echo "Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
   else
     if [ -z "${REPLY_TO_FORCE_PROMPT}" ]; then
       read -p "Backup of ${HOSTS_FILE_PATH} already exist. Continue? [YES/n] " REPLY_TO_FORCE_PROMPT
@@ -54,8 +54,8 @@ installSystemd() {
   sed -i "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SYSTEMD_DIR_PATH}/adsorber.service"
   cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.timer"
   systemctl daemon-reload \
-  && systemctl enable adsorber.timer \
-  && systemctl start adsorber.timer || echo "Couldn't install systemd service."
+    && systemctl enable adsorber.timer \
+    && systemctl start adsorber.timer || echo "Couldn't start systemd service."
   return 0
 }
 
@@ -90,13 +90,5 @@ promptScheduler() {
       echo "Skipping scheduler creation..."
       ;;
   esac
-  return 0
-}
-
-install() {
-  copySourceList
-  promptInstall
-  backupHostsFile
-  promptScheduler
   return 0
 }
