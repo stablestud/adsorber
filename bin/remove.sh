@@ -59,6 +59,7 @@ removeHostsFile() {
   else
     echo "Can not restore hosts file. Original hosts file does not exist." 1>&2
     echo "Maybe already removed?" 1>&2
+    return 1
   fi
   return 0
 }

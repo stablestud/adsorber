@@ -101,8 +101,9 @@ readWhiteList() {
   local domain
   if [ ! -e "${WHITELIST_FILE_PATH}" ]; then
     echo "Whitelist does not exist, ignoring..."
+    return 1
   else
-    :
+    cat "${WHITELIST_FILE_PATH}" >> "${TMP_DIR_PATH}/hosts.whitelist"
   fi
   return 0
 }
@@ -111,8 +112,9 @@ readBlackList() {
   local domain
   if [ ! -e "${BLACKLIST_FILE_PATH}" ]; then
     echo "Blacklist does not exist, ignoring..."
+    return 1
   else
-    :
+    cat "${BLACKLIST_FILE_PATH}" >> "${TMP_DIR_PATH}/hosts.blacklist"
   fi
   return 0
 }

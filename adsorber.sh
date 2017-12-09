@@ -111,14 +111,21 @@ remove() {
 
 update() {
   echo "Updating ${HOSTS_FILE_PATH}..."
-  readSourceList
   checkBackupExist
   createTmpDir
-  fetchSources
-  readWhiteList
-  readBlackList
-  filterDomains "hosts.fetched" "hosts.fetched-filtered"
-  sortDomains "hosts.fetched-filtered" "hosts.fetched-sorted"
+  if readSourceList; then
+    fetchSources
+    filterDomains "hosts.fetched" "hosts.fetched-filtered"
+    sortDomains "hosts.fetched-filtered" "hosts.fetched-sorted"
+  fi
+  if readWhiteList; then
+    filterDomains "hosts.whitelist" "hosts.whitelist-filtered"
+    sortDomains "hosts.whitelist-filtered" "hosts.whitelist-sorted"
+  fi
+  if readBlackList; then
+    filterDomains "hosts.blacklist" "hosts.blacklist-filtered"
+    sortDomains "hosts.blacklist-filtered" "hosts.blacklist-sorted"
+  fi
   buildHostsFile
   applyHostsFile
   updateCleanUp
