@@ -20,6 +20,22 @@ copySourceList() {
   return 0
 }
 
+copyWhiteList() {
+  if [ ! -e "${SCRIPT_DIR_PATH}/whitelist" ]; then
+    cp "${SCRIPT_DIR_PATH}/bin/default/default-whitelist" "${SCRIPT_DIR_PATH}/whitelist" \
+      && echo "To allow host sources, please edit the whitelist."
+  fi
+  return 0
+}
+
+copyBlackList() {
+  if [ ! -e "${SCRIPT_DIR_PATH}/blacklist" ]; then
+    cp "${SCRIPT_DIR_PATH}/bin/default/default-blacklist" "${SCRIPT_DIR_PATH}/blacklist" \
+      && echo "To block additional host sources, please edit the blacklist."
+  fi
+  return 0
+}
+
 backupHostsFile() {
   if [ ! -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
     cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \

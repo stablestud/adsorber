@@ -1,0 +1,6 @@
+# Whitelist
+# Use to allow domains, even if they are blocked from hosts sources.
+# However the blacklist overwrites the whitelist. ## CONFIG SHOULD EDIT THIS ##
+
+127.0.0.1 stablestud.org
+127.0.0.1 github.com

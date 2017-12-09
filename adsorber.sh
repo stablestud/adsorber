@@ -4,7 +4,9 @@ readonly HOSTS_FILE_PATH="/etc/hosts"
 readonly HOSTS_FILE_BACKUP_PATH="/etc/hosts.original"
 readonly TMP_DIR_PATH="/tmp/adsorber"
 readonly SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
-readonly SOURCE_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
+readonly SOURCELIST_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
+readonly WHITELIST_FILE_PATH="${SCRIPT_DIR_PATH}/whitelist"
+readonly BLACKLIST_FILE_PATH="${SCRIPT_DIR_PATH}/blacklist"
 readonly CRONTAB_DIR_PATH="/etc/cron.weekly"
 readonly SYSTEMD_DIR_PATH="/etc/systemd/system"
 
@@ -89,6 +91,8 @@ showVersion() {
 install() {
   echo "Installing Adsorber..."
   copySourceList
+  copyWhiteList
+  copyBlackList
   promptInstall
   backupHostsFile
   promptScheduler
@@ -111,8 +115,10 @@ update() {
   checkBackupExist
   createTmpDir
   fetchSources
-  filterDomains
-  sortDomains
+  readWhiteList
+  readBlackList
+  filterDomains "hosts.fetched" "hosts.fetched-filtered"
+  sortDomains "hosts.fetched-filtered" "hosts.fetched-sorted"
   buildHostsFile
   applyHostsFile
   updateCleanUp
@@ -130,9 +136,6 @@ sourceFiles() {
   . "${SCRIPT_DIR_PATH}/bin/remove.sh"
   . "${SCRIPT_DIR_PATH}/bin/update.sh"
   . "${SCRIPT_DIR_PATH}/bin/revert.sh"
-  . "${SCRIPT_DIR_PATH}/bin/build.sh"
-  . "${SCRIPT_DIR_PATH}/bin/filter.sh"
-  . "${SCRIPT_DIR_PATH}/bin/pre.sh"
   return 0
 }
 
