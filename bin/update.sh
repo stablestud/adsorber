@@ -50,8 +50,11 @@ createTmpDir() {
 
 readSourceList() {
   if [ ! -e "${SOURCELIST_FILE_PATH}" ]; then
-    echo "Missing 'sources.list'. To fix run '${0} install'." 1>&2
-    exit 1
+    if [ ! -e "${BLACKLIST_FILE_PATH}" ]; then
+      echo "Missing 'sources.list' and blacklist. To fix run '${0} install'." 1>&2
+      exit 1
+    fi
+    return 1
   else
     SOURCELIST_FILE_CONTENT="$(sed -n '/^\s*http.*/p' "${SOURCELIST_FILE_PATH}" \
       | sed 's/\s\+#.*//g')"
@@ -69,14 +72,14 @@ fetchSources() {
     (( total_count++ ))
     echo "Getting: ${domain}"
     if [ $(type -fP curl) ]; then
-      if curl "${domain}" --progress-bar -L --connect-timeout 30 --fail --retry 1 >> "${TMP_DIR_PATH}/hosts.fetched"; then
+      if curl "${domain}" --progress-bar -L --connect-timeout 30 --fail --retry 1 >> "${TMP_DIR_PATH}/fetched"; then
         (( successful_count++ ))
       else
         echo "curl couldn't fetch ${domain}" 1>&2
       fi
     elif [ $(type -fP wget) ]; then
       printf "wget: "
-      if wget "${domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${TMP_DIR_PATH}/hosts.fetched"; then
+      if wget "${domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${TMP_DIR_PATH}/fetched"; then
         (( successful_count++ ))
       else
         echo "wget couldn't fetch ${domain}" 1>&2
@@ -98,23 +101,25 @@ fetchSources() {
 }
 
 readWhiteList() {
-  local domain
   if [ ! -e "${WHITELIST_FILE_PATH}" ]; then
     echo "Whitelist does not exist, ignoring..."
     return 1
   else
-    cat "${WHITELIST_FILE_PATH}" >> "${TMP_DIR_PATH}/hosts.whitelist"
+    cat "${WHITELIST_FILE_PATH}" >> "${TMP_DIR_PATH}/whitelist"
+    filterDomains "whitelist" "whitelist-filtered"
+    sortDomains "whitelist-filtered" "whitelist-sorted"
   fi
   return 0
 }
 
 readBlackList() {
-  local domain
   if [ ! -e "${BLACKLIST_FILE_PATH}" ]; then
     echo "Blacklist does not exist, ignoring..."
     return 1
   else
-    cat "${BLACKLIST_FILE_PATH}" >> "${TMP_DIR_PATH}/hosts.blacklist"
+    cat "${BLACKLIST_FILE_PATH}" >> "${TMP_DIR_PATH}/blacklist"
+    filterDomains "blacklist" "blacklist-filtered"
+    sortDomains "blacklist-filtered" "blacklist-sorted"
   fi
   return 0
 }
@@ -130,7 +135,7 @@ filterDomains() {
     | sed 's/[[:blank:]]\+/ /g' \
     | sed -n '/^0\.0\.0\.0\s.*\..*/p' \
     | sed -n '/\.local\s*$/!p' \
-    >> "${TMP_DIR_PATH}/${target_file}"
+    > "${TMP_DIR_PATH}/${target_file}"
   # - replace OSX '\r' and MS-DOS '\r\n' with Unix '\n' (linebreak)
   # - replace 127.0.0.1 and 127.0.1.1 with 0.0.0.0
   # - only keep lines starting with 0.0.0.0
@@ -149,20 +154,49 @@ sortDomains() {
   return 0
 }
 
-buildHostsFile() {
-  # Glue all pieces of the hosts file together
-  cat "${SCRIPT_DIR_PATH}/bin/components/hosts.header" \
-    | sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" >> "${TMP_DIR_PATH}/hosts"
+#mergeBlackList() {
+#  local domain
+#  while read -r domain; do
+#    echo "${domain}"
+#    #cat "${TMP_DIR_PATH}/fetched-sorted" \
+#    cat "${SCRIPT_DIR_PATH}/dummy.list" \
+#      | sed -n "/.*${domain}$/!p" \
+#      >> "${TMP_DIR_PATH}/dummy.list"
+#  done < "${TMP_DIR_PATH}/blacklist-sorted" | sed 's/^0\.0\.0\.0\s\+//g'
+#  echo "CAME HERE"
+#  return 0
+#}
+
+preBuildHosts() {
+  # Add hosts.header
+  # Add hosts.original
+  # Add hosts.title
+  cat "${SCRIPT_DIR_PATH}/bin/components/hosts_header" \
+    | sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" > "${TMP_DIR_PATH}/hosts"
   # Add an empty line between comment and content
   echo "" >> "${TMP_DIR_PATH}/hosts"
   cat "${HOSTS_FILE_BACKUP_PATH}" >> "${TMP_DIR_PATH}/hosts" \
     || echo "You may want to add your hostname to ${HOSTS_FILE_PATH}"
   echo "" >> "${TMP_DIR_PATH}/hosts"
-  cat "${SCRIPT_DIR_PATH}/bin/components/hosts.title" >> "${TMP_DIR_PATH}/hosts"
+  cat "${SCRIPT_DIR_PATH}/bin/components/hosts_title" >> "${TMP_DIR_PATH}/hosts"
+}
+
+buildHostsFile() {
+  # Glue all pieces of the hosts file together
   echo "" >> "${TMP_DIR_PATH}/hosts"
-  cat "${TMP_DIR_PATH}/hosts.fetched-sorted" >> "${TMP_DIR_PATH}/hosts"
+  ######## SET PROPER fetched-whitelist/blacklist-finished what ever ending
+  #cat "${TMP_DIR_PATH}/fetched-finished" >> "${TMP_DIR_PATH}/hosts"
+  ########
+  cat "${TMP_DIR_PATH}/fetched-sorted" >> "${TMP_DIR_PATH}/hosts"
   return 0
 }
+
+
+#applyWhiteList() {
+#  echo "" >> "${TMP_DIR_PATH}/hosts"
+#  cat "${SCRIPT_DIR_PATH}/bin/components/hosts.title-whitelist"
+#  cat "${TMP_DIR_PATH}/hosts.whitelist-sorted" >> "${TMP_DIR_PATH}/hosts"
+#}
 
 applyHostsFile() {
   # Replace systems hosts file with the modified version

@@ -113,19 +113,14 @@ update() {
   echo "Updating ${HOSTS_FILE_PATH}..."
   checkBackupExist
   createTmpDir
+  readBlackList
   if readSourceList; then
     fetchSources
-    filterDomains "hosts.fetched" "hosts.fetched-filtered"
-    sortDomains "hosts.fetched-filtered" "hosts.fetched-sorted"
+    filterDomains "fetched" "fetched-filtered"
+    sortDomains "fetched-filtered" "fetched-sorted"
   fi
-  if readWhiteList; then
-    filterDomains "hosts.whitelist" "hosts.whitelist-filtered"
-    sortDomains "hosts.whitelist-filtered" "hosts.whitelist-sorted"
-  fi
-  if readBlackList; then
-    filterDomains "hosts.blacklist" "hosts.blacklist-filtered"
-    sortDomains "hosts.blacklist-filtered" "hosts.blacklist-sorted"
-  fi
+  #mergeBlackList
+  preBuildHosts
   buildHostsFile
   applyHostsFile
   updateCleanUp
