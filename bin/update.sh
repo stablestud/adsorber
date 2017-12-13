@@ -92,8 +92,7 @@ fetchSources() {
   done <<< "${SOURCELIST_FILE_CONTENT}"
   if [ "${successful_count}" == 0 ]; then
     echo "Nothing to apply [${successful_count}/${total_count}]." 1>&2
-    updateCleanUp
-    exit 1
+    return 1
   else
     echo "Successfully fetched ${successful_count} out of ${total_count} hosts sources."
   fi
@@ -102,7 +101,7 @@ fetchSources() {
 
 readWhiteList() {
   if [ ! -e "${WHITELIST_FILE_PATH}" ]; then
-    echo "Whitelist does not exist, ignoring..."
+    echo "Whitelist does not exist, ignoring..." 1>&2
     return 1
   else
     cat "${WHITELIST_FILE_PATH}" >> "${TMP_DIR_PATH}/whitelist"
@@ -114,7 +113,7 @@ readWhiteList() {
 
 readBlackList() {
   if [ ! -e "${BLACKLIST_FILE_PATH}" ]; then
-    echo "Blacklist does not exist, ignoring..."
+    echo "Blacklist does not exist, ignoring..." 1>&2
     return 1
   else
     cat "${BLACKLIST_FILE_PATH}" >> "${TMP_DIR_PATH}/blacklist"
@@ -125,9 +124,9 @@ readBlackList() {
 }
 
 filterDomains() {
-  local readonly source_file="${1}"
-  local readonly target_file="${2}"
-  cat "${TMP_DIR_PATH}/${source_file}" \
+  local input_file="${1}"
+  local output_file="${2}"
+  cat "${TMP_DIR_PATH}/${input_file}" \
     | sed 's/\r/\n/g' \
     | sed 's/^\s*127\.0\.[01]\.1/0\.0\.0\.0/g' \
     | sed -n '/^\s*0\.0\.0\.0\s\+.\+/p' \
@@ -135,7 +134,7 @@ filterDomains() {
     | sed 's/[[:blank:]]\+/ /g' \
     | sed -n '/^0\.0\.0\.0\s.*\..*/p' \
     | sed -n '/\.local\s*$/!p' \
-    > "${TMP_DIR_PATH}/${target_file}"
+    > "${TMP_DIR_PATH}/${output_file}"
   # - replace OSX '\r' and MS-DOS '\r\n' with Unix '\n' (linebreak)
   # - replace 127.0.0.1 and 127.0.1.1 with 0.0.0.0
   # - only keep lines starting with 0.0.0.0
@@ -148,24 +147,41 @@ filterDomains() {
 
 sortDomains() {
   # Sort the domains by alphabet and also remove duplicates
-  local readonly source_file="${1}"
-  local readonly target_file="${2}"
-  sort "${TMP_DIR_PATH}/${source_file}" -f -u -o "${TMP_DIR_PATH}/${target_file}"
+  local input_file="${1}"
+  local output_file="${2}"
+  sort "${TMP_DIR_PATH}/${input_file}" -f -u -o "${TMP_DIR_PATH}/${output_file}"
   return 0
 }
 
-#mergeBlackList() {
-#  local domain
-#  while read -r domain; do
-#    echo "${domain}"
-#    #cat "${TMP_DIR_PATH}/fetched-sorted" \
-#    cat "${SCRIPT_DIR_PATH}/dummy.list" \
-#      | sed -n "/.*${domain}$/!p" \
-#      >> "${TMP_DIR_PATH}/dummy.list"
-#  done < "${TMP_DIR_PATH}/blacklist-sorted" | sed 's/^0\.0\.0\.0\s\+//g'
-#  echo "CAME HERE"
-#  return 0
-#}
+mergeBlackList() {
+  local input_file="${1}"
+  if [ -s "${TMP_DIR_PATH}/blacklist-sorted" ]; then
+    echo "Applying blacklist..."
+    cat "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/blacklist-sorted" >> "${TMP_DIR_PATH}/merged-blacklist"
+    filterDomains "merged-blacklist" "merged-blacklist-filtered"
+    sortDomains "merged-blacklist-filtered" "merged-blacklist-sorted"
+    cp "${TMP_DIR_PATH}/merged-blacklist-sorted" "${TMP_DIR_PATH}/cache"
+  else
+    return 1
+  fi
+  return 0
+}
+
+applyWhiteList() {
+  local domain
+  if [ -s "${TMP_DIR_PATH}/whitelist-sorted" ]; then
+    echo "Applying whitelist..."
+    sed -i 's/^0\.0\.0\.0\s\+//g' "${TMP_DIR_PATH}/whitelist-sorted"
+    cp "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/applied-whitelist"
+    while read -r domain; do
+      sed -i "/.*${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
+    done < "${TMP_DIR_PATH}/whitelist-sorted"
+    cp "${TMP_DIR_PATH}/applied-whitelist" "${TMP_DIR_PATH}/cache"
+  else
+    return 1
+  fi
+  return 0
+}
 
 preBuildHosts() {
   # Add hosts.header
@@ -184,28 +200,25 @@ preBuildHosts() {
 buildHostsFile() {
   # Glue all pieces of the hosts file together
   echo "" >> "${TMP_DIR_PATH}/hosts"
-  ######## SET PROPER fetched-whitelist/blacklist-finished what ever ending
-  #cat "${TMP_DIR_PATH}/fetched-finished" >> "${TMP_DIR_PATH}/hosts"
-  ########
-  cat "${TMP_DIR_PATH}/fetched-sorted" >> "${TMP_DIR_PATH}/hosts"
+  if [ -s "${TMP_DIR_PATH}/cache" ]; then
+    cat "${TMP_DIR_PATH}/cache" >> "${TMP_DIR_PATH}/hosts"
+  else
+    echo "Nothing to apply. Exiting..." 1>&2
+    updateCleanUp
+    exit 1
+  fi
   return 0
 }
 
-
-#applyWhiteList() {
-#  echo "" >> "${TMP_DIR_PATH}/hosts"
-#  cat "${SCRIPT_DIR_PATH}/bin/components/hosts.title-whitelist"
-#  cat "${TMP_DIR_PATH}/hosts.whitelist-sorted" >> "${TMP_DIR_PATH}/hosts"
-#}
-
 applyHostsFile() {
   # Replace systems hosts file with the modified version
-  echo "Applying new hosts file."
+  echo "Applying new hosts file...."
   cat "${TMP_DIR_PATH}/hosts" > "${HOSTS_FILE_PATH}" \
     || {
       echo "Couldn't apply hosts file. Aborting"
       buildCleanUp
       exit 1
   }
+  echo "Successfully applied new hosts file."
   return 0
 }

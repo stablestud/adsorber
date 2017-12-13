@@ -2,3 +2,5 @@ sources.list
 dummy.list
 whitelist
 blacklist
+
+test.sh

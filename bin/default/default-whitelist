@@ -1,6 +1,7 @@
 # Whitelist
 # Use to allow domains, even if they are blocked from hosts sources.
-# However the blacklist overwrites the whitelist. ## CONFIG SHOULD EDIT THIS ##
+# The blacklist overwrites the whitelist. This can be changed in adsorber.sh
+# Note: the whitelist uses partial matching. Means if you allow for example
 
-127.0.0.1 stablestud.org
-127.0.0.1 github.com
+#127.0.0.1 stablestud.org
+#127.0.0.1 github.com

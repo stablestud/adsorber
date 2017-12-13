@@ -1,5 +1,8 @@
 #!/bin/bash
 
+readonly PRIMARY_LIST="blacklist"
+# Set the blacklist as primary list, overwriting the whitelist
+
 readonly HOSTS_FILE_PATH="/etc/hosts"
 readonly HOSTS_FILE_BACKUP_PATH="/etc/hosts.original"
 readonly TMP_DIR_PATH="/tmp/adsorber"
@@ -114,12 +117,30 @@ update() {
   checkBackupExist
   createTmpDir
   readBlackList
+  readWhiteList
   if readSourceList; then
     fetchSources
     filterDomains "fetched" "fetched-filtered"
     sortDomains "fetched-filtered" "fetched-sorted"
+    cp "${TMP_DIR_PATH}/fetched-sorted" "${TMP_DIR_PATH}/cache"
+  else
+    cat "" >> "${TMP_DIR_PATH}/cache"
   fi
-  #mergeBlackList
+  case "${PRIMARY_LIST}" in
+    whitelist )
+      mergeBlackList
+      applyWhiteList
+      ;;
+    blacklist )
+      applyWhiteList
+      mergeBlackList
+      ;;
+    * )
+      echo "Wrong PRIMARY_LIST set. Choose either 'whitelist' or 'blacklist'" 1>&2
+      updateCleanUp
+      exit 1
+      ;;
+  esac
   preBuildHosts
   buildHostsFile
   applyHostsFile
