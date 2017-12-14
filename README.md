@@ -2,14 +2,25 @@
 A(d)sorber blocks ads by 'absorbing' and dumbing them into void.
 Technically speaking, it adds ad domains to the hosts file with a redirection to a non-existent ip `0.0.0.0`.
 
-Also it saves data, speeds up loading time and prevents some tracking of your browsing habits. For extensive privacy, I recommend using the script along browser add-ons like  [NoScript](https://addons.mozilla.org/en-US/firefox/addon/noscript/) (for [Firefox 56 and less](https://noscript.net/getit)), [Privacy Badger](https://addons.mozilla.org/en-US/firefox/addon/privacy-badger17/) and [HTTPS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/https-everywhere/).
+## Features
+* Block advertisements system-wide, not only in the browser.
+* Prevents annoying anti-adblockers from triggering.
+* Installation and remove built-in.
+* Update hosts from external hosts-servers (like https://adaway.org/hosts.txt).
+* Automatically update the hosts file with cron or systemd.timer.
+* White- and blacklist.
+* Temporary disable the adblocking.
+* Filter dangerous hosts redirections.
+
+Also it saves data, speeds up loading time and prevents some tracking of your browsing habits. For extensive privacy, I recommend using the script along browser add-ons like  [NoScript](https://addons.mozilla.org/en-US/firefox/addon/noscript/) (for [Firefox 56 and below](https://noscript.net/getit)), [Privacy Badger](https://addons.mozilla.org/en-US/firefox/addon/privacy-badger17/) and [HTTPS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/https-everywhere/).
 
 Currently we are using the following hosts lists:
-* [adaway.org/hosts.txt](https://adaway.org/hosts.txt)
-* [pgl.yoyo.org/adservers/serverlist.php](https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext)
+* [adaway.org](https://adaway.org/hosts.txt)
+* [yoyo.org](https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext)
 * & more to come.
 
 To add your own hosts lists, just add them to the `sources.list` file.
+
 ## Usage
 
 ```
@@ -101,25 +112,23 @@ Answers all prompts with `yes` e.g.,
 
 It'll not answer prompts which may harm your system. But `--force` will do it.
 #### `-f, --force`
-This will force the script to continue (dangerous) the installtion/update e.g.,
-* Continue if no backup has been created, overwriting the existing one.
+This will force the script to continue (dangerous) the installation/update e.g.,
+* Continue if no backup has been created, overwriting the existing hosts file.
 
 ## Settings:
 To add or remove sources edit the `soures.list` file which is created after the installation of Adsorber.    
 You can edit e.g., the path of the crontab installation etc, in `adsorber.sh`    
 To change the content of <strong>placed</strong> files go to:
-* `bin/systemd` to edit the systemd files which are installed then as a service. <br/>You may want to run `àdsorber.sh install --systemd` afterwards.
+* `bin/systemd` to edit the systemd files which are installed then as a service. <br/>You may want to run `adsorber.sh install --systemd` afterwards.
 * `bin/cron` to edit the crontab. Run `adsorber.sh install --cron` afterwards to apply the changes.
 * `bin/components` to edit the header and the 'title' of the hosts file modified by Adsorber.
 
 ## Todo for future releases
 
-* Add simulate option
-* Add comments
 * Add config file
 * Add proper exit codes as in [Reserved Exit Codes](http://tldp.org/LDP/abs/html/exitcodes.html#EXITCODESREF)
 * Add testing framework (travis etc.)
-* Port script to shell independent
+* Make script shell independent
 * Create .deb
 * Integrate into package managers
 ## License

@@ -13,7 +13,7 @@
 # SYSTEMD_DIR_PATH          /etc/systemd/system
 
 copySourceList() {
-  if [ ! -e "${SCRIPT_DIR_PATH}/sources.list" ]; then
+  if [ ! -e "${SCRIPT_DIR_PATH}/sources.list" ] || [ ! -s "${SCRIPT_DIR_PATH}/sources.list" ]; then
     cp "${SCRIPT_DIR_PATH}/bin/default/default-sources.list" "${SCRIPT_DIR_PATH}/sources.list" \
       && echo "To add new host sources, please edit sources.list"
   fi
@@ -21,7 +21,7 @@ copySourceList() {
 }
 
 copyWhiteList() {
-  if [ ! -e "${SCRIPT_DIR_PATH}/whitelist" ]; then
+  if [ ! -e "${SCRIPT_DIR_PATH}/whitelist" ] || [ ! -s "${SCRIPT_DIR_PATH}/whitelist" ]; then
     cp "${SCRIPT_DIR_PATH}/bin/default/default-whitelist" "${SCRIPT_DIR_PATH}/whitelist" \
       && echo "To allow host sources, please edit the whitelist."
   fi
@@ -29,7 +29,7 @@ copyWhiteList() {
 }
 
 copyBlackList() {
-  if [ ! -e "${SCRIPT_DIR_PATH}/blacklist" ]; then
+  if [ ! -e "${SCRIPT_DIR_PATH}/blacklist" ] || [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
     cp "${SCRIPT_DIR_PATH}/bin/default/default-blacklist" "${SCRIPT_DIR_PATH}/blacklist" \
       && echo "To block additional host sources, please edit the blacklist."
   fi
@@ -46,10 +46,10 @@ backupHostsFile() {
     fi
     case "${REPLY_TO_FORCE_PROMPT}" in
       [Yy][Ee][Ss] )
-        :
+        return 0
         ;;
       * )
-        echo "Aborted."
+        echo "Aborted." 1>&2
         exit 1
         ;;
     esac
@@ -71,7 +71,7 @@ installSystemd() {
   cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.timer"
   systemctl daemon-reload \
     && systemctl enable adsorber.timer \
-    && systemctl start adsorber.timer || echo "Couldn't start systemd service."
+    && systemctl start adsorber.timer || echo "Couldn't start systemd service." 1>&2
   return 0
 }
 
@@ -81,10 +81,10 @@ promptInstall() {
   fi
   case "${REPLY_TO_PROMPT}" in
     [Yy] | [Yy][Ee][Ss] )
-      unset REPLY_TO_PROMPT
+      return 0
       ;;
     * )
-      echo "Installation cancelled."
+      echo "Installation cancelled." 1>&2
       exit 1
       ;;
   esac
@@ -106,5 +106,16 @@ promptScheduler() {
       echo "Skipping scheduler creation..."
       ;;
   esac
+  return 0
+}
+
+install() {
+  echo "Installing Adsorber..."
+  copySourceList
+  copyWhiteList
+  copyBlackList
+  promptInstall
+  backupHostsFile
+  promptScheduler
   return 0
 }

@@ -13,7 +13,7 @@ readonly BLACKLIST_FILE_PATH="${SCRIPT_DIR_PATH}/blacklist"
 readonly CRONTAB_DIR_PATH="/etc/cron.weekly"
 readonly SYSTEMD_DIR_PATH="/etc/systemd/system"
 
-readonly VERSION="0.1.0"
+readonly VERSION="0.1.1"
 
 readonly OPERATION="${1}"
 
@@ -55,7 +55,7 @@ showHelp() {
   echo "           (with the help of the hosts file)"
   echo ""
   echo "Operations:"
-  echo "  install - setup necessary things needed for adsorber "
+  echo "  install - setup necessary things needed for adsorber"
   echo "              e.g., create backup file of hosts file,"
   echo "                    create scheduler which updates the host file once a week."
   echo "  update  - update hosts file with newest ad servers"
@@ -89,69 +89,6 @@ showVersion() {
 
   Written by stablestud - and hopefully in the future with many others. ;)"
   exit 0
-}
-
-install() {
-  echo "Installing Adsorber..."
-  copySourceList
-  copyWhiteList
-  copyBlackList
-  promptInstall
-  backupHostsFile
-  promptScheduler
-  return 0
-}
-
-remove() {
-  echo "Removing Adsorber..."
-  promptRemove
-  removeSystemd
-  removeCronjob
-  removeHostsFile
-  removeCleanUp
-  return 0
-}
-
-update() {
-  echo "Updating ${HOSTS_FILE_PATH}..."
-  checkBackupExist
-  createTmpDir
-  readBlackList
-  readWhiteList
-  if readSourceList; then
-    fetchSources
-    filterDomains "fetched" "fetched-filtered"
-    sortDomains "fetched-filtered" "fetched-sorted"
-    cp "${TMP_DIR_PATH}/fetched-sorted" "${TMP_DIR_PATH}/cache"
-  else
-    cat "" >> "${TMP_DIR_PATH}/cache"
-  fi
-  case "${PRIMARY_LIST}" in
-    whitelist )
-      mergeBlackList
-      applyWhiteList
-      ;;
-    blacklist )
-      applyWhiteList
-      mergeBlackList
-      ;;
-    * )
-      echo "Wrong PRIMARY_LIST set. Choose either 'whitelist' or 'blacklist'" 1>&2
-      updateCleanUp
-      exit 1
-      ;;
-  esac
-  preBuildHosts
-  buildHostsFile
-  applyHostsFile
-  updateCleanUp
-  return 0
-}
-
-revert() {
-  echo "Reverting ${HOSTS_FILE_PATH}..."
-  revertHostsFile
-  return 0
 }
 
 sourceFiles() {

@@ -6,6 +6,7 @@
 # BLACKLIST_FILE_PATH     SCRIPT_DIR_PATH/whitelist
 # HOSTS_FILE_PATH         /etc/hosts
 # HOSTS_FILE_BACKUP_PATH  /etc/hosts.original
+# PRIMARY_LIST            blacklist
 # REPLY_TO_FORCE_PROMPT   Null (not set)
 # SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
@@ -49,20 +50,60 @@ createTmpDir() {
 }
 
 readSourceList() {
-  if [ ! -e "${SOURCELIST_FILE_PATH}" ]; then
-    if [ ! -e "${BLACKLIST_FILE_PATH}" ]; then
+  if [ ! -s "${SOURCELIST_FILE_PATH}" ]; then
+    if [ ! -s "${BLACKLIST_FILE_PATH}" ]; then
       echo "Missing 'sources.list' and blacklist. To fix run '${0} install'." 1>&2
       exit 1
     fi
+    echo "No sources to fetch from, ignoring..."
     return 1
   else
-    SOURCELIST_FILE_CONTENT="$(sed -n '/^\s*http.*/p' "${SOURCELIST_FILE_PATH}" \
-      | sed 's/\s\+#.*//g')"
-    # Only read sources with http(s) at the beginning
-    # Remove inline # comments
+    cat "${SOURCELIST_FILE_PATH}" \
+      | sed -n '/^\s*http.*/p' \
+      | sed 's/\s\+#.*//g' \
+      > "${TMP_DIR_PATH}/sourceslist-filtered"
+      # Only read sources with http(s) at the beginning
+      # Remove inline # comments
+    if [ ! -s "${TMP_DIR_PATH}/sourceslist-filtered" ]; then
+      echo "No hosts set in sources.list, ignoring..."
+      return 1
+    fi
   fi
   return 0
 }
+
+readWhiteList() {
+  if [ ! -e "${WHITELIST_FILE_PATH}" ]; then
+    echo "Whitelist does not exist, ignoring..." 1>&2
+    return 1
+  else
+    cat "${WHITELIST_FILE_PATH}" >> "${TMP_DIR_PATH}/whitelist"
+    filterDomains "whitelist" "whitelist-filtered"
+    sortDomains "whitelist-filtered" "whitelist-sorted"
+    if [ ! -s "${TMP_DIR_PATH}/whitelist-sorted" ]; then
+      echo "Whitelist is empty, ignoring..."
+      return 1
+    fi
+  fi
+  return 0
+}
+
+readBlackList() {
+  if [ ! -e "${BLACKLIST_FILE_PATH}" ]; then
+    echo "Blacklist does not exist, ignoring..." 1>&2
+    return 1
+  else
+    cat "${BLACKLIST_FILE_PATH}" >> "${TMP_DIR_PATH}/blacklist"
+    filterDomains "blacklist" "blacklist-filtered"
+    sortDomains "blacklist-filtered" "blacklist-sorted"
+    if [ ! -s "${TMP_DIR_PATH}/blacklist-sorted" ]; then
+      echo "Blacklist is empty, ignoring..."
+      return 1
+    fi
+  fi
+  return 0
+}
+
 
 fetchSources() {
   local total_count=0
@@ -89,36 +130,12 @@ fetchSources() {
       updateCleanUp
       exit 2
     fi
-  done <<< "${SOURCELIST_FILE_CONTENT}"
+  done < "${TMP_DIR_PATH}/sourceslist-filtered"
   if [ "${successful_count}" == 0 ]; then
     echo "Nothing to apply [${successful_count}/${total_count}]." 1>&2
     return 1
   else
     echo "Successfully fetched ${successful_count} out of ${total_count} hosts sources."
-  fi
-  return 0
-}
-
-readWhiteList() {
-  if [ ! -e "${WHITELIST_FILE_PATH}" ]; then
-    echo "Whitelist does not exist, ignoring..." 1>&2
-    return 1
-  else
-    cat "${WHITELIST_FILE_PATH}" >> "${TMP_DIR_PATH}/whitelist"
-    filterDomains "whitelist" "whitelist-filtered"
-    sortDomains "whitelist-filtered" "whitelist-sorted"
-  fi
-  return 0
-}
-
-readBlackList() {
-  if [ ! -e "${BLACKLIST_FILE_PATH}" ]; then
-    echo "Blacklist does not exist, ignoring..." 1>&2
-    return 1
-  else
-    cat "${BLACKLIST_FILE_PATH}" >> "${TMP_DIR_PATH}/blacklist"
-    filterDomains "blacklist" "blacklist-filtered"
-    sortDomains "blacklist-filtered" "blacklist-sorted"
   fi
   return 0
 }
@@ -135,13 +152,13 @@ filterDomains() {
     | sed -n '/^0\.0\.0\.0\s.*\..*/p' \
     | sed -n '/\.local\s*$/!p' \
     > "${TMP_DIR_PATH}/${output_file}"
-  # - replace OSX '\r' and MS-DOS '\r\n' with Unix '\n' (linebreak)
-  # - replace 127.0.0.1 and 127.0.1.1 with 0.0.0.0
-  # - only keep lines starting with 0.0.0.0
-  # - remove inline '#' comments
-  # - replace tabs and multiple spaces with one space
-  # - remove domains without a dot (e.g localhost , loopback , ip6-allnodes , etc...)
-  # - remove domains that are redirecting to *.local
+    # - replace OSX '\r' and MS-DOS '\r\n' with Unix '\n' (linebreak)
+    # - replace 127.0.0.1 and 127.0.1.1 with 0.0.0.0
+    # - only keep lines starting with 0.0.0.0
+    # - remove inline '#' comments
+    # - replace tabs and multiple spaces with one space
+    # - remove domains without a dot (e.g localhost , loopback , ip6-allnodes , etc...)
+    # - remove domains that are redirecting to *.local
   return 0
 }
 
@@ -183,6 +200,16 @@ applyWhiteList() {
   return 0
 }
 
+isCacheEmpty() {
+  if [ -s "${TMP_DIR_PATH}/cache" ]; then
+    return 0
+  else
+    echo "Nothing to apply. Exiting..." 1>&2
+    #updateCleanUp
+    exit 1
+  fi
+}
+
 preBuildHosts() {
   # Add hosts.header
   # Add hosts.original
@@ -192,21 +219,15 @@ preBuildHosts() {
   # Add an empty line between comment and content
   echo "" >> "${TMP_DIR_PATH}/hosts"
   cat "${HOSTS_FILE_BACKUP_PATH}" >> "${TMP_DIR_PATH}/hosts" \
-    || echo "You may want to add your hostname to ${HOSTS_FILE_PATH}"
+    || echo "You may want to add your hostname to ${HOSTS_FILE_PATH}" 1>&2
   echo "" >> "${TMP_DIR_PATH}/hosts"
   cat "${SCRIPT_DIR_PATH}/bin/components/hosts_title" >> "${TMP_DIR_PATH}/hosts"
 }
 
 buildHostsFile() {
-  # Glue all pieces of the hosts file together
+  # Glue the final piece of the hosts file to it
   echo "" >> "${TMP_DIR_PATH}/hosts"
-  if [ -s "${TMP_DIR_PATH}/cache" ]; then
-    cat "${TMP_DIR_PATH}/cache" >> "${TMP_DIR_PATH}/hosts"
-  else
-    echo "Nothing to apply. Exiting..." 1>&2
-    updateCleanUp
-    exit 1
-  fi
+  cat "${TMP_DIR_PATH}/cache" >> "${TMP_DIR_PATH}/hosts"
   return 0
 }
 
@@ -215,10 +236,47 @@ applyHostsFile() {
   echo "Applying new hosts file...."
   cat "${TMP_DIR_PATH}/hosts" > "${HOSTS_FILE_PATH}" \
     || {
-      echo "Couldn't apply hosts file. Aborting"
-      buildCleanUp
+      echo "Couldn't apply hosts file. Aborting" 1>&2
+      updateCleanUp
       exit 1
   }
   echo "Successfully applied new hosts file."
+  return 0
+}
+
+update() {
+  echo "Updating ${HOSTS_FILE_PATH}..."
+  checkBackupExist
+  createTmpDir
+  readBlackList
+  readWhiteList
+  if readSourceList; then
+    fetchSources
+    filterDomains "fetched" "fetched-filtered"
+    sortDomains "fetched-filtered" "fetched-sorted"
+    cp "${TMP_DIR_PATH}/fetched-sorted" "${TMP_DIR_PATH}/cache"
+  else
+    printf "" >> "${TMP_DIR_PATH}/cache"
+  fi
+  case "${PRIMARY_LIST}" in
+    whitelist )
+      mergeBlackList
+      applyWhiteList
+      ;;
+    blacklist )
+      applyWhiteList
+      mergeBlackList
+      ;;
+    * )
+      echo "Wrong PRIMARY_LIST set. Choose either 'whitelist' or 'blacklist'" 1>&2
+      updateCleanUp
+      exit 1
+      ;;
+  esac
+  isCacheEmpty
+  preBuildHosts
+  buildHostsFile
+  applyHostsFile
+  updateCleanUp
   return 0
 }

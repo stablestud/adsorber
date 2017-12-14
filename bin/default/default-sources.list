@@ -1,2 +1,5 @@
+# This file is used to read from what sources we should fetch the hosts files.
+# All links must begin with either http:// or https://
+
 https://adaway.org/hosts.txt
 https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext
