@@ -18,69 +18,75 @@ readonly VERSION="0.1.1"
 readonly OPERATION="${1}"
 
 if [ "${#}" -ne 0 ]; then
-  shift
+    shift
 fi
 
 checkRoot() {
-  if [ "${UID}" -ne 0 ]; then
-    echo "This script must be run as root." 1>&2
-    exit 126
-  fi
-  return 0
+    if [ "${UID}" -ne 0 ]; then
+        echo "This script must be run as root." 1>&2
+        exit 126
+    fi
+
+    return 0
 }
 
 checkForWrongParameters() {
-  if [ "${WRONG_OPERATION}" != "" ] || [ "${#WRONG_OPTION[@]}" -ne 0 ]; then
-    showUsage
-  fi
-  return 0
+    if [ "${WRONG_OPERATION}" != "" ] || [ "${#WRONG_OPTION[@]}" -ne 0 ]; then
+        showUsage
+    fi
+
+    return 0
 }
 
 showUsage() {
-  if [ "${WRONG_OPERATION}" != "" ]; then
-    echo "adsorber: Invalid operation: '${WRONG_OPERATION}'" 1>&2
-  fi
-  if [ "${WRONG_OPTION}" != "" ]; then
-    echo "adsorber: Invalid option: ${WRONG_OPTION[@]}" 1>&2
-  fi
-  echo "Usage: ${0} [install|remove|update|revert] {options}" 1>&2
-  echo "Try --help for more information." 1>&2
-  exit 127
+    if [ "${WRONG_OPERATION}" != "" ]; then
+        echo "adsorber: Invalid operation: '${WRONG_OPERATION}'" 1>&2
+    fi
+
+    if [ "${WRONG_OPTION}" != "" ]; then
+        echo "adsorber: Invalid option: ${WRONG_OPTION[@]}" 1>&2
+    fi
+
+    echo "Usage: ${0} [install|remove|update|revert] {options}" 1>&2
+    echo "Try --help for more information." 1>&2
+
+    exit 127
 }
 
 showHelp() {
-  echo "Usage: ${0} [OPERATION] {options}"
-  echo ""
-  echo "A(d)sorber blocks ads by 'absorbing' and dumbing them into void."
-  echo "           (with the help of the hosts file)"
-  echo ""
-  echo "Operations:"
-  echo "  install - setup necessary things needed for adsorber"
-  echo "              e.g., create backup file of hosts file,"
-  echo "                    create scheduler which updates the host file once a week."
-  echo "  update  - update hosts file with newest ad servers"
-  echo "  revert  - revert hosts file to its original state"
-  echo "            (it does not remove the schedule, so this should be used temporary)"
-  echo "  remove  - completely remove changes made by adsorber"
-  echo "              e.g., remove scheduler (if set)"
-  echo "                    revert hosts file (if not already done)"
-  echo "  version - show version of this shell script"
-  echo "  help    - show this help"
-  echo ""
-  echo "Options: (not required)"
-  echo "  -s,  --systemd           - use systemd ..."
-  echo "  -c,  --cron              - use cron as scheduler (use with 'install')"
-  echo "  -ns, --no-scheduler      - set no scheduler (use with 'install')"
-  echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
-  echo "  -f,  --force             - force the installation/update (dangerous)"
-  echo ""
-  echo "Documentation: https://github.com/stablestud/adsorber"
-  echo "If you encounter any issues please report them to the Github repository."
-  exit 0
+    echo "Usage: ${0} [OPERATION] {options}"
+    echo ""
+    echo "A(d)sorber blocks ads by 'absorbing' and dumbing them into void."
+    echo "           (with the help of the hosts file)"
+    echo ""
+    echo "Operations:"
+    echo "  install - setup necessary things needed for adsorber"
+    echo "              e.g., create backup file of hosts file,"
+    echo "                    create scheduler which updates the host file once a week."
+    echo "  update  - update hosts file with newest ad servers"
+    echo "  revert  - revert hosts file to its original state"
+    echo "            (it does not remove the schedule, so this should be used temporary)"
+    echo "  remove  - completely remove changes made by adsorber"
+    echo "              e.g., remove scheduler (if set)"
+    echo "                    revert hosts file (if not already done)"
+    echo "  version - show version of this shell script"
+    echo "  help    - show this help"
+    echo ""
+    echo "Options: (not required)"
+    echo "  -s,  --systemd           - use systemd ..."
+    echo "  -c,  --cron              - use cron as scheduler (use with 'install')"
+    echo "  -ns, --no-scheduler      - set no scheduler (use with 'install')"
+    echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
+    echo "  -f,  --force             - force the installation/update (dangerous)"
+    echo ""
+    echo "Documentation: https://github.com/stablestud/adsorber"
+    echo "If you encounter any issues please report them to the Github repository."
+
+    exit 0
 }
 
 showVersion() {
-  echo "A(d)sorber ${VERSION}
+    echo "A(d)sorber ${VERSION}
 
   Copyright (c) 2017 stablestud
   License MIT
@@ -88,81 +94,86 @@ showVersion() {
   There is NO WARRANTY, to the extent permitted by law.
 
   Written by stablestud - and hopefully in the future with many others. ;)"
-  exit 0
+
+    exit 0
 }
 
 sourceFiles() {
-  . "${SCRIPT_DIR_PATH}/bin/install.sh"
-  . "${SCRIPT_DIR_PATH}/bin/remove.sh"
-  . "${SCRIPT_DIR_PATH}/bin/update.sh"
-  . "${SCRIPT_DIR_PATH}/bin/revert.sh"
-  return 0
+    . "${SCRIPT_DIR_PATH}/bin/install.sh"
+    . "${SCRIPT_DIR_PATH}/bin/remove.sh"
+    . "${SCRIPT_DIR_PATH}/bin/update.sh"
+    . "${SCRIPT_DIR_PATH}/bin/revert.sh"
+
+    return 0
 }
 
 sourceFiles
 
 for option in "${@}"; do
-  case "${option}" in
-    -[Ss] | --systemd )
-      readonly REPLY_TO_SCHEDULER_PROMPT="systemd"
-      ;;
-    -[Cc] | --cron )
-      readonly REPLY_TO_SCHEDULER_PROMPT="cronjob"
-      ;;
-    -[Nn][Ss] | --no-scheduler )
-      readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler"
-      ;;
-    -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
-      readonly REPLY_TO_PROMPT="yes"
-      ;;
-    -[Ff] | --force )
-      readonly REPLY_TO_FORCE_PROMPT="yes"
-      ;;
-    "" )
-      : # Do nothing
-      ;;
-    * )
-      readonly WRONG_OPTION+=("'${option}'")
-      ;;
-  esac
+
+    case "${option}" in
+        -[Ss] | --systemd )
+            readonly REPLY_TO_SCHEDULER_PROMPT="systemd"
+            ;;
+        -[Cc] | --cron )
+            readonly REPLY_TO_SCHEDULER_PROMPT="cronjob"
+            ;;
+        -[Nn][Ss] | --no-scheduler )
+            readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler"
+            ;;
+        -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
+            readonly REPLY_TO_PROMPT="yes"
+            ;;
+        -[Ff] | --force )
+            readonly REPLY_TO_FORCE_PROMPT="yes"
+            ;;
+        "" )
+            : # Do nothing
+            ;;
+        * )
+            readonly WRONG_OPTION+=("'${option}'")
+            ;;
+    esac
+
 done
 
 case "${OPERATION}" in
-  install )
-    checkForWrongParameters
-    checkRoot
-    install
-    update
-    ;;
-  remove )
-    checkForWrongParameters
-    checkRoot
-    remove
-    ;;
-  update )
-    checkForWrongParameters
-    checkRoot
-    update
-    ;;
-  revert )
-    checkForWrongParameters
-    checkRoot
-    revert
-    ;;
-  -[Hh] | help | --help )
-    showHelp
-    ;;
-  -[Vv] | version | --version )
-    showVersion
-    ;;
-  "" )
-    showUsage
-    ;;
-  * )
-    readonly WRONG_OPERATION="${OPERATION}"
-    showUsage
-    ;;
+    install )
+        checkForWrongParameters
+        checkRoot
+        install
+        update
+        ;;
+    remove )
+        checkForWrongParameters
+        checkRoot
+        remove
+        ;;
+    update )
+        checkForWrongParameters
+        checkRoot
+        update
+        ;;
+    revert )
+        checkForWrongParameters
+        checkRoot
+        revert
+        ;;
+    -[Hh] | help | --help )
+        showHelp
+        ;;
+    -[Vv] | version | --version )
+        showVersion
+        ;;
+    "" )
+        showUsage
+        ;;
+    * )
+        readonly WRONG_OPERATION="${OPERATION}"
+        showUsage
+        ;;
 esac
 
 echo "Finished."
+
 exit 0
