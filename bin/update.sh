@@ -13,6 +13,7 @@
 # TMP_DIR_PATH            /tmp/adsorber
 # WHITELIST_FILE_PATH     SCRIPT_DIR_PATH/blacklist
 
+
 updateCleanUp() {
     echo "Cleaning up..."
 
@@ -20,6 +21,7 @@ updateCleanUp() {
 
     return 0
 }
+
 
 checkBackupExist() {
     if [ ! -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
@@ -43,6 +45,7 @@ checkBackupExist() {
     return 0
 }
 
+
 createTmpDir() {
     if [ ! -d ${TMP_DIR_PATH} ]; then
         mkdir "${TMP_DIR_PATH}"
@@ -54,6 +57,7 @@ createTmpDir() {
 
     return 0
 }
+
 
 readSourceList() {
     if [ ! -s "${SOURCELIST_FILE_PATH}" ]; then
@@ -83,6 +87,7 @@ readSourceList() {
     return 0
 }
 
+
 readWhiteList() {
     if [ ! -e "${WHITELIST_FILE_PATH}" ]; then
         echo "Whitelist does not exist, ignoring..." 1>&2
@@ -101,6 +106,7 @@ readWhiteList() {
 
     return 0
 }
+
 
 readBlackList() {
     if [ ! -e "${BLACKLIST_FILE_PATH}" ]; then
@@ -156,7 +162,7 @@ fetchSources() {
 
     done < "${TMP_DIR_PATH}/sourceslist-filtered"
 
-    if [ "${successful_count}" == 0 ]; then
+    if [ "${successful_count}" -eq 0 ]; then
         echo "Nothing to apply [${successful_count}/${total_count}]." 1>&2
         return 1
     else
@@ -165,6 +171,7 @@ fetchSources() {
 
     return 0
 }
+
 
 filterDomains() {
     local input_file="${1}"
@@ -190,6 +197,7 @@ filterDomains() {
     return 0
 }
 
+
 sortDomains() {
     local input_file="${1}"
     local output_file="${2}"
@@ -199,6 +207,7 @@ sortDomains() {
 
     return 0
 }
+
 
 mergeBlackList() {
     local input_file="${1}"
@@ -217,6 +226,7 @@ mergeBlackList() {
     return 0
 }
 
+
 applyWhiteList() {
     local domain
 
@@ -227,7 +237,15 @@ applyWhiteList() {
         cp "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/applied-whitelist"
 
         while read -r domain; do
-            sed -i "/.*${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
+            if [ "${USE_PARTIAL_MATCHING}" == "true" ]; then
+                sed -i "/\.*${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
+            elif [ "${USE_PARTIAL_MATCHING}" == "false" ]; then
+                sed -i "/\s\+${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
+            else
+                echo "Wrong USE_PARTIAL_MATCHING set, either set to 'true' or 'false'."
+                updateCleanUp
+                exit 1
+            fi
         done < "${TMP_DIR_PATH}/whitelist-sorted"
 
         cp "${TMP_DIR_PATH}/applied-whitelist" "${TMP_DIR_PATH}/cache"
@@ -237,6 +255,7 @@ applyWhiteList() {
 
     return 0
 }
+
 
 isCacheEmpty() {
     if [ -s "${TMP_DIR_PATH}/cache" ]; then
@@ -250,12 +269,14 @@ isCacheEmpty() {
     return 0
 }
 
+
 preBuildHosts() {
     # Add hosts.header
     # Add hosts.original
     # Add hosts.title
     cat "${SCRIPT_DIR_PATH}/bin/components/hosts_header" \
         | sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" > "${TMP_DIR_PATH}/hosts"
+        # Replace @...@ with the path to the backup hosts
 
     echo "" >> "${TMP_DIR_PATH}/hosts"
 
@@ -269,6 +290,7 @@ preBuildHosts() {
     return 0
 }
 
+
 buildHostsFile() {
     echo "" >> "${TMP_DIR_PATH}/hosts"
     cat "${TMP_DIR_PATH}/cache" >> "${TMP_DIR_PATH}/hosts"
@@ -276,6 +298,7 @@ buildHostsFile() {
 
     return 0
 }
+
 
 applyHostsFile() {
     echo "Applying new hosts file...."
@@ -293,6 +316,7 @@ applyHostsFile() {
     return 0
 }
 
+
 update() {
     echo "Updating ${HOSTS_FILE_PATH}..."
 
@@ -305,6 +329,7 @@ update() {
         fetchSources
         filterDomains "fetched" "fetched-filtered"
         sortDomains "fetched-filtered" "fetched-sorted"
+
         cp "${TMP_DIR_PATH}/fetched-sorted" "${TMP_DIR_PATH}/cache"
     else
         printf "" >> "${TMP_DIR_PATH}/cache"

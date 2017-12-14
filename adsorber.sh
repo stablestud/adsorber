@@ -1,6 +1,7 @@
 #!/bin/bash
 
 readonly PRIMARY_LIST="blacklist"
+readonly USE_PARTIAL_MATCHING="true"
 # Set the blacklist as primary list, overwriting the whitelist
 
 readonly HOSTS_FILE_PATH="/etc/hosts"
@@ -13,7 +14,7 @@ readonly BLACKLIST_FILE_PATH="${SCRIPT_DIR_PATH}/blacklist"
 readonly CRONTAB_DIR_PATH="/etc/cron.weekly"
 readonly SYSTEMD_DIR_PATH="/etc/systemd/system"
 
-readonly VERSION="0.1.1"
+readonly VERSION="0.1.1a"
 
 readonly OPERATION="${1}"
 
