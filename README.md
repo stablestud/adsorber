@@ -1,6 +1,6 @@
 # Adsorber
 A(d)sorber blocks ads by 'absorbing' and dumbing them into void.
-Technically speaking, it adds ad domains to the hosts file with a redirection to a non-existent ip `0.0.0.0`.
+Technically speaking, it adds ad domains to the hosts file `/etc/hosts` with a redirection to a non-existent ip `0.0.0.0`.
 
 ## Features
 * Block advertisements system-wide, not only in the browser.
@@ -47,7 +47,8 @@ Options: (not required)
   -c,  --cron              - use cron as scheduler (use with 'install')
   -ns, --no-scheduler      - set no scheduler (use with 'install')
   -y,  --yes, --assume-yes - answer all prompts with 'yes'
-  -f,  --force             - force the installation/update (dangerous)
+  -f,  --force             - force the update if no /etc/hosts backup
+                             has been created (dangerous)"
 
 Documentation: https://github.com/stablestud/adsorber
 If you encounter any issues please report them to the Github repository.
@@ -65,7 +66,6 @@ Possible options are:
 * `-c,  --cronjob`
 * `-ns, --no-scheduler`
 * `-y,  --yes, --assume-yes`
-* `-f,  --force`
 #### `adsorber.sh update {options}`:
 To keep the hosts file up-to-date.
 The command will:
@@ -112,7 +112,7 @@ Answers all prompts with `yes` e.g.,
 
 It'll not answer prompts which may harm your system. But `--force` will do it.
 #### `-f, --force`
-This will force the script to continue (dangerous) the installation/update e.g.,
+This will force the script to continue (dangerous) the update e.g.,
 * Continue if no backup has been created, overwriting the existing hosts file.
 
 ## Settings:
