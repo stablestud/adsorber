@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# The following variables are defined in adsorber.sh
+# The following variables are defined in adsorber.sh or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
 # HOSTS_FILE_PATH         /etc/hosts
@@ -48,7 +48,7 @@ createTmpDir() {
     if [ ! -d ${TMP_DIR_PATH} ]; then
         mkdir "${TMP_DIR_PATH}"
     else
-        echo "Removing previous tmp folder..."
+        #echo "Removing previous tmp folder..."
         rm -rf "${TMP_DIR_PATH}"
         mkdir "${TMP_DIR_PATH}"
     fi

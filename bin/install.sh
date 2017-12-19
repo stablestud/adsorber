@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# The following variables are defined in adsorber.sh
+# The following variables are defined in adsorber.conf or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
 # CRONTAB_DIR_PATH          /etc/cron.weekly
@@ -70,7 +70,7 @@ installSystemd() {
     echo "Installing systemd service..."
 
     cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.service"
-    
+
     # Replace the @ place holder line with SCRIPT_DIR_PATH
     sed -i "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SYSTEMD_DIR_PATH}/adsorber.service"
     cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.timer"

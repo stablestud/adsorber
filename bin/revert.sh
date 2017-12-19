@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# The following variables are defined in adsorber.sh
+# The following variables are defined in adsorber.conf or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
 # HOSTS_FILE_PATH         /etc/hosts

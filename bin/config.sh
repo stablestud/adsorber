@@ -1,0 +1,123 @@
+#!/bin/bash
+
+# The following variables are defined in adsorber.sh or adsorber.sh
+# If you run this file independently following variables need to be set:
+# ---variable:----------  ---default value:---
+# SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
+# SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
+# TMP_DIR_PATH            /tmp/adsorber
+
+SETTING_STRING+=("PRIMARY_LIST")
+SETTING_STRING+=("USE_PARTIAL_MATCHING")
+SETTING_STRING+=("HOSTS_FILE_PATH")
+SETTING_STRING+=("HOSTS_FILE_BACKUP_PATH")
+SETTING_STRING+=("CRONTAB_DIR_PATH")
+SETTING_STRING+=("SYSTEMD_DIR_PATH")
+
+readonly SETTING_STRING
+
+
+configCleanUp() {
+    rm -rf "${TMP_DIR_PATH}"
+
+    return 0
+}
+
+
+configCreateTmpDir() {
+    if [ ! -d ${TMP_DIR_PATH} ]; then
+        mkdir "${TMP_DIR_PATH}"
+    else
+        #echo "Removing previous tmp folder..."
+        rm -rf "${TMP_DIR_PATH}"
+        mkdir "${TMP_DIR_PATH}"
+    fi
+
+    return 0
+}
+
+
+copyConfig() {
+    if [ -s "${SCRIPT_DIR_PATH}/adsorber.conf" ]; then
+        cp "${SCRIPT_DIR_PATH}/adsorber.conf" "${TMP_DIR_PATH}/config"
+    else
+        echo "No config file found. Creating default."
+        cp "${SCRIPT_DIR_PATH}/bin/default/default-adsorber.conf" "${SCRIPT_DIR_PATH}/adsorber.conf"
+        configCleanUp
+        exit 1
+    fi
+
+    return 0
+}
+
+
+filterConfig() {
+    local i
+
+    for i in "${SETTING_STRING[@]}"; do
+        # keep only lines starting with value out of SETTING_STRING
+        # remove characters after SETTING="..."
+        sed -n "/^${i}/p" "${TMP_DIR_PATH}/config" \
+            >> "${TMP_DIR_PATH}/config-filtered"
+    done
+
+    return 0
+}
+
+
+readConfig() {
+    local line
+
+    while read -r line; do
+        readonly "${line}"
+    done < "${TMP_DIR_PATH}/config-filtered"
+
+    return 0
+}
+
+
+isVariableSet() {
+    if [ -z "${HOSTS_FILE_PATH}" ] || [ -z "${HOSTS_FILE_BACKUP_PATH}" ] || [ -z "${CRONTAB_DIR_PATH}" ] || [ -z "${SYSTEMD_DIR_PATH}" ]; then
+        echo "Missing settings in adsorber.conf"
+        echo "Please delete adsorber.conf and run '${0} install' to create a new config file."
+        configCleanUp
+        exit 1
+    fi
+
+    if [ -z "${PRIMARY_LIST}" ]; then
+        echo "PRIMARY_LIST not set in adsorber.conf"
+        echo "Using default value: 'blacklist'"
+        readonly PRIMARY_LIST="blacklist"
+    fi
+
+    if [ -z "${USE_PARTIAL_MATCHING}" ]; then
+        echo "USE_PARTIAL_MATCHING not set in adsorber.conf"
+        echo "Using default value: 'true'"
+        readonly USE_PARTIAL_MATCHING="true"
+    fi
+
+    return 0
+}
+
+
+printVariables() {
+    echo "${PRIMARY_LIST}"
+    echo "${USE_PARTIAL_MATCHING}"
+    echo "${HOSTS_FILE_PATH}"
+    echo "${HOSTS_FILE_BACKUP_PATH}"
+    echo "${CRONTAB_DIR_PATH}"
+    echo "${SYSTEMD_DIR_PATH}"
+    echo "${TMP_DIR_PATH}"
+    echo "${SCRIPT_DIR_PATH}"
+}
+
+
+config() {
+    configCreateTmpDir
+    copyConfig
+    filterConfig
+    readConfig
+    isVariableSet
+    printVariables
+    return 0
+}

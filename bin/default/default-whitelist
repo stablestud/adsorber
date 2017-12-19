@@ -1,6 +1,6 @@
 # Whitelist
 # Use to allow domains, even if they are blocked from hosts sources.
-# The blacklist overwrites the whitelist. This can be changed in adsorber.sh
+# The blacklist overwrites the whitelist. This can be changed in adsorber.conf
 #
 # Note: the whitelist uses partial matching. Means if you allow adserver.tld
 # all its subdomains like ad1.adserver.tld will also be allowed.
