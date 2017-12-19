@@ -20,6 +20,7 @@ revertHostsFile() {
     return 0
 }
 
+
 revert() {
     echo "Reverting ${HOSTS_FILE_PATH}..."
     revertHostsFile

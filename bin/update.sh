@@ -3,7 +3,6 @@
 # The following variables are defined in adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
-# BLACKLIST_FILE_PATH     SCRIPT_DIR_PATH/whitelist
 # HOSTS_FILE_PATH         /etc/hosts
 # HOSTS_FILE_BACKUP_PATH  /etc/hosts.original
 # PRIMARY_LIST            blacklist
@@ -11,7 +10,6 @@
 # SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
 # TMP_DIR_PATH            /tmp/adsorber
-# WHITELIST_FILE_PATH     SCRIPT_DIR_PATH/blacklist
 
 
 updateCleanUp() {
@@ -62,7 +60,7 @@ createTmpDir() {
 readSourceList() {
     if [ ! -s "${SOURCELIST_FILE_PATH}" ]; then
 
-        if [ ! -s "${BLACKLIST_FILE_PATH}" ]; then
+        if [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
             echo "Missing 'sources.list' and blacklist. To fix run '${0} install'." 1>&2
             exit 1
         fi
@@ -70,12 +68,12 @@ readSourceList() {
         echo "No sources to fetch from, ignoring..."
         return 1
     else
+        # Only read sources with http(s) at the beginning
+        # Remove inline # comments
         cat "${SOURCELIST_FILE_PATH}" \
             | sed -n '/^\s*http.*/p' \
             | sed 's/\s\+#.*//g' \
             > "${TMP_DIR_PATH}/sourceslist-filtered"
-            # Only read sources with http(s) at the beginning
-            # Remove inline # comments
 
         if [ ! -s "${TMP_DIR_PATH}/sourceslist-filtered" ]; then
             echo "No hosts set in sources.list, ignoring..."
@@ -89,11 +87,11 @@ readSourceList() {
 
 
 readWhiteList() {
-    if [ ! -e "${WHITELIST_FILE_PATH}" ]; then
+    if [ ! -e "${SCRIPT_DIR_PATH}/whitelist" ]; then
         echo "Whitelist does not exist, ignoring..." 1>&2
         return 1
     else
-        cat "${WHITELIST_FILE_PATH}" >> "${TMP_DIR_PATH}/whitelist"
+        cp "${SCRIPT_DIR_PATH}/whitelist" "${TMP_DIR_PATH}/whitelist"
         filterDomains "whitelist" "whitelist-filtered"
         sortDomains "whitelist-filtered" "whitelist-sorted"
 
@@ -109,11 +107,11 @@ readWhiteList() {
 
 
 readBlackList() {
-    if [ ! -e "${BLACKLIST_FILE_PATH}" ]; then
+    if [ ! -e "${SCRIPT_DIR_PATH}/blacklist" ]; then
         echo "Blacklist does not exist, ignoring..." 1>&2
         return 1
     else
-        cat "${BLACKLIST_FILE_PATH}" >> "${TMP_DIR_PATH}/blacklist"
+        cp "${SCRIPT_DIR_PATH}/blacklist" "${TMP_DIR_PATH}/blacklist"
         filterDomains "blacklist" "blacklist-filtered"
         sortDomains "blacklist-filtered" "blacklist-sorted"
 
@@ -183,7 +181,7 @@ filterDomains() {
         | sed -n '/^\s*0\.0\.0\.0\s\+.\+/p' \
         | sed 's/\s\+#.*//g' \
         | sed 's/[[:blank:]]\+/ /g' \
-        | sed -n '/^0\.0\.0\.0\s.*\..*/p' \
+        | sed -n '/^0\.0\.0\.0\s.\+\..\+/p' \
         | sed -n '/\.local\s*$/!p' \
         > "${TMP_DIR_PATH}/${output_file}"
         # - replace OSX '\r' and MS-DOS '\r\n' with Unix '\n' (linebreak)
@@ -202,8 +200,8 @@ sortDomains() {
     local input_file="${1}"
     local output_file="${2}"
 
-    sort "${TMP_DIR_PATH}/${input_file}" -f -u -o "${TMP_DIR_PATH}/${output_file}"
     # Sort the domains by alphabet and also remove duplicates
+    sort "${TMP_DIR_PATH}/${input_file}" -f -u -o "${TMP_DIR_PATH}/${output_file}"
 
     return 0
 }
@@ -237,6 +235,7 @@ applyWhiteList() {
         cp "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/applied-whitelist"
 
         while read -r domain; do
+
             if [ "${USE_PARTIAL_MATCHING}" == "true" ]; then
                 sed -i "/\.*${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
             elif [ "${USE_PARTIAL_MATCHING}" == "false" ]; then
@@ -246,6 +245,7 @@ applyWhiteList() {
                 updateCleanUp
                 exit 1
             fi
+
         done < "${TMP_DIR_PATH}/whitelist-sorted"
 
         cp "${TMP_DIR_PATH}/applied-whitelist" "${TMP_DIR_PATH}/cache"
@@ -274,9 +274,10 @@ preBuildHosts() {
     # Add hosts.header
     # Add hosts.original
     # Add hosts.title
+
+    # Replace @...@ with the path to the backup hosts
     cat "${SCRIPT_DIR_PATH}/bin/components/hosts_header" \
         | sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" > "${TMP_DIR_PATH}/hosts"
-        # Replace @...@ with the path to the backup hosts
 
     echo "" >> "${TMP_DIR_PATH}/hosts"
 
@@ -293,8 +294,9 @@ preBuildHosts() {
 
 buildHostsFile() {
     echo "" >> "${TMP_DIR_PATH}/hosts"
-    cat "${TMP_DIR_PATH}/cache" >> "${TMP_DIR_PATH}/hosts"
+
     # Glue the final piece of the hosts file to it
+    cat "${TMP_DIR_PATH}/cache" >> "${TMP_DIR_PATH}/hosts"
 
     return 0
 }
@@ -303,13 +305,13 @@ buildHostsFile() {
 applyHostsFile() {
     echo "Applying new hosts file...."
 
+    # Replace systems hosts file with the modified version
     cat "${TMP_DIR_PATH}/hosts" > "${HOSTS_FILE_PATH}" \
         || {
             echo "Couldn't apply hosts file. Aborting" 1>&2
             updateCleanUp
             exit 1
     }
-    # Replace systems hosts file with the modified version
 
     echo "Successfully applied new hosts file."
 

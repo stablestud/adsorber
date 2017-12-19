@@ -6,11 +6,11 @@
 # CRONTAB_DIR_PATH          /etc/cron.weekly
 # HOSTS_FILE_PATH           /etc/hosts
 # HOSTS_FILE_BACKUP_PATH    /etc/hosts.original
-# REPLY_TO_FORCE_PROMPT     Null (not set)
 # REPLY_TO_PROMPT           Null (not set)
 # REPLY_TO_SCHEDULER_PROMPT Null (not set)
 # SCRIPT_DIR_PATH           The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SYSTEMD_DIR_PATH          /etc/systemd/system
+
 
 copySourceList() {
     if [ ! -e "${SCRIPT_DIR_PATH}/sources.list" ] || [ ! -s "${SCRIPT_DIR_PATH}/sources.list" ]; then
@@ -21,6 +21,7 @@ copySourceList() {
     return 0
 }
 
+
 copyWhiteList() {
     if [ ! -e "${SCRIPT_DIR_PATH}/whitelist" ] || [ ! -s "${SCRIPT_DIR_PATH}/whitelist" ]; then
         cp "${SCRIPT_DIR_PATH}/bin/default/default-whitelist" "${SCRIPT_DIR_PATH}/whitelist" \
@@ -29,6 +30,7 @@ copyWhiteList() {
 
     return 0
 }
+
 
 copyBlackList() {
     if [ ! -e "${SCRIPT_DIR_PATH}/blacklist" ] || [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
@@ -39,47 +41,38 @@ copyBlackList() {
     return 0
 }
 
+
 backupHostsFile() {
     if [ ! -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
         cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
             || echo "Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
     else
-
-        if [ -z "${REPLY_TO_FORCE_PROMPT}" ]; then
-            read -p "Backup of ${HOSTS_FILE_PATH} already exist. Continue? [YES/n]: " REPLY_TO_FORCE_PROMPT
-        fi
-
-        case "${REPLY_TO_FORCE_PROMPT}" in
-            [Yy][Ee][Ss] )
-                return 0
-                ;;
-            * )
-                echo "Aborted." 1>&2
-                exit 1
-                ;;
-        esac
+        echo "Backup already exist, no need to backup."
     fi
 
     return 0
 }
+
 
 installCronjob() {
     echo "Installing cronjob..."
 
     cp "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" "${CRONTAB_DIR_PATH}"
 
-    sed -i "s|@.*|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${CRONTAB_DIR_PATH}/80adsorber"
     # Replace the @ place holder line with SCRIPT_DIR_PATH
+    sed -i "s|@.*|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${CRONTAB_DIR_PATH}/80adsorber"
 
     return 0
 }
+
 
 installSystemd() {
     echo "Installing systemd service..."
 
     cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.service"
-    sed -i "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SYSTEMD_DIR_PATH}/adsorber.service"
+    
     # Replace the @ place holder line with SCRIPT_DIR_PATH
+    sed -i "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SYSTEMD_DIR_PATH}/adsorber.service"
     cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.timer"
 
     systemctl daemon-reload \
@@ -88,6 +81,7 @@ installSystemd() {
 
     return 0
 }
+
 
 promptInstall() {
     if [ -z "${REPLY_TO_PROMPT}" ]; then
@@ -106,6 +100,7 @@ promptInstall() {
 
     return 0
 }
+
 
 promptScheduler() {
     if [ -z "${REPLY_TO_SCHEDULER_PROMPT}" ]; then
@@ -126,6 +121,7 @@ promptScheduler() {
 
     return 0
 }
+
 
 install() {
     echo "Installing Adsorber..."

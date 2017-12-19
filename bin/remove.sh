@@ -8,6 +8,7 @@
 # SCRIPT_DIR_PATH   The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SYSTEMD_DIR_PATH  /etc/systemd/system
 
+
 removeSystemd() {
     if [ -e "${SYSTEMD_DIR_PATH}/adsorber.service" ]; then
         systemctl stop adsorber.timer
@@ -20,7 +21,7 @@ removeSystemd() {
                 echo "Couldn't remove systemd service files." 1>&2
                 return 1
         }
-        
+
         systemctl daemon-reload
     else
         echo "Systemd service not installed. Skipping..." 1>&2
@@ -28,6 +29,7 @@ removeSystemd() {
 
     return 0
 }
+
 
 removeCronjob() {
     if [ -e "${CRONTAB_DIR_PATH}/80adsorber" ]; then
@@ -39,6 +41,7 @@ removeCronjob() {
 
     return 0
 }
+
 
 promptRemove() {
     if [ -z "${REPLY_TO_PROMPT}" ]; then
@@ -58,6 +61,7 @@ promptRemove() {
     return 0
 }
 
+
 removeHostsFile() {
     if [ -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
         mv "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
@@ -71,12 +75,14 @@ removeHostsFile() {
     return 0
 }
 
+
 removeCleanUp() {
     echo "Removing leftovers..."
     rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
 
     return 0
 }
+
 
 remove() {
     echo "Removing Adsorber..."

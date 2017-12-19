@@ -1,16 +1,14 @@
 #!/bin/bash
 
+# Set the blacklist as primary list, overwriting the whitelist
 readonly PRIMARY_LIST="blacklist"
 readonly USE_PARTIAL_MATCHING="true"
-# Set the blacklist as primary list, overwriting the whitelist
 
 readonly HOSTS_FILE_PATH="/etc/hosts"
 readonly HOSTS_FILE_BACKUP_PATH="/etc/hosts.original"
 readonly TMP_DIR_PATH="/tmp/adsorber"
 readonly SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
 readonly SOURCELIST_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
-readonly WHITELIST_FILE_PATH="${SCRIPT_DIR_PATH}/whitelist"
-readonly BLACKLIST_FILE_PATH="${SCRIPT_DIR_PATH}/blacklist"
 readonly CRONTAB_DIR_PATH="/etc/cron.weekly"
 readonly SYSTEMD_DIR_PATH="/etc/systemd/system"
 
@@ -22,6 +20,7 @@ if [ "${#}" -ne 0 ]; then
     shift
 fi
 
+
 checkRoot() {
     if [ "${UID}" -ne 0 ]; then
         echo "This script must be run as root." 1>&2
@@ -31,6 +30,7 @@ checkRoot() {
     return 0
 }
 
+
 checkForWrongParameters() {
     if [ "${WRONG_OPERATION}" != "" ] || [ "${#WRONG_OPTION[@]}" -ne 0 ]; then
         showUsage
@@ -38,6 +38,7 @@ checkForWrongParameters() {
 
     return 0
 }
+
 
 showUsage() {
     if [ "${WRONG_OPERATION}" != "" ]; then
@@ -53,6 +54,7 @@ showUsage() {
 
     exit 127
 }
+
 
 showHelp() {
     echo "Usage: ${0} [OPERATION] {options}"
@@ -78,13 +80,15 @@ showHelp() {
     echo "  -c,  --cron              - use cron as scheduler (use with 'install')"
     echo "  -ns, --no-scheduler      - set no scheduler (use with 'install')"
     echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
-    echo "  -f,  --force             - force the installation/update (dangerous)"
+    echo "  -f,  --force             - force the update if no /etc/hosts backup"
+    echo "                             has been created (dangerous)"
     echo ""
     echo "Documentation: https://github.com/stablestud/adsorber"
     echo "If you encounter any issues please report them to the Github repository."
 
     exit 0
 }
+
 
 showVersion() {
     echo "A(d)sorber ${VERSION}
@@ -98,6 +102,7 @@ showVersion() {
 
     exit 0
 }
+
 
 sourceFiles() {
     . "${SCRIPT_DIR_PATH}/bin/install.sh"
