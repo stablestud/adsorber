@@ -217,7 +217,7 @@ applyWhiteList() {
             elif [ "${USE_PARTIAL_MATCHING}" == "false" ]; then
                 sed -i "/\s\+${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
             else
-                echo "Wrong USE_PARTIAL_MATCHING set, either set to 'true' or 'false'."
+                echo "Wrong USE_PARTIAL_MATCHING set, either set to 'true' or 'false'." 1>&2
                 updateCleanUp
                 exit 1
             fi

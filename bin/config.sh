@@ -111,19 +111,19 @@ readConfig() {
 
 isVariableSet() {
     if [ -z "${HOSTS_FILE_PATH}" ] || [ -z "${HOSTS_FILE_BACKUP_PATH}" ] || [ -z "${CRONTAB_DIR_PATH}" ] || [ -z "${SYSTEMD_DIR_PATH}" ]; then
-        echo "Missing settings in adsorber.conf"
-        echo "Please delete adsorber.conf and run '${0} install' to create a new config file."
+        echo "Missing settings in adsorber.conf" 1>&2
+        echo "Please delete adsorber.conf and run '${0} install' to create a new config file." 1>&2
         configCleanUp
         exit 1
     fi
 
     if [ -z "${PRIMARY_LIST}" ]; then
-        echo "PRIMARY_LIST not set in adsorber.conf. Using default value: 'blacklist'"
+        echo "PRIMARY_LIST not set in adsorber.conf. Using default value: 'blacklist'" 1>&2
         readonly PRIMARY_LIST="blacklist"
     fi
 
     if [ -z "${USE_PARTIAL_MATCHING}" ]; then
-        echo "USE_PARTIAL_MATCHING not set in adsorber.conf. Using default value: 'true'"
+        echo "USE_PARTIAL_MATCHING not set in adsorber.conf. Using default value: 'true'" 1>&2
         readonly USE_PARTIAL_MATCHING="true"
     fi
 
@@ -132,7 +132,7 @@ isVariableSet() {
 
 isVariableValid() {
     if [ ! -f "${HOSTS_FILE_PATH}" ]; then
-        echo "Wrong HOSTS_FILE_PATH set. Can't access ${HOSTS_FILE_PATH}"
+        echo "Wrong HOSTS_FILE_PATH set. Can't access ${HOSTS_FILE_PATH}" 1>&2
     fi
 
     return 0

@@ -28,7 +28,7 @@ installCronjob() {
     echo "Installing cronjob..."
 
     if [ ! -d "${CRONTAB_DIR_PATH}" ]; then
-        echo "Wrong CRONTAB_DIR_PATH set. Can't access ${CRONTAB_DIR_PATH}. Exiting..."
+        echo "Wrong CRONTAB_DIR_PATH set. Can't access ${CRONTAB_DIR_PATH}. Exiting..." 1>&2
         exit 1
     fi
 
