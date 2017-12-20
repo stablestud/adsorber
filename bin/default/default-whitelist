@@ -3,7 +3,7 @@
 # The blacklist overwrites the whitelist. This can be changed in adsorber.conf
 #
 # Note: the whitelist uses partial matching. Means if you allow adserver.tld
-# all its subdomains like ad1.adserver.tld will also be allowed.
+# all its subdomains like ad1.adserver.tld also will be allowed.
 #
 # Entries must begin with either 127.0.0.1 or 0.0.0.0
 

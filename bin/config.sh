@@ -3,9 +3,11 @@
 # The following variables are defined in adsorber.sh or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
+# PRIMARY_LIST            blacklist
 # SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
 # TMP_DIR_PATH            /tmp/adsorber
+# USE_PARTIAL_MATCHING    true
 
 SETTING_STRING+=("PRIMARY_LIST")
 SETTING_STRING+=("USE_PARTIAL_MATCHING")
@@ -37,11 +39,42 @@ configCreateTmpDir() {
 }
 
 
+copySourceList() {
+    if [ ! -f "${SCRIPT_DIR_PATH}/sources.list" ] || [ ! -s "${SCRIPT_DIR_PATH}/sources.list" ]; then
+        cp "${SCRIPT_DIR_PATH}/bin/default/default-sources.list" "${SCRIPT_DIR_PATH}/sources.list" \
+            && echo "To add new host sources, please edit sources.list"
+    fi
+
+    return 0
+}
+
+
+copyWhiteList() {
+    if [ ! -f "${SCRIPT_DIR_PATH}/whitelist" ] || [ ! -s "${SCRIPT_DIR_PATH}/whitelist" ]; then
+        cp "${SCRIPT_DIR_PATH}/bin/default/default-whitelist" "${SCRIPT_DIR_PATH}/whitelist" \
+            && echo "To allow host sources, please edit the whitelist."
+    fi
+
+    return 0
+}
+
+
+copyBlackList() {
+    if [ ! -f "${SCRIPT_DIR_PATH}/blacklist" ] || [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
+        cp "${SCRIPT_DIR_PATH}/bin/default/default-blacklist" "${SCRIPT_DIR_PATH}/blacklist" \
+            && echo "To block additional host sources, please edit the blacklist."
+    fi
+
+    return 0
+}
+
+
 copyConfig() {
     if [ -s "${SCRIPT_DIR_PATH}/adsorber.conf" ]; then
         cp "${SCRIPT_DIR_PATH}/adsorber.conf" "${TMP_DIR_PATH}/config"
     else
         echo "No config file found. Creating default."
+        echo "Please re-run the command to continue."
         cp "${SCRIPT_DIR_PATH}/bin/default/default-adsorber.conf" "${SCRIPT_DIR_PATH}/adsorber.conf"
         configCleanUp
         exit 1
@@ -85,20 +118,25 @@ isVariableSet() {
     fi
 
     if [ -z "${PRIMARY_LIST}" ]; then
-        echo "PRIMARY_LIST not set in adsorber.conf"
-        echo "Using default value: 'blacklist'"
+        echo "PRIMARY_LIST not set in adsorber.conf. Using default value: 'blacklist'"
         readonly PRIMARY_LIST="blacklist"
     fi
 
     if [ -z "${USE_PARTIAL_MATCHING}" ]; then
-        echo "USE_PARTIAL_MATCHING not set in adsorber.conf"
-        echo "Using default value: 'true'"
+        echo "USE_PARTIAL_MATCHING not set in adsorber.conf. Using default value: 'true'"
         readonly USE_PARTIAL_MATCHING="true"
     fi
 
     return 0
 }
 
+isVariableValid() {
+    if [ ! -f "${HOSTS_FILE_PATH}" ]; then
+        echo "Wrong HOSTS_FILE_PATH set. Can't access ${HOSTS_FILE_PATH}"
+    fi
+
+    return 0
+}
 
 printVariables() {
     echo "${PRIMARY_LIST}"
@@ -109,15 +147,21 @@ printVariables() {
     echo "${SYSTEMD_DIR_PATH}"
     echo "${TMP_DIR_PATH}"
     echo "${SCRIPT_DIR_PATH}"
+
+    return 0
 }
 
 
 config() {
     configCreateTmpDir
+    copySourceList
+    copyWhiteList
+    copyBlackList
     copyConfig
     filterConfig
     readConfig
     isVariableSet
-    printVariables
+    isVariableValid
+    #printVariables # used for debugging
     return 0
 }

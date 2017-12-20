@@ -10,6 +10,7 @@
 # SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
 # TMP_DIR_PATH            /tmp/adsorber
+# USE_PARTIAL_MATCHING    true
 
 
 updateCleanUp() {
@@ -22,7 +23,7 @@ updateCleanUp() {
 
 
 checkBackupExist() {
-    if [ ! -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
+    if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
 
         if [ -z "${REPLY_TO_FORCE_PROMPT}" ]; then
             echo "Backup of ${HOSTS_FILE_PATH} does not exist. To backup run '${0} install'." 1>&2
@@ -87,19 +88,14 @@ readSourceList() {
 
 
 readWhiteList() {
-    if [ ! -e "${SCRIPT_DIR_PATH}/whitelist" ]; then
+    if [ ! -f "${SCRIPT_DIR_PATH}/whitelist" ]; then
         echo "Whitelist does not exist, ignoring..." 1>&2
         return 1
     else
         cp "${SCRIPT_DIR_PATH}/whitelist" "${TMP_DIR_PATH}/whitelist"
+
         filterDomains "whitelist" "whitelist-filtered"
         sortDomains "whitelist-filtered" "whitelist-sorted"
-
-        if [ ! -s "${TMP_DIR_PATH}/whitelist-sorted" ]; then
-            echo "Whitelist is empty, ignoring..."
-            return 1
-        fi
-
     fi
 
     return 0
@@ -107,19 +103,14 @@ readWhiteList() {
 
 
 readBlackList() {
-    if [ ! -e "${SCRIPT_DIR_PATH}/blacklist" ]; then
+    if [ ! -f "${SCRIPT_DIR_PATH}/blacklist" ]; then
         echo "Blacklist does not exist, ignoring..." 1>&2
         return 1
     else
         cp "${SCRIPT_DIR_PATH}/blacklist" "${TMP_DIR_PATH}/blacklist"
+
         filterDomains "blacklist" "blacklist-filtered"
         sortDomains "blacklist-filtered" "blacklist-sorted"
-
-        if [ ! -s "${TMP_DIR_PATH}/blacklist-sorted" ]; then
-            echo "Blacklist is empty, ignoring..."
-            return 1
-        fi
-
     fi
 
     return 0
@@ -207,28 +198,13 @@ sortDomains() {
 }
 
 
-mergeBlackList() {
-    local input_file="${1}"
-
-    if [ -s "${TMP_DIR_PATH}/blacklist-sorted" ]; then
-        echo "Applying blacklist..."
-
-        cat "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/blacklist-sorted" >> "${TMP_DIR_PATH}/merged-blacklist"
-        filterDomains "merged-blacklist" "merged-blacklist-filtered"
-        sortDomains "merged-blacklist-filtered" "merged-blacklist-sorted"
-        cp "${TMP_DIR_PATH}/merged-blacklist-sorted" "${TMP_DIR_PATH}/cache"
-    else
-        return 1
-    fi
-
-    return 0
-}
-
-
 applyWhiteList() {
     local domain
 
-    if [ -s "${TMP_DIR_PATH}/whitelist-sorted" ]; then
+    if [ ! -s "${TMP_DIR_PATH}/whitelist-sorted" ]; then
+        echo "Whitelist is empty, ignoring..."
+        return 1
+    else
         echo "Applying whitelist..."
 
         sed -i 's/^0\.0\.0\.0\s\+//g' "${TMP_DIR_PATH}/whitelist-sorted"
@@ -249,8 +225,27 @@ applyWhiteList() {
         done < "${TMP_DIR_PATH}/whitelist-sorted"
 
         cp "${TMP_DIR_PATH}/applied-whitelist" "${TMP_DIR_PATH}/cache"
-    else
+    fi
+
+    return 0
+}
+
+
+mergeBlackList() {
+    local input_file="${1}"
+
+    if [ ! -s "${TMP_DIR_PATH}/blacklist-sorted" ]; then
+        echo "Blacklist is empty, ignoring..."
         return 1
+    else
+        echo "Applying blacklist..."
+
+        cat "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/blacklist-sorted" >> "${TMP_DIR_PATH}/merged-blacklist"
+
+        filterDomains "merged-blacklist" "merged-blacklist-filtered"
+        sortDomains "merged-blacklist-filtered" "merged-blacklist-sorted"
+
+        cp "${TMP_DIR_PATH}/merged-blacklist-sorted" "${TMP_DIR_PATH}/cache"
     fi
 
     return 0
@@ -271,21 +266,20 @@ isCacheEmpty() {
 
 
 preBuildHosts() {
-    # Add hosts.header
-    # Add hosts.original
-    # Add hosts.title
-
+    # Add hosts_header
     # Replace @...@ with the path to the backup hosts
     cat "${SCRIPT_DIR_PATH}/bin/components/hosts_header" \
         | sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" > "${TMP_DIR_PATH}/hosts"
 
     echo "" >> "${TMP_DIR_PATH}/hosts"
 
+    # Add hosts.original
     cat "${HOSTS_FILE_BACKUP_PATH}" >> "${TMP_DIR_PATH}/hosts" \
         || echo "You may want to add your hostname to ${HOSTS_FILE_PATH}" 1>&2
 
     echo "" >> "${TMP_DIR_PATH}/hosts"
 
+    # Add hosts_title
     cat "${SCRIPT_DIR_PATH}/bin/components/hosts_title" >> "${TMP_DIR_PATH}/hosts"
 
     return 0
@@ -334,6 +328,7 @@ update() {
 
         cp "${TMP_DIR_PATH}/fetched-sorted" "${TMP_DIR_PATH}/cache"
     else
+        # Create empty cache file
         printf "" >> "${TMP_DIR_PATH}/cache"
     fi
 

@@ -8,7 +8,7 @@
 
 
 revertHostsFile() {
-    if [ -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
+    if [ -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
         cp "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
             && echo "Successfully reverted ${HOSTS_FILE_PATH}." \
             && echo "To reapply please run './adsorber.sh update'"

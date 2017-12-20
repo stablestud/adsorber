@@ -12,38 +12,8 @@
 # SYSTEMD_DIR_PATH          /etc/systemd/system
 
 
-copySourceList() {
-    if [ ! -e "${SCRIPT_DIR_PATH}/sources.list" ] || [ ! -s "${SCRIPT_DIR_PATH}/sources.list" ]; then
-        cp "${SCRIPT_DIR_PATH}/bin/default/default-sources.list" "${SCRIPT_DIR_PATH}/sources.list" \
-            && echo "To add new host sources, please edit sources.list"
-    fi
-
-    return 0
-}
-
-
-copyWhiteList() {
-    if [ ! -e "${SCRIPT_DIR_PATH}/whitelist" ] || [ ! -s "${SCRIPT_DIR_PATH}/whitelist" ]; then
-        cp "${SCRIPT_DIR_PATH}/bin/default/default-whitelist" "${SCRIPT_DIR_PATH}/whitelist" \
-            && echo "To allow host sources, please edit the whitelist."
-    fi
-
-    return 0
-}
-
-
-copyBlackList() {
-    if [ ! -e "${SCRIPT_DIR_PATH}/blacklist" ] || [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
-        cp "${SCRIPT_DIR_PATH}/bin/default/default-blacklist" "${SCRIPT_DIR_PATH}/blacklist" \
-            && echo "To block additional host sources, please edit the blacklist."
-    fi
-
-    return 0
-}
-
-
 backupHostsFile() {
-    if [ ! -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
+    if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
         cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
             || echo "Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
     else
@@ -57,6 +27,11 @@ backupHostsFile() {
 installCronjob() {
     echo "Installing cronjob..."
 
+    if [ ! -d "${CRONTAB_DIR_PATH}" ]; then
+        echo "Wrong CRONTAB_DIR_PATH set. Can't access ${CRONTAB_DIR_PATH}. Exiting..."
+        exit 1
+    fi
+
     cp "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" "${CRONTAB_DIR_PATH}"
 
     # Replace the @ place holder line with SCRIPT_DIR_PATH
@@ -68,6 +43,11 @@ installCronjob() {
 
 installSystemd() {
     echo "Installing systemd service..."
+
+    if [ ! -d "${SYSTEMD_DIR_PATH}" ]; then
+        echo "Wrong SYSTEMD_DIR_PATH set. Can't access ${SYSTEMD_DIR_PATH}. Exiting..."
+        exit 1
+    fi
 
     cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.service"
 
@@ -125,9 +105,6 @@ promptScheduler() {
 
 install() {
     echo "Installing Adsorber..."
-    copySourceList
-    copyWhiteList
-    copyBlackList
     promptInstall
     backupHostsFile
     promptScheduler

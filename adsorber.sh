@@ -4,7 +4,7 @@ readonly TMP_DIR_PATH="/tmp/adsorber"
 readonly SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
 readonly SOURCELIST_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
 
-readonly VERSION="0.1.1a"
+readonly VERSION="0.1.1b"
 
 readonly OPERATION="${1}"
 
