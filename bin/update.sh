@@ -16,7 +16,7 @@
 updateCleanUp() {
     echo "Cleaning up..."
 
-    rm -rf "${TMP_DIR_PATH}"
+    rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
 
     return 0
 }
@@ -36,6 +36,7 @@ checkBackupExist() {
                 ;;
             * )
                 echo "Aborted." 1>&2
+                updateCleanUp
                 exit 1
                 ;;
         esac
@@ -46,10 +47,10 @@ checkBackupExist() {
 
 
 createTmpDir() {
-    if [ ! -d ${TMP_DIR_PATH} ]; then
+    if [ ! -d "${TMP_DIR_PATH}" ]; then
         mkdir "${TMP_DIR_PATH}"
-    else
-        #echo "Removing previous tmp folder..."
+    elif [ ! -s "${TMP_DIR_PATH}/config-filtered" ]; then
+        echo "Removing previous tmp folder..."
         rm -rf "${TMP_DIR_PATH}"
         mkdir "${TMP_DIR_PATH}"
     fi
