@@ -1,18 +1,10 @@
 #!/bin/bash
 
-# Set the blacklist as primary list, overwriting the whitelist
-readonly PRIMARY_LIST="blacklist"
-readonly USE_PARTIAL_MATCHING="true"
-
-readonly HOSTS_FILE_PATH="/etc/hosts"
-readonly HOSTS_FILE_BACKUP_PATH="/etc/hosts.original"
 readonly TMP_DIR_PATH="/tmp/adsorber"
 readonly SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
 readonly SOURCELIST_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
-readonly CRONTAB_DIR_PATH="/etc/cron.weekly"
-readonly SYSTEMD_DIR_PATH="/etc/systemd/system"
 
-readonly VERSION="0.1.1a"
+readonly VERSION="0.1.1b"
 
 readonly OPERATION="${1}"
 
@@ -109,6 +101,7 @@ sourceFiles() {
     . "${SCRIPT_DIR_PATH}/bin/remove.sh"
     . "${SCRIPT_DIR_PATH}/bin/update.sh"
     . "${SCRIPT_DIR_PATH}/bin/revert.sh"
+    . "${SCRIPT_DIR_PATH}/bin/config.sh"
 
     return 0
 }
@@ -147,22 +140,26 @@ case "${OPERATION}" in
     install )
         checkForWrongParameters
         checkRoot
+        config
         install
         update
         ;;
     remove )
         checkForWrongParameters
         checkRoot
+        config
         remove
         ;;
     update )
         checkForWrongParameters
         checkRoot
+        config
         update
         ;;
     revert )
         checkForWrongParameters
         checkRoot
+        config
         revert
         ;;
     -[Hh] | help | --help )

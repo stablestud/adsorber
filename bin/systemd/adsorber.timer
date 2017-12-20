@@ -1,6 +1,6 @@
 [Unit]
 Description=Adsorber timer that runs the Adsorber service weekly.
-Documentation=https://github.com/stablestud/adsorber
+Documentation=https://github.com/stablestud/Adsorber
 
 [Timer]
 OnCalendar=weekly

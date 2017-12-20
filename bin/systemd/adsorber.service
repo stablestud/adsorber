@@ -1,6 +1,6 @@
 [Unit]
 Description=Adsorber service to update the hosts file periodically.
-Documentation=https://github.com/stablestud/adsorber
+Documentation=https://github.com/stablestud/Adsorber
 After=network.target
 
 [Service]

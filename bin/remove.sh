@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# The following variables are defined in adsorber.sh
+# The following variables are defined in adsorber.conf or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:---   ---default value:---
 # CRONTAB_DIR_PATH  /etc/cron.weekly
@@ -10,7 +10,7 @@
 
 
 removeSystemd() {
-    if [ -e "${SYSTEMD_DIR_PATH}/adsorber.service" ]; then
+    if [ -f "${SYSTEMD_DIR_PATH}/adsorber.service" ]; then
         systemctl stop adsorber.timer
         systemctl disable adsorber.timer
         #systemctl stop adsorber.service 2>/dev/null 1>&2
@@ -32,7 +32,7 @@ removeSystemd() {
 
 
 removeCronjob() {
-    if [ -e "${CRONTAB_DIR_PATH}/80adsorber" ]; then
+    if [ -f "${CRONTAB_DIR_PATH}/80adsorber" ]; then
         rm "${CRONTAB_DIR_PATH}/80adsorber" \
             && echo "Removed adsorber's cronjob."
     else
@@ -63,7 +63,7 @@ promptRemove() {
 
 
 removeHostsFile() {
-    if [ -e "${HOSTS_FILE_BACKUP_PATH}" ]; then
+    if [ -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
         mv "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
             && echo "Successfully restored ${HOSTS_FILE_PATH}"
     else

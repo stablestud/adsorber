@@ -1,4 +1,4 @@
-# This file is used to read from what sources we should fetch the hosts files.
+# This file is used to read from what sources we should fetch the hosts files from.
 # All links must begin with either http:// or https://
 
 https://adaway.org/hosts.txt

@@ -1,6 +1,6 @@
 # Blacklist
 # Use to manually block domains.
-# By default it overwrites the whitelist. This can be changed in adsorber.sh
+# By default it overwrites the whitelist. This can be changed in adsorber.conf
 #
 # Entries must begin with either 127.0.0.1 or 0.0.0.0
 
