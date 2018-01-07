@@ -32,10 +32,9 @@ installCronjob() {
         exit 1
     fi
 
-    cp "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" "${CRONTAB_DIR_PATH}"
-
-    # Replace the @ place holder line with SCRIPT_DIR_PATH
-    sed -i "s|@.*|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${CRONTAB_DIR_PATH}/80adsorber"
+    # Replace the @ place holder line with SCRIPT_DIR_PATH and copy the content to crons directory
+    sed "s|@.*|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" > "${CRONTAB_DIR_PATH}/80adsorber"
+    chmod u=rwx,g=rx,o=rx "${CRONTAB_DIR_PATH}/80adsorber"
 
     return 0
 }
@@ -49,11 +48,11 @@ installSystemd() {
         exit 1
     fi
 
-    cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.service"
-
-    # Replace the @ place holder line with SCRIPT_DIR_PATH
-    sed -i "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SYSTEMD_DIR_PATH}/adsorber.service"
+    # Replace the @ place holder line with SCRIPT_DIR_PATH and copy to its systemd directory
+    sed "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" > "${SYSTEMD_DIR_PATH}/adsorber.service"
     cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.timer"
+
+    chmod u=rwx,g=rx,o=rx "${SYSTEMD_DIR_PATH}/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.timer"
 
     systemctl daemon-reload \
         && systemctl enable adsorber.timer \

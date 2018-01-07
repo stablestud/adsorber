@@ -1,8 +1,8 @@
 # This file has been edited by Adsorber.
 #
 # To make any changes to this file please edit @${HOSTS_FILE_BACKUP_PATH}@
-# and run './adsorber.sh update'.
-# Or else your changes will be overwritten by adsorber every week.
+# and run './adsorber.sh update' to apply your changes.
+# Or else your changes will be overwritten by adsorber once a week.
 #
 # The domains will be updated once a week.
 # For further information please run './adsorber --help'

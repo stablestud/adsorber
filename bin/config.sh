@@ -8,13 +8,14 @@
 # SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
 # TMP_DIR_PATH            /tmp/adsorber
 # USE_PARTIAL_MATCHING    true
+# VERSION                 0.2.1 or similar
 
-SETTING_STRING+=("PRIMARY_LIST")
-SETTING_STRING+=("USE_PARTIAL_MATCHING")
-SETTING_STRING+=("HOSTS_FILE_PATH")
-SETTING_STRING+=("HOSTS_FILE_BACKUP_PATH")
-SETTING_STRING+=("CRONTAB_DIR_PATH")
-SETTING_STRING+=("SYSTEMD_DIR_PATH")
+SETTING_STRING[0]="PRIMARY_LIST"
+SETTING_STRING[1]="USE_PARTIAL_MATCHING"
+SETTING_STRING[2]="HOSTS_FILE_PATH"
+SETTING_STRING[3]="HOSTS_FILE_BACKUP_PATH"
+SETTING_STRING[4]="CRONTAB_DIR_PATH"
+SETTING_STRING[5]="SYSTEMD_DIR_PATH"
 
 readonly SETTING_STRING
 
@@ -42,7 +43,7 @@ configCreateTmpDir() {
 copySourceList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/sources.list" ] || [ ! -s "${SCRIPT_DIR_PATH}/sources.list" ]; then
         cp "${SCRIPT_DIR_PATH}/bin/default/default-sources.list" "${SCRIPT_DIR_PATH}/sources.list" \
-            && echo "To add new host sources, please edit sources.list"
+            && echo "Created sources.list: to add new host sources edit this file."
     fi
 
     return 0
@@ -52,7 +53,7 @@ copySourceList() {
 copyWhiteList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/whitelist" ] || [ ! -s "${SCRIPT_DIR_PATH}/whitelist" ]; then
         cp "${SCRIPT_DIR_PATH}/bin/default/default-whitelist" "${SCRIPT_DIR_PATH}/whitelist" \
-            && echo "To allow host sources, please edit the whitelist."
+            && echo "Created whitelist: To allow specific domains edit this file."
     fi
 
     return 0
@@ -62,7 +63,7 @@ copyWhiteList() {
 copyBlackList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/blacklist" ] || [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
         cp "${SCRIPT_DIR_PATH}/bin/default/default-blacklist" "${SCRIPT_DIR_PATH}/blacklist" \
-            && echo "To block additional host sources, please edit the blacklist."
+            && echo "Created blacklist: to block additional domains edit this file."
     fi
 
     return 0
@@ -75,7 +76,8 @@ copyConfig() {
     else
         echo "No config file found. Creating default."
         echo "Please re-run the command to continue."
-        cp "${SCRIPT_DIR_PATH}/bin/default/default-adsorber.conf" "${SCRIPT_DIR_PATH}/adsorber.conf"
+        sed "s|@.*|# Config file for Adsorber v${VERSION}|g" "${SCRIPT_DIR_PATH}/bin/default/default-adsorber.conf" > "${SCRIPT_DIR_PATH}/adsorber.conf"
+
         configCleanUp
         exit 1
     fi
@@ -132,7 +134,9 @@ isVariableSet() {
 
 isVariableValid() {
     if [ ! -f "${HOSTS_FILE_PATH}" ]; then
-        echo "Wrong HOSTS_FILE_PATH set. Can't access ${HOSTS_FILE_PATH}" 1>&2
+        echo "Wrong HOSTS_FILE_PATH set in adsorber.conf. Can't access ${HOSTS_FILE_PATH}" 1>&2
+        configCleanUp
+        exit 1
     fi
 
     return 0

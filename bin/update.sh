@@ -167,6 +167,13 @@ filterDomains() {
     local input_file="${1}"
     local output_file="${2}"
 
+    # - replace OSX '\r' and MS-DOS '\r\n' with Unix '\n' (linebreak)
+    # - replace 127.0.0.1 and 127.0.1.1 with 0.0.0.0
+    # - only keep lines starting with 0.0.0.0
+    # - remove inline '#' comments
+    # - replace tabs and multiple spaces with one space
+    # - remove domains without a dot (e.g localhost , loopback , ip6-allnodes , etc...)
+    # - remove domains that are redirecting to *.local
     cat "${TMP_DIR_PATH}/${input_file}" \
         | sed 's/\r/\n/g' \
         | sed 's/^\s*127\.0\.[01]\.1/0\.0\.0\.0/g' \
@@ -176,13 +183,6 @@ filterDomains() {
         | sed -n '/^0\.0\.0\.0\s.\+\..\+/p' \
         | sed -n '/\.local\s*$/!p' \
         > "${TMP_DIR_PATH}/${output_file}"
-        # - replace OSX '\r' and MS-DOS '\r\n' with Unix '\n' (linebreak)
-        # - replace 127.0.0.1 and 127.0.1.1 with 0.0.0.0
-        # - only keep lines starting with 0.0.0.0
-        # - remove inline '#' comments
-        # - replace tabs and multiple spaces with one space
-        # - remove domains without a dot (e.g localhost , loopback , ip6-allnodes , etc...)
-        # - remove domains that are redirecting to *.local
 
     return 0
 }
@@ -267,10 +267,8 @@ isCacheEmpty() {
 
 
 preBuildHosts() {
-    # Add hosts_header
     # Replace @...@ with the path to the backup hosts
-    cat "${SCRIPT_DIR_PATH}/bin/components/hosts_header" \
-        | sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" > "${TMP_DIR_PATH}/hosts"
+    sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" "${SCRIPT_DIR_PATH}/bin/components/hosts_header" > "${TMP_DIR_PATH}/hosts"
 
     echo "" >> "${TMP_DIR_PATH}/hosts"
 
@@ -290,8 +288,12 @@ preBuildHosts() {
 buildHostsFile() {
     echo "" >> "${TMP_DIR_PATH}/hosts"
 
-    # Glue the final piece of the hosts file to it
+    # Add ad-domains to the hosts file
     cat "${TMP_DIR_PATH}/cache" >> "${TMP_DIR_PATH}/hosts"
+
+    echo "" >> "${TMP_DIR_PATH}/hosts"
+
+    sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" "${SCRIPT_DIR_PATH}/bin/components/hosts_header" >> "${TMP_DIR_PATH}/hosts"
 
     return 0
 }
@@ -343,7 +345,7 @@ update() {
             mergeBlackList
             ;;
         * )
-            echo "Wrong PRIMARY_LIST set. Choose either 'whitelist' or 'blacklist'" 1>&2
+            echo "Wrong PRIMARY_LIST set in adsorber.conf. Choose either 'whitelist' or 'blacklist'" 1>&2
             updateCleanUp
             exit 1
             ;;
