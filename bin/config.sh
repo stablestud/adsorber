@@ -31,7 +31,7 @@ configCreateTmpDir() {
     if [ ! -d ${TMP_DIR_PATH} ]; then
         mkdir "${TMP_DIR_PATH}"
     else
-        #echo "Removing previous tmp folder..."
+        #echo -e "Removing previous tmp folder..."
         rm -rf "${TMP_DIR_PATH}"
         mkdir "${TMP_DIR_PATH}"
     fi
@@ -43,7 +43,7 @@ configCreateTmpDir() {
 copySourceList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/sources.list" ] || [ ! -s "${SCRIPT_DIR_PATH}/sources.list" ]; then
         cp "${SCRIPT_DIR_PATH}/bin/default/default-sources.list" "${SCRIPT_DIR_PATH}/sources.list" \
-            && echo "Created sources.list: to add new host sources edit this file."
+            && echo -e "${PREFIX}Created sources.list: to add new host sources edit this file."
     fi
 
     return 0
@@ -53,7 +53,7 @@ copySourceList() {
 copyWhiteList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/whitelist" ] || [ ! -s "${SCRIPT_DIR_PATH}/whitelist" ]; then
         cp "${SCRIPT_DIR_PATH}/bin/default/default-whitelist" "${SCRIPT_DIR_PATH}/whitelist" \
-            && echo "Created whitelist: To allow specific domains edit this file."
+            && echo -e "${PREFIX}Created whitelist: to allow specific domains edit this file."
     fi
 
     return 0
@@ -63,7 +63,7 @@ copyWhiteList() {
 copyBlackList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/blacklist" ] || [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
         cp "${SCRIPT_DIR_PATH}/bin/default/default-blacklist" "${SCRIPT_DIR_PATH}/blacklist" \
-            && echo "Created blacklist: to block additional domains edit this file."
+            && echo -e "${PREFIX}Created blacklist: to block additional domains edit this file."
     fi
 
     return 0
@@ -74,8 +74,8 @@ copyConfig() {
     if [ -s "${SCRIPT_DIR_PATH}/adsorber.conf" ]; then
         cp "${SCRIPT_DIR_PATH}/adsorber.conf" "${TMP_DIR_PATH}/config"
     else
-        echo "No config file found. Creating default."
-        echo "Please re-run the command to continue."
+        echo -e "! No config file found. Creating default." 1>&2
+        echo -e "${PREFIX}Please re-run the command to continue."
         sed "s|@.*|# Config file for Adsorber v${VERSION}|g" "${SCRIPT_DIR_PATH}/bin/default/default-adsorber.conf" > "${SCRIPT_DIR_PATH}/adsorber.conf"
 
         configCleanUp
@@ -113,19 +113,19 @@ readConfig() {
 
 isVariableSet() {
     if [ -z "${HOSTS_FILE_PATH}" ] || [ -z "${HOSTS_FILE_BACKUP_PATH}" ] || [ -z "${CRONTAB_DIR_PATH}" ] || [ -z "${SYSTEMD_DIR_PATH}" ]; then
-        echo "Missing settings in adsorber.conf" 1>&2
-        echo "Please delete adsorber.conf and run '${0} install' to create a new config file." 1>&2
+        echo -e "! Missing setting(s) in adsorber.conf." 1>&2
+        echo -e "${PREFIX}Please delete adsorber.conf and run '${0} install' to create a new config file." 1>&2
         configCleanUp
         exit 1
     fi
 
     if [ -z "${PRIMARY_LIST}" ]; then
-        echo "PRIMARY_LIST not set in adsorber.conf. Using default value: 'blacklist'" 1>&2
+        echo -e "${PREFIX_WARNING}PRIMARY_LIST not set in adsorber.conf. Using default value: blacklist" 1>&2
         readonly PRIMARY_LIST="blacklist"
     fi
 
     if [ -z "${USE_PARTIAL_MATCHING}" ]; then
-        echo "USE_PARTIAL_MATCHING not set in adsorber.conf. Using default value: 'true'" 1>&2
+        echo -e "${PREFIX_WARNING}USE_PARTIAL_MATCHING not set in adsorber.conf. Using default value: true" 1>&2
         readonly USE_PARTIAL_MATCHING="true"
     fi
 
@@ -134,7 +134,7 @@ isVariableSet() {
 
 isVariableValid() {
     if [ ! -f "${HOSTS_FILE_PATH}" ]; then
-        echo "Wrong HOSTS_FILE_PATH set in adsorber.conf. Can't access ${HOSTS_FILE_PATH}" 1>&2
+        echo -e "! Wrong HOSTS_FILE_PATH set in adsorber.conf. Can't access: ${HOSTS_FILE_PATH}" 1>&2
         configCleanUp
         exit 1
     fi
@@ -143,20 +143,21 @@ isVariableValid() {
 }
 
 printVariables() {
-    echo "${PRIMARY_LIST}"
-    echo "${USE_PARTIAL_MATCHING}"
-    echo "${HOSTS_FILE_PATH}"
-    echo "${HOSTS_FILE_BACKUP_PATH}"
-    echo "${CRONTAB_DIR_PATH}"
-    echo "${SYSTEMD_DIR_PATH}"
-    echo "${TMP_DIR_PATH}"
-    echo "${SCRIPT_DIR_PATH}"
+    echo -e "  - PRIMARY_LIST: ${PRIMARY_LIST}"
+    echo -e "  - USE_PARTIAL_MATCHING: ${USE_PARTIAL_MATCHING}"
+    echo -e "  - HOSTS_FILE_PATH:: ${HOSTS_FILE_PATH}"
+    echo -e "  - HOSTS_FILE_BACKUP_PATH: ${HOSTS_FILE_BACKUP_PATH}"
+    echo -e "  - CRONTAB_DIR_PATH: ${CRONTAB_DIR_PATH}"
+    echo -e "  - SYSTEMD_DIR_PATH: ${SYSTEMD_DIR_PATH}"
+    echo -e "  - TMP_DIR_PATH: ${TMP_DIR_PATH}"
+    echo -e "  - SCRIPT_DIR_PATH: ${SCRIPT_DIR_PATH}"
 
     return 0
 }
 
 
 config() {
+    echo -e "${BWHITE}Reading configuration ... ${COLOUR_RESET}"
     configCreateTmpDir
     copySourceList
     copyWhiteList

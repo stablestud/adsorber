@@ -12,12 +12,19 @@
 # SYSTEMD_DIR_PATH          /etc/systemd/system
 
 
+installCleanUp() {
+    rm -rf "${TMP_DIR_PATH}"
+
+    return 0
+}
+
+
 backupHostsFile() {
     if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
         cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
-            || echo "Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
+            && echo -e "${PREFIX}Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
     else
-        echo "Backup already exist, no need to backup."
+        echo -e "${PREFIX}Backup already exist, no need to backup."
     fi
 
     return 0
@@ -25,10 +32,11 @@ backupHostsFile() {
 
 
 installCronjob() {
-    echo "Installing cronjob..."
+    echo -e "${PREFIX}Installing cronjob..."
 
     if [ ! -d "${CRONTAB_DIR_PATH}" ]; then
-        echo "Wrong CRONTAB_DIR_PATH set. Can't access ${CRONTAB_DIR_PATH}. Exiting..." 1>&2
+        echo -e "! Wrong CRONTAB_DIR_PATH set. Can't access: ${CRONTAB_DIR_PATH}." 1>&2
+        installCleanUp
         exit 1
     fi
 
@@ -41,10 +49,11 @@ installCronjob() {
 
 
 installSystemd() {
-    echo "Installing systemd service..."
+    echo -e "${PREFIX}Installing systemd service..."
 
     if [ ! -d "${SYSTEMD_DIR_PATH}" ]; then
-        echo "Wrong SYSTEMD_DIR_PATH set. Can't access ${SYSTEMD_DIR_PATH}. Exiting..."
+        echo -e "! Wrong SYSTEMD_DIR_PATH set. Can't access: ${SYSTEMD_DIR_PATH}."
+        installCleanUp
         exit 1
     fi
 
@@ -54,9 +63,10 @@ installSystemd() {
 
     chmod u=rwx,g=rx,o=rx "${SYSTEMD_DIR_PATH}/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.timer"
 
+    printf "${PREFIX}"
     systemctl daemon-reload \
         && systemctl enable adsorber.timer \
-        && systemctl start adsorber.timer || echo "Couldn't start systemd service." 1>&2
+        && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start systemd service." 1>&2
 
     return 0
 }
@@ -64,7 +74,7 @@ installSystemd() {
 
 promptInstall() {
     if [ -z "${REPLY_TO_PROMPT}" ]; then
-        read -p "Do you really want to install adsorber? [Y/n]: " REPLY_TO_PROMPT
+        read -p "${PREFIX}Do you really want to install Adsorber? [Y/n]: " REPLY_TO_PROMPT
     fi
 
     case "${REPLY_TO_PROMPT}" in
@@ -72,7 +82,8 @@ promptInstall() {
             return 0
             ;;
         * )
-            echo "Installation cancelled." 1>&2
+            echo -e "${PREFIX_WARNING}Installation cancelled." 1>&2
+            installCleanUp
             exit 1
             ;;
     esac
@@ -83,7 +94,7 @@ promptInstall() {
 
 promptScheduler() {
     if [ -z "${REPLY_TO_SCHEDULER_PROMPT}" ]; then
-        read -p "What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
+        read -p "${PREFIX}What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
     fi
 
     case "${REPLY_TO_SCHEDULER_PROMPT}" in
@@ -94,7 +105,7 @@ promptScheduler() {
             installCronjob
             ;;
         * )
-            echo "Skipping scheduler creation..."
+            echo -e "${PREFIX}Skipping scheduler creation..."
             ;;
     esac
 
@@ -103,7 +114,7 @@ promptScheduler() {
 
 
 install() {
-    echo "Installing Adsorber..."
+    echo -e "${BWHITE}Installing Adsorber ...${COLOUR_RESET}"
     promptInstall
     backupHostsFile
     promptScheduler

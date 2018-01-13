@@ -10,10 +10,10 @@
 revertHostsFile() {
     if [ -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
         cp "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
-            && echo "Successfully reverted ${HOSTS_FILE_PATH}." \
-            && echo "To reapply please run './adsorber.sh update'"
+            && echo -e "${PREFIX}Successfully reverted ${HOSTS_FILE_PATH}." \
+            && echo -e "${PREFIX}To reapply please run './adsorber.sh update'"
     else
-        echo "Can not restore hosts file. Original hosts file does not exist." 1>&2
+        echo -e "${PREFIX_WARNING}Can not restore hosts file. Original hosts file does not exist." 1>&2
         exit 1
     fi
 
@@ -22,7 +22,7 @@ revertHostsFile() {
 
 
 revert() {
-    echo "Reverting ${HOSTS_FILE_PATH}..."
+    echo -e "${BWHITE}Reverting ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
     revertHostsFile
 
     return 0
