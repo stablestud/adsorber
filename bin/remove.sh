@@ -25,7 +25,7 @@ removeSystemd() {
 
         systemctl daemon-reload
     else
-        echo -e "${PREFIX}Systemd service not installed. Skipping..." 1>&2
+        echo -e "${PREFIX}Systemd service not installed. Skipping ..." 1>&2
     fi
 
     return 0
@@ -37,7 +37,7 @@ removeCronjob() {
         rm "${CRONTAB_DIR_PATH}/80adsorber" \
             && echo -e "${PREFIX}Removed adsorber's cronjob."
     else
-        echo -e "${PREFIX}Cronjob not installed. Skipping..." 1>&2
+        echo -e "${PREFIX}Cronjob not installed. Skipping ..." 1>&2
     fi
 
     return 0
@@ -46,7 +46,7 @@ removeCronjob() {
 
 promptRemove() {
     if [ -z "${REPLY_TO_PROMPT}" ]; then
-        read -p "${PREFIX}Do you really want to remove adsorber? [Y/n] " REPLY_TO_PROMPT
+        read -p "${PREFIX_INPUT}Do you really want to remove adsorber? [Y/n] " REPLY_TO_PROMPT
     fi
 
     case "${REPLY_TO_PROMPT}" in
@@ -78,7 +78,7 @@ removeHostsFile() {
 
 
 removeCleanUp() {
-    echo -e "${PREFIX}Removing leftovers..."
+    echo -e "${PREFIX}Removing leftovers ..."
     rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
 
     return 0

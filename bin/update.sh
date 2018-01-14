@@ -27,8 +27,8 @@ checkBackupExist() {
     if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
 
         if [ -z "${REPLY_TO_FORCE_PROMPT}" ]; then
-            echo -e "${PREFIX_FATAL}Backup of ${HOSTS_FILE_PATH} does not exist. To backup run '${0} install'." 1>&2
-            read -p "${PREFIX_WARNING}Ignore issue and continue? (May break your system, not recommended) [YES/n]: " REPLY_TO_FORCE_PROMPT
+            echo -e "${PREFIX_FATAL}Backup of ${HOSTS_FILE_PATH} does not exist. To backup run '${0} install'.${COLOUR_RESET}" 1>&2
+            read -p "${PREFIX_INPUT}Ignore issue and continue? (May break your system, not recommended) [YES/n]: " REPLY_TO_FORCE_PROMPT
         fi
 
         case "${REPLY_TO_FORCE_PROMPT}" in
@@ -64,7 +64,7 @@ readSourceList() {
     if [ ! -s "${SOURCELIST_FILE_PATH}" ]; then
 
         if [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
-            echo -e "${PREFIX_FATAL}Missing 'sources.list' and blacklist. To fix run '${0} install'." 1>&2
+            echo -e "${PREFIX_FATAL}Missing 'sources.list' and blacklist. To fix run '${0} install'.${COLOUR_RESET}" 1>&2
             exit 1
         fi
 
@@ -128,27 +128,23 @@ fetchSources() {
         (( total_count++ ))
         echo -e "${PREFIX}${IWHITE}Getting${COLOUR_RESET}: ${domain}"
 
+        if [ $(type -fP wget) ]; then
+            printf "${PREFIX}"
 
-        #if [ $(type -fP wget) ]; then
-        #    printf "${PREFIX}"
-
-        #    if wget "${domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${TMP_DIR_PATH}/fetched"; then
-        #        (( successful_count++ ))
-        #    else
-        #        echo -e "${PREFIX_WARNING}wget couldn't fetch: ${domain}" 1>&2
-        #    fi
-
-        if [ $(type -fP curl) ]; then
+            if wget "${domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${TMP_DIR_PATH}/fetched"; then
+                (( successful_count++ ))
+            else
+                echo -e "${PREFIX_WARNING}wget couldn't fetch: ${domain}" 1>&2
+            fi
+        elif [ $(type -fP curl) ]; then
             printf "${PREFIX}"
             if curl "${domain}" --progress-bar -L --connect-timeout 30 --fail --retry 1 >> "${TMP_DIR_PATH}/fetched"; then
                 (( successful_count++ ))
             else
                 echo -e "${PREFIX_WARNING}Curl couldn't fetch ${domain}" 1>&2
             fi
-
-
         else
-            echo -e "${PREFIX_FATAL}Neither curl nor wget installed. Can't continue." 1>&2
+            echo -e "${PREFIX_FATAL}Neither curl nor wget installed. Can't continue.${COLOUR_RESET}" 1>&2
             updateCleanUp
             exit 2
         fi
@@ -221,7 +217,7 @@ applyWhiteList() {
             elif [ "${USE_PARTIAL_MATCHING}" == "false" ]; then
                 sed -i "/\s\+${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
             else
-                echo -e "${PREFIX_FATAL}Wrong USE_PARTIAL_MATCHING set, either set it to 'true' or 'false'." 1>&2
+                echo -e "${PREFIX_FATAL}Wrong USE_PARTIAL_MATCHING set, either set it to 'true' or 'false'.${COLOUR_RESET}" 1>&2
                 updateCleanUp
                 exit 1
             fi
@@ -302,18 +298,24 @@ buildHostsFile() {
 }
 
 
+countBlockedDomains() {
+    readonly COUNT_BLOCKED="$(cat ${TMP_DIR_PATH}/cache | wc -l)"
+    return 0
+}
+
+
 applyHostsFile() {
     echo -e "${PREFIX}Applying new hosts file ..."
 
     # Replace systems hosts file with the modified version
     cat "${TMP_DIR_PATH}/hosts" > "${HOSTS_FILE_PATH}" \
         || {
-            echo -e "${PREFIX_FATAL}Couldn't apply hosts file. Aborting" 1>&2
+            echo -e "${PREFIX_FATAL}Couldn't apply hosts file. Aborting.${COLOUR_RESET}" 1>&2
             updateCleanUp
             exit 1
     }
 
-    echo -e "${PREFIX}${IWHITE}Successfully applied new hosts file.${COLOUR_RESET}"
+    echo -e "${PREFIX}${IWHITE}Successfully applied new hosts file with ${BWHITE}${COUNT_BLOCKED} ${IWHITE}blocked domains.${COLOUR_RESET}"
 
     return 0
 }
@@ -348,7 +350,7 @@ update() {
             mergeBlackList
             ;;
         * )
-            echo -e "${PREFIX_FATAL}Wrong PRIMARY_LIST set in adsorber.conf. Choose either 'whitelist' or 'blacklist'" 1>&2
+            echo -e "${PREFIX_FATAL}Wrong PRIMARY_LIST set in adsorber.conf. Choose either 'whitelist' or 'blacklist'${COLOUR_RESET}" 1>&2
             updateCleanUp
             exit 1
             ;;
@@ -357,6 +359,7 @@ update() {
     isCacheEmpty
     preBuildHosts
     buildHostsFile
+    countBlockedDomains
     applyHostsFile
     updateCleanUp
 

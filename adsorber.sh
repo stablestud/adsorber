@@ -4,7 +4,7 @@ readonly TMP_DIR_PATH="/tmp/adsorber"
 readonly SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
 readonly SOURCELIST_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
 
-readonly VERSION="0.2.1"
+readonly VERSION="0.2.2"
 
 readonly OPERATION="${1}"
 
@@ -15,7 +15,7 @@ fi
 
 checkRoot() {
     if [ "${UID}" -ne 0 ]; then
-        echo -e "This script must be run as root." 1>&2
+        echo "This script must be run as root." 1>&2
         exit 126
     fi
 
@@ -34,56 +34,56 @@ checkForWrongParameters() {
 
 showUsage() {
     if [ "${WRONG_OPERATION}" != "" ]; then
-        echo -e "Adsorber: Invalid operation: '${WRONG_OPERATION}'" 1>&2
+        echo "Adsorber: Invalid operation: '${WRONG_OPERATION}'" 1>&2
     fi
 
     if [ "${WRONG_OPTION}" != "" ]; then
-        echo -e "Adsorber: Invalid option: ${WRONG_OPTION[@]}" 1>&2
+        echo "Adsorber: Invalid option: ${WRONG_OPTION[@]}" 1>&2
     fi
 
-    echo -e "Usage: ${0} [install|remove|update|revert] {options}" 1>&2
-    echo -e "Try --help for more information." 1>&2
+    echo "Usage: ${0} [install|remove|update|revert] {options}" 1>&2
+    echo "Try --help for more information." 1>&2
 
     exit 127
 }
 
 
 showHelp() {
-    echo -e "Usage: ${0} [OPERATION] {options}"
-    echo -e ""
-    echo -e "A(d)sorber blocks ads by 'absorbing' and dumbing them into void."
-    echo -e "           (with the help of the hosts file)"
-    echo -e ""
-    echo -e "Operations:"
-    echo -e "  install - setup necessary things needed for adsorber"
-    echo -e "              e.g., create backup file of hosts file,"
-    echo -e "                    create scheduler which updates the host file once a week."
-    echo -e "  update  - update hosts file with newest ad servers"
-    echo -e "  revert  - revert hosts file to its original state"
-    echo -e "            (it does not remove the schedule, so this should be used temporary)"
-    echo -e "  remove  - completely remove changes made by adsorber"
-    echo -e "              e.g., remove scheduler (if set)"
-    echo -e "                    revert hosts file (if not already done)"
-    echo -e "  version - show version of this shell script"
-    echo -e "  help    - show this help"
-    echo -e ""
-    echo -e "Options: (not required)"
-    echo -e "  -s,  --systemd           - use systemd ..."
-    echo -e "  -c,  --cron              - use cron as scheduler (use with 'install')"
-    echo -e "  -ns, --no-scheduler      - set no scheduler (use with 'install')"
-    echo -e "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
-    echo -e "  -f,  --force             - force the update if no /etc/hosts backup"
-    echo -e "                             has been created (dangerous)"
-    echo -e ""
-    echo -e "Documentation: https://github.com/stablestud/adsorber"
-    echo -e "If you encounter any issues please report them to the Github repository."
+    echo "Usage: ${0} [OPERATION] {options}"
+    echo ""
+    echo "A(d)sorber blocks ads by 'absorbing' and dumbing them into void."
+    echo "           (with the help of the hosts file)"
+    echo ""
+    echo "Operations:"
+    echo "  install - setup necessary things needed for adsorber"
+    echo "              e.g., create backup file of hosts file,"
+    echo "                    create scheduler which updates the host file once a week."
+    echo "  update  - update hosts file with newest ad servers"
+    echo "  revert  - revert hosts file to its original state"
+    echo "            (it does not remove the schedule, so this should be used temporary)"
+    echo "  remove  - completely remove changes made by adsorber"
+    echo "              e.g., remove scheduler (if set)"
+    echo "                    revert hosts file (if not already done)"
+    echo "  version - show version of this shell script"
+    echo "  help    - show this help"
+    echo ""
+    echo "Options: (not required)"
+    echo "  -s,  --systemd           - use systemd ..."
+    echo "  -c,  --cron              - use cron as scheduler (use with 'install')"
+    echo "  -ns, --no-scheduler      - set no scheduler (use with 'install')"
+    echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
+    echo "  -f,  --force             - force the update if no /etc/hosts backup"
+    echo "                             has been created (dangerous)"
+    echo ""
+    echo "Documentation: https://github.com/stablestud/adsorber"
+    echo "If you encounter any issues please report them to the Github repository."
 
     exit 0
 }
 
 
 showVersion() {
-    echo -e "A(d)sorber ${VERSION}
+    echo "A(d)sorber ${VERSION}
 
   License MIT
   Copyright (c) 2017 stablestud
@@ -179,6 +179,6 @@ case "${OPERATION}" in
         ;;
 esac
 
-echo -e "${PREFIX}${BWHITE}Finished.${COLOUR_RESET}"
+echo -e "${BWHITE}Finished.${COLOUR_RESET}"
 
 exit 0

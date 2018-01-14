@@ -31,7 +31,7 @@ configCreateTmpDir() {
     if [ ! -d ${TMP_DIR_PATH} ]; then
         mkdir "${TMP_DIR_PATH}"
     else
-        #echo -e "Removing previous tmp folder..."
+        #echo -e "Removing previous tmp folder ..."
         rm -rf "${TMP_DIR_PATH}"
         mkdir "${TMP_DIR_PATH}"
     fi

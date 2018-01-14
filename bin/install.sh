@@ -32,7 +32,7 @@ backupHostsFile() {
 
 
 installCronjob() {
-    echo -e "${PREFIX}Installing cronjob..."
+    echo -e "${PREFIX}Installing cronjob ..."
 
     if [ ! -d "${CRONTAB_DIR_PATH}" ]; then
         echo -e "! Wrong CRONTAB_DIR_PATH set. Can't access: ${CRONTAB_DIR_PATH}." 1>&2
@@ -49,7 +49,7 @@ installCronjob() {
 
 
 installSystemd() {
-    echo -e "${PREFIX}Installing systemd service..."
+    echo -e "${PREFIX}Installing systemd service ..."
 
     if [ ! -d "${SYSTEMD_DIR_PATH}" ]; then
         echo -e "! Wrong SYSTEMD_DIR_PATH set. Can't access: ${SYSTEMD_DIR_PATH}."
@@ -74,7 +74,7 @@ installSystemd() {
 
 promptInstall() {
     if [ -z "${REPLY_TO_PROMPT}" ]; then
-        read -p "${PREFIX}Do you really want to install Adsorber? [Y/n]: " REPLY_TO_PROMPT
+        read -p "${PREFIX_INPUT}Do you really want to install Adsorber? [Y/n]: " REPLY_TO_PROMPT
     fi
 
     case "${REPLY_TO_PROMPT}" in
@@ -94,7 +94,7 @@ promptInstall() {
 
 promptScheduler() {
     if [ -z "${REPLY_TO_SCHEDULER_PROMPT}" ]; then
-        read -p "${PREFIX}What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
+        read -p "${PREFIX_INPUT}What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
     fi
 
     case "${REPLY_TO_SCHEDULER_PROMPT}" in
@@ -105,7 +105,7 @@ promptScheduler() {
             installCronjob
             ;;
         * )
-            echo -e "${PREFIX}Skipping scheduler creation..."
+            echo -e "${PREFIX}Skipping scheduler creation ..."
             ;;
     esac
 
