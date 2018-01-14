@@ -10,6 +10,7 @@
 # COLOUR_RESET            \033[0m
 # HOSTS_FILE_PATH         /etc/hosts
 # HOSTS_FILE_BACKUP_PATH  /etc/hosts.original
+# IGNORE_DOWNLOAD_ERROR   true
 # PREFIX                  '  ' (two spaces)
 # PREFIX_FATAL            '\033[0;91mE '
 # PREFIX_INFO             '\033[0;97m  '
@@ -167,7 +168,10 @@ fetchSources() {
     if [ "${successful_count}" -eq 0 ]; then
         echo -e "${PREFIX_WARNING}Nothing to apply [${successful_count}/${total_count}]." 1>&2
         return 1
-    elif [ "${}" ]
+    elif [ "${IGNORE_DOWNLOAD_ERROR}" == "false" ] && [ "${successful_count} != ${total_count}" ]; then
+        echo -e "${PREFIX_WARNING}Couldn't fetch all hosts sources [${successful_count}/${total_count}]. Aborting ..."
+        updateCleanUp
+        exit 1
     else
         echo -e "${PREFIX_INFO}Successfully fetched ${successful_count} out of ${total_count} hosts sources.${COLOUR_RESET}"
     fi
@@ -317,6 +321,7 @@ buildHostsFile() {
 
 countBlockedDomains() {
     readonly COUNT_BLOCKED="$(cat ${TMP_DIR_PATH}/cache | wc -l)"
+
     return 0
 }
 

@@ -20,10 +20,11 @@
 
 SETTING_STRING[0]="PRIMARY_LIST"
 SETTING_STRING[1]="USE_PARTIAL_MATCHING"
-SETTING_STRING[2]="HOSTS_FILE_PATH"
-SETTING_STRING[3]="HOSTS_FILE_BACKUP_PATH"
-SETTING_STRING[4]="CRONTAB_DIR_PATH"
-SETTING_STRING[5]="SYSTEMD_DIR_PATH"
+SETTING_STRING[2]="IGNORE_DOWNLOAD_ERROR"
+SETTING_STRING[3]="HOSTS_FILE_PATH"
+SETTING_STRING[4]="HOSTS_FILE_BACKUP_PATH"
+SETTING_STRING[5]="CRONTAB_DIR_PATH"
+SETTING_STRING[6]="SYSTEMD_DIR_PATH"
 
 readonly SETTING_STRING
 
@@ -99,7 +100,6 @@ filterConfig() {
 
     for i in "${SETTING_STRING[@]}"; do
         # keep only lines starting with value out of SETTING_STRING
-        # remove characters after SETTING="..."
         sed -n "/^${i}/p" "${TMP_DIR_PATH}/config" \
             >> "${TMP_DIR_PATH}/config-filtered"
     done
@@ -135,6 +135,11 @@ isVariableSet() {
     if [ -z "${USE_PARTIAL_MATCHING}" ]; then
         echo -e "${PREFIX_WARNING}USE_PARTIAL_MATCHING not set in adsorber.conf. Using default value: true" 1>&2
         readonly USE_PARTIAL_MATCHING="true"
+    fi
+
+    if [ -z "${IGNORE_DOWNLOAD_ERROR}" ]; then
+        echo -e "${PREFIX_WARNING}IGNORE_DOWNLOAD_ERROR not set in adsorber.conf. Using default value: false" 1>&2
+        readonly IGNORE_DOWNLOAD_ERROR="false"
     fi
 
     return 0
