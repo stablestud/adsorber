@@ -1,10 +1,15 @@
 #!/bin/bash
 
+# Author:     stablestud <dev@stablestud.org>
+# Repository: https://github.com/stablestud/adsorber
+# License:    MIT, https://opensource.org/licenses/MIT
+
+
 readonly TMP_DIR_PATH="/tmp/adsorber"
 readonly SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
 readonly SOURCELIST_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
 
-readonly VERSION="0.2.1"
+readonly VERSION="0.2.2"
 
 readonly OPERATION="${1}"
 
@@ -34,11 +39,11 @@ checkForWrongParameters() {
 
 showUsage() {
     if [ "${WRONG_OPERATION}" != "" ]; then
-        echo "adsorber: Invalid operation: '${WRONG_OPERATION}'" 1>&2
+        echo "Adsorber: Invalid operation: '${WRONG_OPERATION}'" 1>&2
     fi
 
     if [ "${WRONG_OPTION}" != "" ]; then
-        echo "adsorber: Invalid option: ${WRONG_OPTION[@]}" 1>&2
+        echo "Adsorber: Invalid option: ${WRONG_OPTION[@]}" 1>&2
     fi
 
     echo "Usage: ${0} [install|remove|update|revert] {options}" 1>&2
@@ -85,12 +90,13 @@ showHelp() {
 showVersion() {
     echo "A(d)sorber ${VERSION}
 
-  Copyright (c) 2017 stablestud
   License MIT
+  Copyright (c) 2017 stablestud
   This is free software: you are free to change and redistribute it.
   There is NO WARRANTY, to the extent permitted by law.
 
-  Written by stablestud - and hopefully in the future with many others. ;)"
+  Written by stablestud - and hopefully in the future with many others. ;)
+  Repository: https://github.com/stablestud/adsorber"
 
     exit 0
 }
@@ -102,6 +108,7 @@ sourceFiles() {
     . "${SCRIPT_DIR_PATH}/bin/update.sh"
     . "${SCRIPT_DIR_PATH}/bin/revert.sh"
     . "${SCRIPT_DIR_PATH}/bin/config.sh"
+    . "${SCRIPT_DIR_PATH}/bin/colours.sh"
 
     return 0
 }
@@ -177,6 +184,6 @@ case "${OPERATION}" in
         ;;
 esac
 
-echo "Finished."
+echo -e "${PREFIX_TITLE}Finished.${COLOUR_RESET}"
 
 exit 0

@@ -1,23 +1,40 @@
 #!/bin/bash
 
+# Author:     stablestud <dev@stablestud.org>
+# Repository: https://github.com/stablestud/adsorber
+# License:    MIT, https://opensource.org/licenses/MIT
+
 # The following variables are defined in adsorber.conf or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
 # CRONTAB_DIR_PATH          /etc/cron.weekly
+# COLOUR_RESET              \033[0m
 # HOSTS_FILE_PATH           /etc/hosts
 # HOSTS_FILE_BACKUP_PATH    /etc/hosts.original
+# PREFIX                    '  ' (two spaces)
+# PREFIX_INPUT              '  '
+# PREFIX_FATAL              '\033[0;91mE '
+# PREFIX_TITLE              \033[1;37m
+# PREFIX_WARNING            '- '
 # REPLY_TO_PROMPT           Null (not set)
 # REPLY_TO_SCHEDULER_PROMPT Null (not set)
 # SCRIPT_DIR_PATH           The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SYSTEMD_DIR_PATH          /etc/systemd/system
 
 
+installCleanUp() {
+    rm -rf "${TMP_DIR_PATH}"
+
+    return 0
+}
+
+
 backupHostsFile() {
     if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
         cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
-            || echo "Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
+            && echo -e "${PREFIX}Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
     else
-        echo "Backup already exist, no need to backup."
+        echo -e "${PREFIX}Backup already exist, no need to backup."
     fi
 
     return 0
@@ -25,14 +42,15 @@ backupHostsFile() {
 
 
 installCronjob() {
-    echo "Installing cronjob..."
+    echo -e "${PREFIX}Installing cronjob ..."
 
     if [ ! -d "${CRONTAB_DIR_PATH}" ]; then
-        echo "Wrong CRONTAB_DIR_PATH set. Can't access ${CRONTAB_DIR_PATH}. Exiting..." 1>&2
+        echo -e "${PREFIX_FATAL}Wrong CRONTAB_DIR_PATH set. Can't access: ${CRONTAB_DIR_PATH}.${COLOUR_RESET}" 1>&2
+        installCleanUp
         exit 1
     fi
 
-    # Replace the @ place holder line with SCRIPT_DIR_PATH and copy the content to crons directory
+    # Replace the @ place holder line with SCRIPT_DIR_PATH and copy the content to cron's directory
     sed "s|@.*|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" > "${CRONTAB_DIR_PATH}/80adsorber"
     chmod u=rwx,g=rx,o=rx "${CRONTAB_DIR_PATH}/80adsorber"
 
@@ -41,10 +59,11 @@ installCronjob() {
 
 
 installSystemd() {
-    echo "Installing systemd service..."
+    echo -e "${PREFIX}Installing systemd service ..."
 
     if [ ! -d "${SYSTEMD_DIR_PATH}" ]; then
-        echo "Wrong SYSTEMD_DIR_PATH set. Can't access ${SYSTEMD_DIR_PATH}. Exiting..."
+        echo -e "${PREFIX_FATAL}Wrong SYSTEMD_DIR_PATH set. Can't access: ${SYSTEMD_DIR_PATH}.${COLOUR_RESET}"
+        installCleanUp
         exit 1
     fi
 
@@ -54,9 +73,11 @@ installSystemd() {
 
     chmod u=rwx,g=rx,o=rx "${SYSTEMD_DIR_PATH}/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.timer"
 
+    printf "${PREFIX}"
+    # Enable the systemd service
     systemctl daemon-reload \
         && systemctl enable adsorber.timer \
-        && systemctl start adsorber.timer || echo "Couldn't start systemd service." 1>&2
+        && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start systemd service." 1>&2
 
     return 0
 }
@@ -64,7 +85,7 @@ installSystemd() {
 
 promptInstall() {
     if [ -z "${REPLY_TO_PROMPT}" ]; then
-        read -p "Do you really want to install adsorber? [Y/n]: " REPLY_TO_PROMPT
+        read -p "${PREFIX_INPUT}Do you really want to install Adsorber? [Y/n]: " REPLY_TO_PROMPT
     fi
 
     case "${REPLY_TO_PROMPT}" in
@@ -72,7 +93,8 @@ promptInstall() {
             return 0
             ;;
         * )
-            echo "Installation cancelled." 1>&2
+            echo -e "${PREFIX_WARNING}Installation cancelled." 1>&2
+            installCleanUp
             exit 1
             ;;
     esac
@@ -83,7 +105,7 @@ promptInstall() {
 
 promptScheduler() {
     if [ -z "${REPLY_TO_SCHEDULER_PROMPT}" ]; then
-        read -p "What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
+        read -p "${PREFIX_INPUT}What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
     fi
 
     case "${REPLY_TO_SCHEDULER_PROMPT}" in
@@ -94,7 +116,7 @@ promptScheduler() {
             installCronjob
             ;;
         * )
-            echo "Skipping scheduler creation..."
+            echo -e "${PREFIX}Skipping scheduler creation ..."
             ;;
     esac
 
@@ -103,7 +125,7 @@ promptScheduler() {
 
 
 install() {
-    echo "Installing Adsorber..."
+    echo -e "${PREFIX_TITLE}Installing Adsorber ...${COLOUR_RESET}"
     promptInstall
     backupHostsFile
     promptScheduler

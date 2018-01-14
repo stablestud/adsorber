@@ -1,10 +1,22 @@
 #!/bin/bash
 
+# Author:     stablestud <dev@stablestud.org>
+# Repository: https://github.com/stablestud/adsorber
+# License:    MIT, https://opensource.org/licenses/MIT
+
 # The following variables are defined in adsorber.sh or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
+# COLOUR_RESET            \033[0m
 # HOSTS_FILE_PATH         /etc/hosts
 # HOSTS_FILE_BACKUP_PATH  /etc/hosts.original
+# IGNORE_DOWNLOAD_ERROR   true
+# PREFIX                  '  ' (two spaces)
+# PREFIX_FATAL            '\033[0;91mE '
+# PREFIX_INFO             '\033[0;97m  '
+# PREFIX_INPUT            '  '
+# PREFIX_TITLE            \033[1;37m
+# PREFIX_WARNING          '- '
 # PRIMARY_LIST            blacklist
 # REPLY_TO_FORCE_PROMPT   Null (not set)
 # SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
@@ -14,7 +26,7 @@
 
 
 updateCleanUp() {
-    echo "Cleaning up..."
+    echo -e "${PREFIX}Cleaning up ..."
 
     rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
 
@@ -26,8 +38,8 @@ checkBackupExist() {
     if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
 
         if [ -z "${REPLY_TO_FORCE_PROMPT}" ]; then
-            echo "Backup of ${HOSTS_FILE_PATH} does not exist. To backup run '${0} install'." 1>&2
-            read -p "Ignore issue and continue? (May break your system, not recommended) [YES/n]: " REPLY_TO_FORCE_PROMPT
+            echo -e "${PREFIX_FATAL}Backup of ${HOSTS_FILE_PATH} does not exist. To backup run '${0} install'.${COLOUR_RESET}" 1>&2
+            read -p "${PREFIX_INPUT}Ignore issue and continue? (May break your system, not recommended) [YES/n]: " REPLY_TO_FORCE_PROMPT
         fi
 
         case "${REPLY_TO_FORCE_PROMPT}" in
@@ -35,7 +47,7 @@ checkBackupExist() {
                 return 0
                 ;;
             * )
-                echo "Aborted." 1>&2
+                echo -e "${PREFIX_WARNING}Aborted." 1>&2
                 updateCleanUp
                 exit 1
                 ;;
@@ -50,7 +62,7 @@ createTmpDir() {
     if [ ! -d "${TMP_DIR_PATH}" ]; then
         mkdir "${TMP_DIR_PATH}"
     elif [ ! -s "${TMP_DIR_PATH}/config-filtered" ]; then
-        echo "Removing previous tmp folder..."
+        echo -e "${PREFIX}Removing previous tmp folder ..."
         rm -rf "${TMP_DIR_PATH}"
         mkdir "${TMP_DIR_PATH}"
     fi
@@ -63,11 +75,11 @@ readSourceList() {
     if [ ! -s "${SOURCELIST_FILE_PATH}" ]; then
 
         if [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
-            echo "Missing 'sources.list' and blacklist. To fix run '${0} install'." 1>&2
+            echo -e "${PREFIX_FATAL}Missing 'sources.list' and blacklist. To fix run '${0} install'.${COLOUR_RESET}" 1>&2
             exit 1
         fi
 
-        echo "No sources to fetch from, ignoring..."
+        echo -e "${PREFIX}No sources to fetch from, ignoring ..."
         return 1
     else
         # Only read sources with http(s) at the beginning
@@ -78,7 +90,7 @@ readSourceList() {
             > "${TMP_DIR_PATH}/sourceslist-filtered"
 
         if [ ! -s "${TMP_DIR_PATH}/sourceslist-filtered" ]; then
-            echo "No hosts set in sources.list, ignoring..."
+            echo -e "${PREFIX}No hosts set in sources.list, ignoring ..."
             return 1
         fi
 
@@ -90,7 +102,7 @@ readSourceList() {
 
 readWhiteList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/whitelist" ]; then
-        echo "Whitelist does not exist, ignoring..." 1>&2
+        echo -e "${PREFIX}Whitelist does not exist, ignoring ..." 1>&2
         return 1
     else
         cp "${SCRIPT_DIR_PATH}/whitelist" "${TMP_DIR_PATH}/whitelist"
@@ -105,7 +117,7 @@ readWhiteList() {
 
 readBlackList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/blacklist" ]; then
-        echo "Blacklist does not exist, ignoring..." 1>&2
+        echo -e "${PREFIX}Blacklist does not exist, ignoring ..." 1>&2
         return 1
     else
         cp "${SCRIPT_DIR_PATH}/blacklist" "${TMP_DIR_PATH}/blacklist"
@@ -125,27 +137,28 @@ fetchSources() {
 
     while read -r domain; do
         (( total_count++ ))
-        echo "Getting: ${domain}"
 
-        if [ $(type -fP curl) ]; then
+        echo -e "${PREFIX_INFO}Getting${COLOUR_RESET}: ${domain}"
 
-            if curl "${domain}" --progress-bar -L --connect-timeout 30 --fail --retry 1 >> "${TMP_DIR_PATH}/fetched"; then
-                (( successful_count++ ))
-            else
-                echo "curl couldn't fetch ${domain}" 1>&2
-            fi
-
-        elif [ $(type -fP wget) ]; then
-            printf "wget: "
+        # Is wget installed? If yes download the hosts files.
+        if [ $(type -fP wget) ]; then
+            printf "${PREFIX}"
 
             if wget "${domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${TMP_DIR_PATH}/fetched"; then
                 (( successful_count++ ))
             else
-                echo "wget couldn't fetch ${domain}" 1>&2
+                echo -e "${PREFIX_WARNING}wget couldn't fetch: ${domain}" 1>&2
             fi
-
+        # Is curl installed? If yes download the hosts files.
+        elif [ $(type -fP curl) ]; then
+            printf "${PREFIX}"
+            if curl "${domain}" --progress-bar -L --connect-timeout 30 --fail --retry 1 >> "${TMP_DIR_PATH}/fetched"; then
+                (( successful_count++ ))
+            else
+                echo -e "${PREFIX_WARNING}Curl couldn't fetch ${domain}" 1>&2
+            fi
         else
-            echo "Neither curl nor wget installed. Can't continue." 1>&2
+            echo -e "${PREFIX_FATAL}Neither curl nor wget installed. Can't continue.${COLOUR_RESET}" 1>&2
             updateCleanUp
             exit 2
         fi
@@ -153,10 +166,14 @@ fetchSources() {
     done < "${TMP_DIR_PATH}/sourceslist-filtered"
 
     if [ "${successful_count}" -eq 0 ]; then
-        echo "Nothing to apply [${successful_count}/${total_count}]." 1>&2
+        echo -e "${PREFIX_WARNING}Nothing to apply [${successful_count}/${total_count}]." 1>&2
         return 1
+    elif [ "${IGNORE_DOWNLOAD_ERROR}" == "false" ] && [ "${successful_count} != ${total_count}" ]; then
+        echo -e "${PREFIX_WARNING}Couldn't fetch all hosts sources [${successful_count}/${total_count}]. Aborting ..."
+        updateCleanUp
+        exit 1
     else
-        echo "Successfully fetched ${successful_count} out of ${total_count} hosts sources."
+        echo -e "${PREFIX_INFO}Successfully fetched ${successful_count} out of ${total_count} hosts sources.${COLOUR_RESET}"
     fi
 
     return 0
@@ -203,10 +220,10 @@ applyWhiteList() {
     local domain
 
     if [ ! -s "${TMP_DIR_PATH}/whitelist-sorted" ]; then
-        echo "Whitelist is empty, ignoring..."
+        echo -e "${PREFIX}Whitelist is empty, ignoring ..."
         return 1
     else
-        echo "Applying whitelist..."
+        echo -e "${PREFIX}Applying whitelist ..."
 
         sed -i 's/^0\.0\.0\.0\s\+//g' "${TMP_DIR_PATH}/whitelist-sorted"
         cp "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/applied-whitelist"
@@ -214,11 +231,13 @@ applyWhiteList() {
         while read -r domain; do
 
             if [ "${USE_PARTIAL_MATCHING}" == "true" ]; then
+                # Filter out domains from whitelist, also for sub-domains
                 sed -i "/\.*${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
             elif [ "${USE_PARTIAL_MATCHING}" == "false" ]; then
+                # Filter out domains from whitelist, ignoring sub-domains
                 sed -i "/\s\+${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
             else
-                echo "Wrong USE_PARTIAL_MATCHING set, either set to 'true' or 'false'." 1>&2
+                echo -e "${PREFIX_FATAL}Wrong USE_PARTIAL_MATCHING set, either set it to 'true' or 'false'.${COLOUR_RESET}" 1>&2
                 updateCleanUp
                 exit 1
             fi
@@ -236,10 +255,10 @@ mergeBlackList() {
     local input_file="${1}"
 
     if [ ! -s "${TMP_DIR_PATH}/blacklist-sorted" ]; then
-        echo "Blacklist is empty, ignoring..."
+        echo -e "${PREFIX}Blacklist is empty, ignoring ..."
         return 1
     else
-        echo "Applying blacklist..."
+        echo -e "${PREFIX}Applying blacklist ..."
 
         cat "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/blacklist-sorted" >> "${TMP_DIR_PATH}/merged-blacklist"
 
@@ -257,7 +276,7 @@ isCacheEmpty() {
     if [ -s "${TMP_DIR_PATH}/cache" ]; then
         return 0
     else
-        echo "Nothing to apply. Exiting..." 1>&2
+        echo -e "${PREFIX_WARNING}Nothing to apply." 1>&2
         updateCleanUp
         exit 1
     fi
@@ -270,13 +289,13 @@ preBuildHosts() {
     # Replace @...@ with the path to the backup hosts
     sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" "${SCRIPT_DIR_PATH}/bin/components/hosts_header" > "${TMP_DIR_PATH}/hosts"
 
-    echo "" >> "${TMP_DIR_PATH}/hosts"
+    echo -e "" >> "${TMP_DIR_PATH}/hosts"
 
     # Add hosts.original
     cat "${HOSTS_FILE_BACKUP_PATH}" >> "${TMP_DIR_PATH}/hosts" \
-        || echo "You may want to add your hostname to ${HOSTS_FILE_PATH}" 1>&2
+        || echo -e "${PREFIX}You may want to add your hostname to ${HOSTS_FILE_PATH}" 1>&2
 
-    echo "" >> "${TMP_DIR_PATH}/hosts"
+    echo -e "" >> "${TMP_DIR_PATH}/hosts"
 
     # Add hosts_title
     cat "${SCRIPT_DIR_PATH}/bin/components/hosts_title" >> "${TMP_DIR_PATH}/hosts"
@@ -286,38 +305,46 @@ preBuildHosts() {
 
 
 buildHostsFile() {
-    echo "" >> "${TMP_DIR_PATH}/hosts"
+    echo -e "" >> "${TMP_DIR_PATH}/hosts"
 
-    # Add ad-domains to the hosts file
+    # Add the fetched ad-domains to the hosts file
     cat "${TMP_DIR_PATH}/cache" >> "${TMP_DIR_PATH}/hosts"
 
-    echo "" >> "${TMP_DIR_PATH}/hosts"
+    echo -e "" >> "${TMP_DIR_PATH}/hosts"
 
+    # Add the hosts_header to the hosts file in the temporary folder, filter out the line with @ and replace with HOSTS_FILE_BACKUP_PATH
     sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" "${SCRIPT_DIR_PATH}/bin/components/hosts_header" >> "${TMP_DIR_PATH}/hosts"
 
     return 0
 }
 
 
+countBlockedDomains() {
+    readonly COUNT_BLOCKED="$(cat ${TMP_DIR_PATH}/cache | wc -l)"
+
+    return 0
+}
+
+
 applyHostsFile() {
-    echo "Applying new hosts file...."
+    echo -e "${PREFIX}Applying new hosts file ..."
 
     # Replace systems hosts file with the modified version
     cat "${TMP_DIR_PATH}/hosts" > "${HOSTS_FILE_PATH}" \
         || {
-            echo "Couldn't apply hosts file. Aborting" 1>&2
+            echo -e "${PREFIX_FATAL}Couldn't apply hosts file. Aborting.${COLOUR_RESET}" 1>&2
             updateCleanUp
             exit 1
     }
 
-    echo "Successfully applied new hosts file."
+    echo -e "${PREFIX_INFO}Successfully applied new hosts file with ${COUNT_BLOCKED} blocked domains.${COLOUR_RESET}"
 
     return 0
 }
 
 
 update() {
-    echo "Updating ${HOSTS_FILE_PATH}..."
+    echo -e "${PREFIX_TITLE}Updating ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
 
     checkBackupExist
     createTmpDir
@@ -345,7 +372,7 @@ update() {
             mergeBlackList
             ;;
         * )
-            echo "Wrong PRIMARY_LIST set in adsorber.conf. Choose either 'whitelist' or 'blacklist'" 1>&2
+            echo -e "${PREFIX_FATAL}Wrong PRIMARY_LIST set in adsorber.conf. Choose either 'whitelist' or 'blacklist'${COLOUR_RESET}" 1>&2
             updateCleanUp
             exit 1
             ;;
@@ -354,6 +381,7 @@ update() {
     isCacheEmpty
     preBuildHosts
     buildHostsFile
+    countBlockedDomains
     applyHostsFile
     updateCleanUp
 
