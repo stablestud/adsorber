@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Author:     stablestud <dev@stablestud.org>
+# Repository: https://github.com/stablestud/adsorber
+# License:    MIT, https://opensource.org/licenses/MIT
+
 readonly PREFIX="  "
 readonly PREFIX_FATAL="\033[0;91mE "
 readonly PREFIX_INPUT="  "

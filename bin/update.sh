@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Author:     stablestud <dev@stablestud.org>
+# Repository: https://github.com/stablestud/adsorber
+# License:    MIT, https://opensource.org/licenses/MIT
+
 # The following variables are defined in adsorber.sh or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---

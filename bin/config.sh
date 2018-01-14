@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Author:     stablestud <dev@stablestud.org>
+# Repository: https://github.com/stablestud/adsorber
+# License:    MIT, https://opensource.org/licenses/MIT
+
 # The following variables are defined in adsorber.sh or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
@@ -8,7 +12,7 @@
 # SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
 # TMP_DIR_PATH            /tmp/adsorber
 # USE_PARTIAL_MATCHING    true
-# VERSION                 0.2.1 or similar
+# VERSION                 0.2.2 or similar
 
 SETTING_STRING[0]="PRIMARY_LIST"
 SETTING_STRING[1]="USE_PARTIAL_MATCHING"
@@ -31,7 +35,7 @@ configCreateTmpDir() {
     if [ ! -d ${TMP_DIR_PATH} ]; then
         mkdir "${TMP_DIR_PATH}"
     else
-        #echo -e "Removing previous tmp folder ..."
+        echo -e "${PREFIX}Removing previous tmp folder ..."
         rm -rf "${TMP_DIR_PATH}"
         mkdir "${TMP_DIR_PATH}"
     fi
