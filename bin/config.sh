@@ -82,7 +82,7 @@ copyConfig() {
     if [ -s "${SCRIPT_DIR_PATH}/adsorber.conf" ]; then
         cp "${SCRIPT_DIR_PATH}/adsorber.conf" "${TMP_DIR_PATH}/config"
     else
-        echo -e "! No config file found. Creating default." 1>&2
+        echo -e "${PREFIX_FATAL}No config file found. Creating default.${COLOUR_RESET}" 1>&2
         echo -e "${PREFIX}Please re-run the command to continue."
         sed "s|@.*|# Config file for Adsorber v${VERSION}|g" "${SCRIPT_DIR_PATH}/bin/default/default-adsorber.conf" > "${SCRIPT_DIR_PATH}/adsorber.conf"
 

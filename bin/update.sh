@@ -167,6 +167,7 @@ fetchSources() {
     if [ "${successful_count}" -eq 0 ]; then
         echo -e "${PREFIX_WARNING}Nothing to apply [${successful_count}/${total_count}]." 1>&2
         return 1
+    elif [ "${}" ]
     else
         echo -e "${PREFIX_INFO}Successfully fetched ${successful_count} out of ${total_count} hosts sources.${COLOUR_RESET}"
     fi

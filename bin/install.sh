@@ -13,6 +13,7 @@
 # HOSTS_FILE_BACKUP_PATH    /etc/hosts.original
 # PREFIX                    '  ' (two spaces)
 # PREFIX_INPUT              '  '
+# PREFIX_FATAL              '\033[0;91mE '
 # PREFIX_TITLE              \033[1;37m
 # PREFIX_WARNING            '- '
 # REPLY_TO_PROMPT           Null (not set)
@@ -44,7 +45,7 @@ installCronjob() {
     echo -e "${PREFIX}Installing cronjob ..."
 
     if [ ! -d "${CRONTAB_DIR_PATH}" ]; then
-        echo -e "! Wrong CRONTAB_DIR_PATH set. Can't access: ${CRONTAB_DIR_PATH}." 1>&2
+        echo -e "${PREFIX_FATAL}Wrong CRONTAB_DIR_PATH set. Can't access: ${CRONTAB_DIR_PATH}.${COLOUR_RESET}" 1>&2
         installCleanUp
         exit 1
     fi
@@ -61,7 +62,7 @@ installSystemd() {
     echo -e "${PREFIX}Installing systemd service ..."
 
     if [ ! -d "${SYSTEMD_DIR_PATH}" ]; then
-        echo -e "! Wrong SYSTEMD_DIR_PATH set. Can't access: ${SYSTEMD_DIR_PATH}."
+        echo -e "${PREFIX_FATAL}Wrong SYSTEMD_DIR_PATH set. Can't access: ${SYSTEMD_DIR_PATH}.${COLOUR_RESET}"
         installCleanUp
         exit 1
     fi
@@ -73,6 +74,7 @@ installSystemd() {
     chmod u=rwx,g=rx,o=rx "${SYSTEMD_DIR_PATH}/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.timer"
 
     printf "${PREFIX}"
+    # Enable the systemd service
     systemctl daemon-reload \
         && systemctl enable adsorber.timer \
         && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start systemd service." 1>&2

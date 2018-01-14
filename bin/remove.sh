@@ -44,7 +44,7 @@ removeSystemd() {
 removeCronjob() {
     if [ -f "${CRONTAB_DIR_PATH}/80adsorber" ]; then
         rm "${CRONTAB_DIR_PATH}/80adsorber" \
-            && echo -e "${PREFIX}Removed adsorber's cronjob."
+            && echo -e "${PREFIX}Removed Adsorber's cronjob."
     else
         echo -e "${PREFIX}Cronjob not installed. Skipping ..." 1>&2
     fi

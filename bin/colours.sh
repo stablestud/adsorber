@@ -5,8 +5,8 @@
 # License:    MIT, https://opensource.org/licenses/MIT
 
 readonly PREFIX="  "
-readonly PREFIX_FATAL="\033[0;91mE "    # 'E' in Intensity Red
-readonly PREFIX_INFO="\033[0;97m  "       # Intensity White
+readonly PREFIX_FATAL="\033[0;91mE "    # 'E' in intensity red
+readonly PREFIX_INFO="\033[0;97m  "     # Intensity white
 readonly PREFIX_INPUT="  "
 readonly PREFIX_TITLE="\033[1;37m"      # Bold white
 readonly PREFIX_WARNING="- "
