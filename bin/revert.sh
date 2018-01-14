@@ -15,6 +15,13 @@
 # PREFIX_WARNING          '- '
 
 
+revertCleanUp() {
+    rm -rf "${TMP_DIR_PATH}"
+
+    return 0
+}
+
+
 revertHostsFile() {
     if [ -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
         cp "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
@@ -32,6 +39,7 @@ revertHostsFile() {
 revert() {
     echo -e "${PREFIX_TITLE}Reverting ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
     revertHostsFile
+    revertCleanUp
 
     return 0
 }

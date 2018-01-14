@@ -18,6 +18,14 @@
 # SYSTEMD_DIR_PATH  /etc/systemd/system
 
 
+removeCleanUp() {
+    echo -e "${PREFIX}Removing leftovers ..."
+    rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
+
+    return 0
+}
+
+
 removeSystemd() {
     if [ -f "${SYSTEMD_DIR_PATH}/adsorber.service" ]; then
         printf "${PREFIX}"
@@ -81,14 +89,6 @@ removeHostsFile() {
         echo -e "${PREFIX}Maybe already removed?" 1>&2
         exit 1
     fi
-
-    return 0
-}
-
-
-removeCleanUp() {
-    echo -e "${PREFIX}Removing leftovers ..."
-    rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
 
     return 0
 }
