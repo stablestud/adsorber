@@ -7,6 +7,10 @@
 # The following variables are defined in adsorber.sh or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
+# COLOUR_RESET            \033[0m
+# PREFIX                  '  ' (two spaces)
+# PREFIX_TITLE            \033[1;37m
+# PREFIX_WARNING          '- '
 # PRIMARY_LIST            blacklist
 # SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
@@ -161,7 +165,7 @@ printVariables() {
 
 
 config() {
-    echo -e "${BWHITE}Reading configuration ... ${COLOUR_RESET}"
+    echo -e "${PREFIX_TITLE}Reading configuration ... ${COLOUR_RESET}"
     configCreateTmpDir
     copySourceList
     copyWhiteList

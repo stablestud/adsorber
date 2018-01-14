@@ -7,11 +7,17 @@
 # The following variables are defined in adsorber.sh or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
+# COLOUR_RESET            \033[0m
 # HOSTS_FILE_PATH         /etc/hosts
 # HOSTS_FILE_BACKUP_PATH  /etc/hosts.original
+# PREFIX                  '  ' (two spaces)
+# PREFIX_FATAL            '\033[0;91mE '
+# PREFIX_INFO             '\033[0;97m  '
+# PREFIX_INPUT            '  '
+# PREFIX_TITLE            \033[1;37m
+# PREFIX_WARNING          '- '
 # PRIMARY_LIST            blacklist
 # REPLY_TO_FORCE_PROMPT   Null (not set)
-# COLOUR_RESET
 # SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
 # TMP_DIR_PATH            /tmp/adsorber
@@ -130,8 +136,10 @@ fetchSources() {
 
     while read -r domain; do
         (( total_count++ ))
-        echo -e "${PREFIX}${IWHITE}Getting${COLOUR_RESET}: ${domain}"
 
+        echo -e "${PREFIX_INFO}Getting${COLOUR_RESET}: ${domain}"
+
+        # Is wget installed? If yes download the hosts files.
         if [ $(type -fP wget) ]; then
             printf "${PREFIX}"
 
@@ -140,6 +148,7 @@ fetchSources() {
             else
                 echo -e "${PREFIX_WARNING}wget couldn't fetch: ${domain}" 1>&2
             fi
+        # Is curl installed? If yes download the hosts files.
         elif [ $(type -fP curl) ]; then
             printf "${PREFIX}"
             if curl "${domain}" --progress-bar -L --connect-timeout 30 --fail --retry 1 >> "${TMP_DIR_PATH}/fetched"; then
@@ -159,7 +168,7 @@ fetchSources() {
         echo -e "${PREFIX_WARNING}Nothing to apply [${successful_count}/${total_count}]." 1>&2
         return 1
     else
-        echo -e "${PREFIX}${IWHITE}Successfully fetched ${BWHITE}${successful_count} out of ${total_count}${IWHITE} hosts sources.${COLOUR_RESET}"
+        echo -e "${PREFIX_INFO}Successfully fetched ${successful_count} out of ${total_count} hosts sources.${COLOUR_RESET}"
     fi
 
     return 0
@@ -217,8 +226,10 @@ applyWhiteList() {
         while read -r domain; do
 
             if [ "${USE_PARTIAL_MATCHING}" == "true" ]; then
+                # Filter out domains from whitelist, also for sub-domains
                 sed -i "/\.*${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
             elif [ "${USE_PARTIAL_MATCHING}" == "false" ]; then
+                # Filter out domains from whitelist, ignoring sub-domains
                 sed -i "/\s\+${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
             else
                 echo -e "${PREFIX_FATAL}Wrong USE_PARTIAL_MATCHING set, either set it to 'true' or 'false'.${COLOUR_RESET}" 1>&2
@@ -291,11 +302,12 @@ preBuildHosts() {
 buildHostsFile() {
     echo -e "" >> "${TMP_DIR_PATH}/hosts"
 
-    # Add ad-domains to the hosts file
+    # Add the fetched ad-domains to the hosts file
     cat "${TMP_DIR_PATH}/cache" >> "${TMP_DIR_PATH}/hosts"
 
     echo -e "" >> "${TMP_DIR_PATH}/hosts"
 
+    # Add the hosts_header to the hosts file in the temporary folder, filter out the line with @ and replace with HOSTS_FILE_BACKUP_PATH
     sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" "${SCRIPT_DIR_PATH}/bin/components/hosts_header" >> "${TMP_DIR_PATH}/hosts"
 
     return 0
@@ -319,14 +331,14 @@ applyHostsFile() {
             exit 1
     }
 
-    echo -e "${PREFIX}${IWHITE}Successfully applied new hosts file with ${BWHITE}${COUNT_BLOCKED} ${IWHITE}blocked domains.${COLOUR_RESET}"
+    echo -e "${PREFIX_INFO}Successfully applied new hosts file with ${COUNT_BLOCKED} blocked domains.${COLOUR_RESET}"
 
     return 0
 }
 
 
 update() {
-    echo -e "${BWHITE}Updating ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
+    echo -e "${PREFIX_TITLE}Updating ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
 
     checkBackupExist
     createTmpDir

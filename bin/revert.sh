@@ -7,8 +7,12 @@
 # The following variables are defined in adsorber.conf or adsorber.sh
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
+# COLOUR_RESET            \033[0m
 # HOSTS_FILE_PATH         /etc/hosts
 # HOSTS_FILE_BACKUP_PATH  /etc/hosts.original
+# PREFIX                  '  ' (two spaces)
+# PREFIX_TITLE            \033[1;37m
+# PREFIX_WARNING          '- '
 
 
 revertHostsFile() {
@@ -26,7 +30,7 @@ revertHostsFile() {
 
 
 revert() {
-    echo -e "${BWHITE}Reverting ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
+    echo -e "${PREFIX_TITLE}Reverting ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
     revertHostsFile
 
     return 0

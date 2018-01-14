@@ -8,8 +8,13 @@
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:---
 # CRONTAB_DIR_PATH          /etc/cron.weekly
+# COLOUR_RESET              \033[0m
 # HOSTS_FILE_PATH           /etc/hosts
 # HOSTS_FILE_BACKUP_PATH    /etc/hosts.original
+# PREFIX                    '  ' (two spaces)
+# PREFIX_INPUT              '  '
+# PREFIX_TITLE              \033[1;37m
+# PREFIX_WARNING            '- '
 # REPLY_TO_PROMPT           Null (not set)
 # REPLY_TO_SCHEDULER_PROMPT Null (not set)
 # SCRIPT_DIR_PATH           The scripts root directory (e.g., /home/user/Downloads/adsorber)
@@ -44,7 +49,7 @@ installCronjob() {
         exit 1
     fi
 
-    # Replace the @ place holder line with SCRIPT_DIR_PATH and copy the content to crons directory
+    # Replace the @ place holder line with SCRIPT_DIR_PATH and copy the content to cron's directory
     sed "s|@.*|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" > "${CRONTAB_DIR_PATH}/80adsorber"
     chmod u=rwx,g=rx,o=rx "${CRONTAB_DIR_PATH}/80adsorber"
 
@@ -118,7 +123,7 @@ promptScheduler() {
 
 
 install() {
-    echo -e "${BWHITE}Installing Adsorber ...${COLOUR_RESET}"
+    echo -e "${PREFIX_TITLE}Installing Adsorber ...${COLOUR_RESET}"
     promptInstall
     backupHostsFile
     promptScheduler

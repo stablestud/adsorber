@@ -183,6 +183,6 @@ case "${OPERATION}" in
         ;;
 esac
 
-echo -e "${BWHITE}Finished.${COLOUR_RESET}"
+echo -e "${PREFIX_TITLE}Finished.${COLOUR_RESET}"
 
 exit 0

@@ -8,6 +8,11 @@
 # If you run this file independently following variables need to be set:
 # ---variable:---   ---default value:---
 # CRONTAB_DIR_PATH  /etc/cron.weekly
+# COLOUR_RESET      \033[0m
+# PREFIX            '  ' (two spaces)
+# PREFIX_INPUT      '  '
+# PREFIX_TITLE      \033[1;37m
+# PREFIX_WARNING    '- '
 # REPLY_TO_PROMPT   Null (not set)
 # SCRIPT_DIR_PATH   The scripts root directory (e.g., /home/user/Downloads/adsorber)
 # SYSTEMD_DIR_PATH  /etc/systemd/system
@@ -90,7 +95,7 @@ removeCleanUp() {
 
 
 remove() {
-    echo -e "${BWHITE}Removing Adsorber ...${COLOUR_RESET}"
+    echo -e "${PREFIX_TITLE}Removing Adsorber ...${COLOUR_RESET}"
     promptRemove
     removeSystemd
     removeCronjob
