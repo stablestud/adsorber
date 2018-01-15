@@ -1,40 +1,40 @@
 #!/bin/bash
 
-# Author:     stablestud <dev@stablestud.org>
+# Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# The following variables are defined in adsorber.conf or adsorber.sh
+# The following variables are declared in adsorber.conf, adsorber.sh or bin/config.sh.
 # If you run this file independently following variables need to be set:
-# ---variable:----------  ---default value:---
-# CRONTAB_DIR_PATH          /etc/cron.weekly
-# COLOUR_RESET              \033[0m
-# HOSTS_FILE_PATH           /etc/hosts
-# HOSTS_FILE_BACKUP_PATH    /etc/hosts.original
-# PREFIX                    '  ' (two spaces)
-# PREFIX_INPUT              '  '
-# PREFIX_FATAL              '\033[0;91mE '
-# PREFIX_TITLE              \033[1;37m
-# PREFIX_WARNING            '- '
-# REPLY_TO_PROMPT           Null (not set)
-# REPLY_TO_SCHEDULER_PROMPT Null (not set)
-# SCRIPT_DIR_PATH           The scripts root directory (e.g., /home/user/Downloads/adsorber)
-# SYSTEMD_DIR_PATH          /etc/systemd/system
+# ---variable:-------------   ---default value:----   ---defined in:--------------
+# CRONTAB_DIR_PATH            /etc/cron.weekly        bin/config.sh, adsorber.conf
+# COLOUR_RESET                \033[0m                 bin/colours.sh
+# HOSTS_FILE_PATH             /etc/hosts              bin/config.sh, adsorber.sh
+# HOSTS_FILE_BACKUP_PATH      /etc/hosts.original     bin/config.sh, adsorber.sh
+# PREFIX                      '  ' (two spaces)       bin/colours.sh
+# PREFIX_INPUT                '  '                    bin/colours.sh
+# PREFIX_FATAL                '\033[0;91mE '          bin/colours.sh
+# PREFIX_TITLE                \033[1;37m              bin/colours.sh
+# PREFIX_WARNING              '- '                    bin/colours.sh
+# REPLY_TO_PROMPT             Null (not set)          bin/install.sh, adsorber.sh
+# REPLY_TO_SCHEDULER_PROMPT   Null (not set)          bin/install.sh, adsorber.sh
+# SCRIPT_DIR_PATH             script root directory   adsorber.sh
+#   (e.g., /home/user/Downloads/adsorber)
+# SYSTEMD_DIR_PATH            /etc/systemd/system     bin/config.sh, adsorber.conf
 
-
-installCleanUp() {
-    rm -rf "${TMP_DIR_PATH}"
-
-    return 0
-}
-
+# The following functions are defined in different files.
+# If you run this file independently following functions need to emulated:
+# ---function:-----  ---function defined in:---
+# cleanUp            bin/remove.sh
+# errorCleanUp       bin/remove.sh
+# removeSystemd      bin/remove.sh
 
 backupHostsFile() {
     if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
         cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
-            && echo -e "${PREFIX}Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
+            && echo "${PREFIX}Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
     else
-        echo -e "${PREFIX}Backup already exist, no need to backup."
+        echo "${PREFIX}Backup already exist, no need to backup."
     fi
 
     return 0
@@ -42,11 +42,11 @@ backupHostsFile() {
 
 
 installCronjob() {
-    echo -e "${PREFIX}Installing Cronjob ..."
+    echo "${PREFIX}Installing Cronjob ..."
 
     if [ ! -d "${CRONTAB_DIR_PATH}" ]; then
         echo -e "${PREFIX_FATAL}Wrong CRONTAB_DIR_PATH set. Can't access: ${CRONTAB_DIR_PATH}.${COLOUR_RESET}" 1>&2
-        installCleanUp
+        errorCleanUp
         exit 1
     fi
 
@@ -54,18 +54,27 @@ installCronjob() {
     sed "s|@.*|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" > "${CRONTAB_DIR_PATH}/80adsorber"
     chmod u=rwx,g=rx,o=rx "${CRONTAB_DIR_PATH}/80adsorber"
 
+    INSTALLED_SCHEDULER="cronjob"
+
     return 0
 }
 
 
 installSystemd() {
-    echo -e "${PREFIX}Installing Systemd service ..."
 
     if [ ! -d "${SYSTEMD_DIR_PATH}" ]; then
         echo -e "${PREFIX_FATAL}Wrong SYSTEMD_DIR_PATH set. Can't access: ${SYSTEMD_DIR_PATH}.${COLOUR_RESET}" 1>&2
-        installCleanUp
+        errorCleanUp
         exit 1
     fi
+
+    # Remove Systemd service if already installed (requires remove.sh)
+    if [ -f "${SYSTEMD_DIR_PATH}/adsorber.service" ] || [ -f "${SYSTEMD_DIR_PATH}/adsorber.timer" ]; then
+        echo "${PREFIX}Removing previous installed Systemd service ..."
+        removeSystemd
+    fi
+
+    echo "${PREFIX}Installing Systemd service ..."
 
     # Replace the @ place holder line with SCRIPT_DIR_PATH and copy to its systemd directory
     sed "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" > "${SYSTEMD_DIR_PATH}/adsorber.service"
@@ -78,6 +87,8 @@ installSystemd() {
     systemctl daemon-reload \
         && systemctl enable adsorber.timer \
         && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start Systemd service." 1>&2
+
+    INSTALLED_SCHEDULER="systemd"
 
     return 0
 }
@@ -94,7 +105,7 @@ promptInstall() {
             ;;
         * )
             echo -e "${PREFIX_WARNING}Installation cancelled." 1>&2
-            installCleanUp
+            errorCleanUp
             exit 1
             ;;
     esac
@@ -116,7 +127,7 @@ promptScheduler() {
             installCronjob
             ;;
         * )
-            echo -e "${PREFIX}Skipping scheduler creation ..."
+            echo "${PREFIX}Skipping scheduler creation ..."
             ;;
     esac
 

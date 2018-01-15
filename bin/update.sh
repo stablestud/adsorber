@@ -1,37 +1,36 @@
 #!/bin/bash
 
-# Author:     stablestud <dev@stablestud.org>
+# Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# The following variables are defined in adsorber.sh or adsorber.sh
+# The following variables are declared in adsorber.conf, adsorber.sh or bin/config.sh.
 # If you run this file independently following variables need to be set:
-# ---variable:----------  ---default value:---
-# COLOUR_RESET            \033[0m
-# HOSTS_FILE_PATH         /etc/hosts
-# HOSTS_FILE_BACKUP_PATH  /etc/hosts.original
-# IGNORE_DOWNLOAD_ERROR   true
-# PREFIX                  '  ' (two spaces)
-# PREFIX_FATAL            '\033[0;91mE '
-# PREFIX_INFO             '\033[0;97m  '
-# PREFIX_INPUT            '  '
-# PREFIX_TITLE            \033[1;37m
-# PREFIX_WARNING          '- '
-# PRIMARY_LIST            blacklist
-# REPLY_TO_FORCE_PROMPT   Null (not set)
-# SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
-# SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
-# TMP_DIR_PATH            /tmp/adsorber
-# USE_PARTIAL_MATCHING    true
+# ---variable:----------   ---default value:-----------   ---declared in:-------------
+# COLOUR_RESET             \033[0m                        bin/colours.sh
+# HOSTS_FILE_PATH          /etc/hosts                     bin/config.sh, adsorber.conf
+# HOSTS_FILE_BACKUP_PATH   /etc/hosts.original            bin/config.sh, adsorber.conf
+# IGNORE_DOWNLOAD_ERROR    true                           bin/config.sh, adsorber.conf
+# PREFIX                   '  ' (two spaces)              bin/colours.sh
+# PREFIX_FATAL             '\033[0;91mE '                 bin/colours.sh
+# PREFIX_INFO              '\033[0;97m  '                 bin/colours.sh
+# PREFIX_INPUT             '  '                           bin/colours.sh
+# PREFIX_TITLE             \033[1;37m                     bin/colours.sh
+# PREFIX_WARNING           '- '                           bin/colours.sh
+# PRIMARY_LIST             blacklist                      bin/config.sh, adsorber.conf
+# REPLY_TO_FORCE_PROMPT    Null (not set)                 bin/install.sh
+# SCRIPT_DIR_PATH          script root directory          adsorber.sh
+#   (e.g., /home/user/Downloads/adsorber)
+# SOURCELIST_FILE_PATH     SCRIPT_DIR_PATH/sources.list   adsorber.sh
+#   (e.g., /home/user/Downloads/absorber/sources.list)
+# TMP_DIR_PATH             /tmp/adsorber                  adsorber.sh
+# USE_PARTIAL_MATCHING     true                           bin/config.sh, adsorber.conf
 
-
-updateCleanUp() {
-    echo -e "${PREFIX}Cleaning up ..."
-
-    rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
-
-    return 0
-}
+# The following functions are defined in different files.
+# If you run this file independently following functions need to emulated:
+# ---function:-----  ---function defined in:---
+# cleanUp            bin/remove.sh
+# errorCleanUp       bin/remove.sh
 
 
 checkBackupExist() {
@@ -48,7 +47,7 @@ checkBackupExist() {
                 ;;
             * )
                 echo -e "${PREFIX_WARNING}Aborted." 1>&2
-                updateCleanUp
+                errorCleanUp
                 exit 1
                 ;;
         esac
@@ -62,7 +61,7 @@ createTmpDir() {
     if [ ! -d "${TMP_DIR_PATH}" ]; then
         mkdir "${TMP_DIR_PATH}"
     elif [ ! -s "${TMP_DIR_PATH}/config-filtered" ]; then
-        echo -e "${PREFIX}Removing previous tmp folder ..."
+        echo "${PREFIX}Removing previous tmp folder ..."
         rm -rf "${TMP_DIR_PATH}"
         mkdir "${TMP_DIR_PATH}"
     fi
@@ -79,7 +78,7 @@ readSourceList() {
             exit 1
         fi
 
-        echo -e "${PREFIX}No sources to fetch from, ignoring ..."
+        echo "${PREFIX}No sources to fetch from, ignoring ..."
         return 1
     else
         # Only read sources with http(s) at the beginning
@@ -90,7 +89,7 @@ readSourceList() {
             > "${TMP_DIR_PATH}/sourceslist-filtered"
 
         if [ ! -s "${TMP_DIR_PATH}/sourceslist-filtered" ]; then
-            echo -e "${PREFIX}No hosts set in sources.list, ignoring ..."
+            echo "${PREFIX}No hosts set in sources.list, ignoring ..."
             return 1
         fi
 
@@ -102,7 +101,7 @@ readSourceList() {
 
 readWhiteList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/whitelist" ]; then
-        echo -e "${PREFIX}Whitelist does not exist, ignoring ..." 1>&2
+        echo "${PREFIX}Whitelist does not exist, ignoring ..." 1>&2
         return 1
     else
         cp "${SCRIPT_DIR_PATH}/whitelist" "${TMP_DIR_PATH}/whitelist"
@@ -117,7 +116,7 @@ readWhiteList() {
 
 readBlackList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/blacklist" ]; then
-        echo -e "${PREFIX}Blacklist does not exist, ignoring ..." 1>&2
+        echo "${PREFIX}Blacklist does not exist, ignoring ..." 1>&2
         return 1
     else
         cp "${SCRIPT_DIR_PATH}/blacklist" "${TMP_DIR_PATH}/blacklist"
@@ -151,15 +150,14 @@ fetchSources() {
             fi
         # Is curl installed? If yes download the hosts files.
         elif [ $(type -fP curl) ]; then
-            printf "${PREFIX}"
-            if curl "${domain}" --progress-bar -L --connect-timeout 30 --fail --retry 1 >> "${TMP_DIR_PATH}/fetched"; then
-                (( successful_count++ ))
+            if curl "${domain}" -sS -L --connect-timeout 30 --fail --retry 1 >> "${TMP_DIR_PATH}/fetched"; then
+                    (( successful_count++ ))
             else
                 echo -e "${PREFIX_WARNING}Curl couldn't fetch ${domain}" 1>&2
             fi
         else
             echo -e "${PREFIX_FATAL}Neither curl nor wget installed. Can't continue.${COLOUR_RESET}" 1>&2
-            updateCleanUp
+            errorCleanUp
             exit 2
         fi
 
@@ -170,7 +168,7 @@ fetchSources() {
         return 1
     elif [ "${IGNORE_DOWNLOAD_ERROR}" == "false" ] && [ "${successful_count} != ${total_count}" ]; then
         echo -e "${PREFIX_WARNING}Couldn't fetch all hosts sources [${successful_count}/${total_count}]. Aborting ..."
-        updateCleanUp
+        cleanUp
         exit 1
     else
         echo -e "${PREFIX_INFO}Successfully fetched ${successful_count} out of ${total_count} hosts sources.${COLOUR_RESET}"
@@ -220,10 +218,10 @@ applyWhiteList() {
     local domain
 
     if [ ! -s "${TMP_DIR_PATH}/whitelist-sorted" ]; then
-        echo -e "${PREFIX}Whitelist is empty, ignoring ..."
+        echo "${PREFIX}Whitelist is empty, ignoring ..."
         return 1
     else
-        echo -e "${PREFIX}Applying whitelist ..."
+        echo "${PREFIX}Applying whitelist ..."
 
         sed -i 's/^0\.0\.0\.0\s\+//g' "${TMP_DIR_PATH}/whitelist-sorted"
         cp "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/applied-whitelist"
@@ -238,7 +236,7 @@ applyWhiteList() {
                 sed -i "/\s\+${domain}$/d" "${TMP_DIR_PATH}/applied-whitelist"
             else
                 echo -e "${PREFIX_FATAL}Wrong USE_PARTIAL_MATCHING set, either set it to 'true' or 'false'.${COLOUR_RESET}" 1>&2
-                updateCleanUp
+                errorCleanUp
                 exit 1
             fi
 
@@ -255,10 +253,10 @@ mergeBlackList() {
     local input_file="${1}"
 
     if [ ! -s "${TMP_DIR_PATH}/blacklist-sorted" ]; then
-        echo -e "${PREFIX}Blacklist is empty, ignoring ..."
+        echo "${PREFIX}Blacklist is empty, ignoring ..."
         return 1
     else
-        echo -e "${PREFIX}Applying blacklist ..."
+        echo "${PREFIX}Applying blacklist ..."
 
         cat "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/blacklist-sorted" >> "${TMP_DIR_PATH}/merged-blacklist"
 
@@ -277,7 +275,7 @@ isCacheEmpty() {
         return 0
     else
         echo -e "${PREFIX_WARNING}Nothing to apply." 1>&2
-        updateCleanUp
+        cleanUp
         exit 1
     fi
 
@@ -293,7 +291,7 @@ preBuildHosts() {
 
     # Add hosts.original
     cat "${HOSTS_FILE_BACKUP_PATH}" >> "${TMP_DIR_PATH}/hosts" \
-        || echo -e "${PREFIX}You may want to add your hostname to ${HOSTS_FILE_PATH}" 1>&2
+        || echo "${PREFIX}You may want to add your hostname to ${HOSTS_FILE_PATH}" 1>&2
 
     echo -e "" >> "${TMP_DIR_PATH}/hosts"
 
@@ -327,13 +325,13 @@ countBlockedDomains() {
 
 
 applyHostsFile() {
-    echo -e "${PREFIX}Applying new hosts file ..."
+    echo "${PREFIX}Applying new hosts file ..."
 
     # Replace systems hosts file with the modified version
     cat "${TMP_DIR_PATH}/hosts" > "${HOSTS_FILE_PATH}" \
         || {
             echo -e "${PREFIX_FATAL}Couldn't apply hosts file. Aborting.${COLOUR_RESET}" 1>&2
-            updateCleanUp
+            errorCleanUp
             exit 1
     }
 
@@ -373,7 +371,7 @@ update() {
             ;;
         * )
             echo -e "${PREFIX_FATAL}Wrong PRIMARY_LIST set in adsorber.conf. Choose either 'whitelist' or 'blacklist'${COLOUR_RESET}" 1>&2
-            updateCleanUp
+            errorCleanUp
             exit 1
             ;;
     esac
@@ -383,7 +381,7 @@ update() {
     buildHostsFile
     countBlockedDomains
     applyHostsFile
-    updateCleanUp
+    cleanUp
 
     return 0
 }

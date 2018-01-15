@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Author:     stablestud <dev@stablestud.org>
+# Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 

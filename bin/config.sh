@@ -1,22 +1,30 @@
 #!/bin/bash
 
-# Author:     stablestud <dev@stablestud.org>
+# Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# The following variables are defined in adsorber.sh or adsorber.sh
+# The following variables are declared in adsorber.conf, adsorber.sh or bin/config.sh.
 # If you run this file independently following variables need to be set:
-# ---variable:----------  ---default value:---
-# COLOUR_RESET            \033[0m
-# PREFIX                  '  ' (two spaces)
-# PREFIX_TITLE            \033[1;37m
-# PREFIX_WARNING          '- '
-# PRIMARY_LIST            blacklist
-# SCRIPT_DIR_PATH         The scripts root directory (e.g., /home/user/Downloads/adsorber)
-# SOURCELIST_FILE_PATH    SCRIPT_DIR_PATH/sources.list (e.g., /home/user/Downloads/absorber/sources.list)
-# TMP_DIR_PATH            /tmp/adsorber
-# USE_PARTIAL_MATCHING    true
-# VERSION                 0.2.2 or similar
+# ---variable:--------   ---default value:------------   ----declared in:------------
+# COLOUR_RESET           \033[0m                         bin/colours.sh
+# PREFIX                 '  ' (two spaces)               bin/colours.sh
+# PREFIX_TITLE           \033[1;37m                      bin/colours.sh
+# PREFIX_WARNING         '- '                            bin/colours.sh
+# PRIMARY_LIST           blacklist                       bin/config.sh, adsorber.conf
+# SCRIPT_DIR_PATH        script root directory           adsorber.sh
+#   (e.g., /home/user/Downloads/adsorber)
+# SOURCELIST_FILE_PATH   SCRIPT_DIR_PATH/sources.list    adsorber.sh
+#   (e.g., /home/user/Downloads/absorber/sources.list)
+# TMP_DIR_PATH           /tmp/adsorber                   adsorber.sh
+# USE_PARTIAL_MATCHING   true                            bin/config.sh, adsorber.conf
+# VERSION                0.2.2 or similar                adsorber.sh
+
+# The following functions are defined in different files.
+# If you run this file independently following functions need to emulated:
+# ---function:-----  ---function defined in:---
+# cleanUp            bin/remove.sh
+# errorCleanUp       bin/remove.sh
 
 
 SETTING_STRING[0]="PRIMARY_LIST"
@@ -30,18 +38,11 @@ SETTING_STRING[6]="SYSTEMD_DIR_PATH"
 readonly SETTING_STRING
 
 
-configCleanUp() {
-    rm -rf "${TMP_DIR_PATH}"
-
-    return 0
-}
-
-
 configCreateTmpDir() {
     if [ ! -d ${TMP_DIR_PATH} ]; then
         mkdir "${TMP_DIR_PATH}"
     else
-        echo -e "${PREFIX}Removing previous tmp folder ..."
+        echo "${PREFIX}Removing previous tmp folder ..."
         rm -rf "${TMP_DIR_PATH}"
         mkdir "${TMP_DIR_PATH}"
     fi
@@ -53,7 +54,7 @@ configCreateTmpDir() {
 copySourceList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/sources.list" ] || [ ! -s "${SCRIPT_DIR_PATH}/sources.list" ]; then
         cp "${SCRIPT_DIR_PATH}/bin/default/default-sources.list" "${SCRIPT_DIR_PATH}/sources.list" \
-            && echo -e "${PREFIX}Created sources.list: to add new host sources edit this file."
+            && echo "${PREFIX}Created sources.list: to add new host sources edit this file."
     fi
 
     return 0
@@ -63,7 +64,7 @@ copySourceList() {
 copyWhiteList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/whitelist" ] || [ ! -s "${SCRIPT_DIR_PATH}/whitelist" ]; then
         cp "${SCRIPT_DIR_PATH}/bin/default/default-whitelist" "${SCRIPT_DIR_PATH}/whitelist" \
-            && echo -e "${PREFIX}Created whitelist: to allow specific domains edit this file."
+            && echo "${PREFIX}Created whitelist: to allow specific domains edit this file."
     fi
 
     return 0
@@ -73,7 +74,7 @@ copyWhiteList() {
 copyBlackList() {
     if [ ! -f "${SCRIPT_DIR_PATH}/blacklist" ] || [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
         cp "${SCRIPT_DIR_PATH}/bin/default/default-blacklist" "${SCRIPT_DIR_PATH}/blacklist" \
-            && echo -e "${PREFIX}Created blacklist: to block additional domains edit this file."
+            && echo "${PREFIX}Created blacklist: to block additional domains edit this file."
     fi
 
     return 0
@@ -85,10 +86,10 @@ copyConfig() {
         cp "${SCRIPT_DIR_PATH}/adsorber.conf" "${TMP_DIR_PATH}/config"
     else
         echo -e "${PREFIX_FATAL}No config file found. Creating default.${COLOUR_RESET}" 1>&2
-        echo -e "${PREFIX}Please re-run the command to continue."
+        echo "${PREFIX}Please re-run the command to continue."
         sed "s|@.*|# Config file for Adsorber v${VERSION}|g" "${SCRIPT_DIR_PATH}/bin/default/default-adsorber.conf" > "${SCRIPT_DIR_PATH}/adsorber.conf"
 
-        configCleanUp
+        errorCleanUp
         exit 1
     fi
 
@@ -123,8 +124,8 @@ readConfig() {
 isVariableSet() {
     if [ -z "${HOSTS_FILE_PATH}" ] || [ -z "${HOSTS_FILE_BACKUP_PATH}" ] || [ -z "${CRONTAB_DIR_PATH}" ] || [ -z "${SYSTEMD_DIR_PATH}" ]; then
         echo -e "! Missing setting(s) in adsorber.conf." 1>&2
-        echo -e "${PREFIX}Please delete adsorber.conf and run '${0} install' to create a new config file." 1>&2
-        configCleanUp
+        echo "${PREFIX}Please delete adsorber.conf and run '${0} install' to create a new config file." 1>&2
+        errorCleanUp
         exit 1
     fi
 
@@ -149,7 +150,7 @@ isVariableSet() {
 isVariableValid() {
     if [ ! -f "${HOSTS_FILE_PATH}" ]; then
         echo -e "! Wrong HOSTS_FILE_PATH set in adsorber.conf. Can't access: ${HOSTS_FILE_PATH}" 1>&2
-        configCleanUp
+        errorCleanUp
         exit 1
     fi
 

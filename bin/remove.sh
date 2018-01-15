@@ -1,38 +1,58 @@
 #!/bin/bash
 
-# Author:     stablestud <dev@stablestud.org>
+# Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# The following variables are defined in adsorber.conf or adsorber.sh
+# The following variables are declared in adsorber.conf, adsorber.sh or bin/config.sh.
 # If you run this file independently following variables need to be set:
-# ---variable:---   ---default value:---
-# CRONTAB_DIR_PATH  /etc/cron.weekly
-# COLOUR_RESET      \033[0m
-# PREFIX            '  ' (two spaces)
-# PREFIX_INPUT      '  '
-# PREFIX_TITLE      \033[1;37m
-# PREFIX_WARNING    '- '
-# REPLY_TO_PROMPT   Null (not set)
-# SCRIPT_DIR_PATH   The scripts root directory (e.g., /home/user/Downloads/adsorber)
-# SYSTEMD_DIR_PATH  /etc/systemd/system
+# ---variable:-------    ---default value:----   ---defined in:--------------
+# CRONTAB_DIR_PATH       /etc/cron.weekly        bin/config.sh, adsorber.conf
+# COLOUR_RESET           \033[0m                 bin/colours.sh
+# INSTALLED_SCHEDULER    Null (not set)          bin/install.sh
+# PREFIX                 '  ' (two spaces)       bin/colours.sh
+# PREFIX_INPUT           '  '                    bin/colours.sh
+# PREFIX_TITLE           \033[1;37m              bin/colours.sh
+# PREFIX_WARNING         '- '                    bin/colours.sh
+# REPLY_TO_PROMPT        Null (not set)          bin/install.sh, adsorber.sh
+# SCRIPT_DIR_PATH        script root directory   adsorber.sh
+#   (e.g., /home/user/Downloads/adsorber)
+# SYSTEMD_DIR_PATH       /etc/systemd/system     bin/config.sh, adsorber.conf
 
+errorCleanUp() {
+    echo "${PREFIX_WARNING}Cleaning up ..."
 
-removeCleanUp() {
-    #echo -e "${PREFIX}Removing leftovers ..."
+    # Remove scheduler if installed
+    case "${INSTALLED_SCHEDULER}" in
+        cronjob )
+            removeCronjob
+            ;;
+        systemd )
+            removeSystemd
+            ;;
+    esac
+
     rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
 
     return 0
 }
 
 
+cleanUp() {
+    echo "${PREFIX}Cleaning up ..."
+
+    rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
+
+    return 0
+}
+
 removeSystemd() {
-    if [ -f "${SYSTEMD_DIR_PATH}/adsorber.service" ]; then
-        printf "${PREFIX}"
-        systemctl stop adsorber.timer
-        systemctl disable adsorber.timer
-        #systemctl stop adsorber.service 2>/dev/null 1>&2
-        #systemctl disable adsorber.server 2/dev/null 1>&2 # Is not enabled by default
+    if [ -f "${SYSTEMD_DIR_PATH}/adsorber.service" ] || [ -f "${SYSTEMD_DIR_PATH}/adsorber.timer" ]; then
+
+        systemctl stop adsorber.timer 2>/dev/null
+        systemctl disable adsorber.timer | ( printf "${PREFIX}" && cat )
+        systemctl stop adsorber.service 2>/dev/null 1>&2
+        systemctl disable adsorber.service 2>/dev/null 1>&2 # The service is not enabled by default
 
         rm "${SYSTEMD_DIR_PATH}/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.service" \
             || {
@@ -42,7 +62,7 @@ removeSystemd() {
 
         systemctl daemon-reload
     else
-        echo -e "${PREFIX}Systemd service not installed. Skipping ..." 1>&2
+        echo "${PREFIX}Systemd service not installed. Skipping ..." 1>&2
     fi
 
     return 0
@@ -52,9 +72,9 @@ removeSystemd() {
 removeCronjob() {
     if [ -f "${CRONTAB_DIR_PATH}/80adsorber" ]; then
         rm "${CRONTAB_DIR_PATH}/80adsorber" \
-            && echo -e "${PREFIX}Removed Adsorber's Cronjob."
+            && echo "${PREFIX}Removed Adsorber's Cronjob."
     else
-        echo -e "${PREFIX}Cronjob not installed. Skipping ..." 1>&2
+        echo "${PREFIX}Cronjob not installed. Skipping ..." 1>&2
     fi
 
     return 0
@@ -72,7 +92,7 @@ promptRemove() {
             ;;
         * )
             echo -e "${PREFIX_WARNING}Remove cancelled." 1>&2
-            removeCleanUp
+            errorCleanUp
             exit 1
             ;;
     esac
@@ -84,11 +104,11 @@ promptRemove() {
 removeHostsFile() {
     if [ -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
         mv "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
-            && echo -e "${PREFIX}Successfully restored ${HOSTS_FILE_PATH}"
+            && echo "${PREFIX}Successfully restored ${HOSTS_FILE_PATH}"
     else
         echo -e "${PREFIX_FATAL}Can not restore hosts file. Original hosts file does not exist.${COLOUR_RESET}" 1>&2
-        echo -e "${PREFIX}Maybe already removed?" 1>&2
-        removeCleanUp
+        echo "${PREFIX}Maybe already removed?" 1>&2
+        errorCleanUp
         exit 1
     fi
 
@@ -102,7 +122,7 @@ remove() {
     removeSystemd
     removeCronjob
     removeHostsFile
-    removeCleanUp
+    cleanUp
 
     return 0
 }
