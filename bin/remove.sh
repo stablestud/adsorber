@@ -85,6 +85,7 @@ removeHostsFile() {
         mv "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
             && echo -e "${PREFIX}Successfully restored ${HOSTS_FILE_PATH}"
     else
+        removeCleanUp
         echo -e "${PREFIX_WARNING}Can not restore hosts file. Original hosts file does not exist." 1>&2
         echo -e "${PREFIX}Maybe already removed?" 1>&2
         exit 1

@@ -4,6 +4,7 @@
 #
 # Note: the whitelist uses partial matching. Means if you allow adserver.tld
 # all its subdomains like ad1.adserver.tld also will be allowed.
+# (Can be changed in adsorber.conf ny editing USE_PARTIAL_MATCHING)
 #
 # Entries must begin with either 127.0.0.1 or 0.0.0.0
 
