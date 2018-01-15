@@ -16,6 +16,7 @@
 
 
 revertCleanUp() {
+    #echo -e "${PREFIX}Removing leftovers ..."
     rm -rf "${TMP_DIR_PATH}"
 
     return 0
@@ -28,7 +29,8 @@ revertHostsFile() {
             && echo -e "${PREFIX}Successfully reverted ${HOSTS_FILE_PATH}." \
             && echo -e "${PREFIX}To reapply please run './adsorber.sh update'."
     else
-        echo -e "${PREFIX_WARNING}Can not restore hosts file. Original hosts file does not exist." 1>&2
+        echo -e "${PREFIX_FATAL}Can not restore hosts file. Original hosts file does not exist.${COLOUR_RESET}" 1>&2
+        revertCleanUp
         exit 1
     fi
 

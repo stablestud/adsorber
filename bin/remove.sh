@@ -19,7 +19,7 @@
 
 
 removeCleanUp() {
-    echo -e "${PREFIX}Removing leftovers ..."
+    #echo -e "${PREFIX}Removing leftovers ..."
     rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
 
     return 0
@@ -36,7 +36,7 @@ removeSystemd() {
 
         rm "${SYSTEMD_DIR_PATH}/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.service" \
             || {
-                echo -e "${PREFIX_WARNING}Couldn't remove systemd service files." 1>&2
+                echo -e "${PREFIX_WARNING}Couldn't remove Systemd service files." 1>&2
                 return 1
         }
 
@@ -52,7 +52,7 @@ removeSystemd() {
 removeCronjob() {
     if [ -f "${CRONTAB_DIR_PATH}/80adsorber" ]; then
         rm "${CRONTAB_DIR_PATH}/80adsorber" \
-            && echo -e "${PREFIX}Removed Adsorber's cronjob."
+            && echo -e "${PREFIX}Removed Adsorber's Cronjob."
     else
         echo -e "${PREFIX}Cronjob not installed. Skipping ..." 1>&2
     fi
@@ -63,7 +63,7 @@ removeCronjob() {
 
 promptRemove() {
     if [ -z "${REPLY_TO_PROMPT}" ]; then
-        read -p "${PREFIX_INPUT}Do you really want to remove adsorber? [Y/n] " REPLY_TO_PROMPT
+        read -p "${PREFIX_INPUT}Do you really want to remove Adsorber? [Y/n] " REPLY_TO_PROMPT
     fi
 
     case "${REPLY_TO_PROMPT}" in
@@ -72,6 +72,7 @@ promptRemove() {
             ;;
         * )
             echo -e "${PREFIX_WARNING}Remove cancelled." 1>&2
+            removeCleanUp
             exit 1
             ;;
     esac
@@ -85,9 +86,9 @@ removeHostsFile() {
         mv "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
             && echo -e "${PREFIX}Successfully restored ${HOSTS_FILE_PATH}"
     else
-        removeCleanUp
-        echo -e "${PREFIX_WARNING}Can not restore hosts file. Original hosts file does not exist." 1>&2
+        echo -e "${PREFIX_FATAL}Can not restore hosts file. Original hosts file does not exist.${COLOUR_RESET}" 1>&2
         echo -e "${PREFIX}Maybe already removed?" 1>&2
+        removeCleanUp
         exit 1
     fi
 

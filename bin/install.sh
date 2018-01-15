@@ -42,7 +42,7 @@ backupHostsFile() {
 
 
 installCronjob() {
-    echo -e "${PREFIX}Installing cronjob ..."
+    echo -e "${PREFIX}Installing Cronjob ..."
 
     if [ ! -d "${CRONTAB_DIR_PATH}" ]; then
         echo -e "${PREFIX_FATAL}Wrong CRONTAB_DIR_PATH set. Can't access: ${CRONTAB_DIR_PATH}.${COLOUR_RESET}" 1>&2
@@ -59,10 +59,10 @@ installCronjob() {
 
 
 installSystemd() {
-    echo -e "${PREFIX}Installing systemd service ..."
+    echo -e "${PREFIX}Installing Systemd service ..."
 
     if [ ! -d "${SYSTEMD_DIR_PATH}" ]; then
-        echo -e "${PREFIX_FATAL}Wrong SYSTEMD_DIR_PATH set. Can't access: ${SYSTEMD_DIR_PATH}.${COLOUR_RESET}"
+        echo -e "${PREFIX_FATAL}Wrong SYSTEMD_DIR_PATH set. Can't access: ${SYSTEMD_DIR_PATH}.${COLOUR_RESET}" 1>&2
         installCleanUp
         exit 1
     fi
@@ -77,7 +77,7 @@ installSystemd() {
     # Enable the systemd service
     systemctl daemon-reload \
         && systemctl enable adsorber.timer \
-        && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start systemd service." 1>&2
+        && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start Systemd service." 1>&2
 
     return 0
 }
