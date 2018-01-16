@@ -6,4 +6,4 @@ After=network.target
 [Service]
 Type=oneshot
 User=root
-@ExecStart=/some/path/adsorber.sh update - line will be overwritten by script (DO NOT EDIT)@
+#@ExecStart=/some/path/adsorber.sh update - line will be overwritten by script (DO NOT EDIT)#@

@@ -38,7 +38,7 @@ checkBackupExist() {
 
         if [ -z "${REPLY_TO_FORCE_PROMPT}" ]; then
             echo -e "${PREFIX_FATAL}Backup of ${HOSTS_FILE_PATH} does not exist. To backup run '${0} install'.${COLOUR_RESET}" 1>&2
-            read -p "${PREFIX_INPUT}Ignore issue and continue? (May break your system, not recommended) [YES/n]: " REPLY_TO_FORCE_PROMPT
+            read -r -p "${PREFIX_INPUT}Ignore issue and continue? (May break your system, not recommended) [YES/n]: " REPLY_TO_FORCE_PROMPT
         fi
 
         case "${REPLY_TO_FORCE_PROMPT}" in
@@ -83,8 +83,7 @@ readSourceList() {
     else
         # Only read sources with http(s) at the beginning
         # Remove inline # comments
-        cat "${SOURCELIST_FILE_PATH}" \
-            | sed -n '/^\s*http.*/p' \
+        sed -n '/^\s*http.*/p' "${SOURCELIST_FILE_PATH}" \
             | sed 's/\s\+#.*//g' \
             > "${TMP_DIR_PATH}/sourceslist-filtered"
 
@@ -140,8 +139,8 @@ fetchSources() {
         echo -e "${PREFIX_INFO}Getting${COLOUR_RESET}: ${domain}"
 
         # Is wget installed? If yes download the hosts files.
-        if [ $(type -fP wget) ]; then
-            printf "${PREFIX}"
+        if [ "$(type -fP wget)" ]; then
+            printf "%s" "${PREFIX}"
 
             if wget "${domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${TMP_DIR_PATH}/fetched"; then
                 (( successful_count++ ))
@@ -149,7 +148,7 @@ fetchSources() {
                 echo -e "${PREFIX_WARNING}wget couldn't fetch: ${domain}" 1>&2
             fi
         # Is curl installed? If yes download the hosts files.
-        elif [ $(type -fP curl) ]; then
+        elif [ "$(type -fP curl)" ]; then
             if curl "${domain}" -sS -L --connect-timeout 30 --fail --retry 1 >> "${TMP_DIR_PATH}/fetched"; then
                     (( successful_count++ ))
             else
@@ -166,7 +165,7 @@ fetchSources() {
     if [ "${successful_count}" -eq 0 ]; then
         echo -e "${PREFIX_WARNING}Nothing to apply [${successful_count}/${total_count}]." 1>&2
         return 1
-    elif [ "${IGNORE_DOWNLOAD_ERROR}" == "false" ] && [ "${successful_count} != ${total_count}" ]; then
+    elif [ "${IGNORE_DOWNLOAD_ERROR}" == "false" ] && [ "${successful_count}" == "${total_count}" ]; then
         echo -e "${PREFIX_WARNING}Couldn't fetch all hosts sources [${successful_count}/${total_count}]. Aborting ..."
         cleanUp
         exit 1
@@ -189,8 +188,7 @@ filterDomains() {
     # - replace tabs and multiple spaces with one space
     # - remove domains without a dot (e.g localhost , loopback , ip6-allnodes , etc...)
     # - remove domains that are redirecting to *.local
-    cat "${TMP_DIR_PATH}/${input_file}" \
-        | sed 's/\r/\n/g' \
+    sed 's/\r/\n/g' "${TMP_DIR_PATH}/${input_file}" \
         | sed 's/^\s*127\.0\.[01]\.1/0\.0\.0\.0/g' \
         | sed -n '/^\s*0\.0\.0\.0\s\+.\+/p' \
         | sed 's/\s\+#.*//g' \
@@ -250,8 +248,6 @@ applyWhiteList() {
 
 
 mergeBlackList() {
-    local input_file="${1}"
-
     if [ ! -s "${TMP_DIR_PATH}/blacklist-sorted" ]; then
         echo "${PREFIX}Blacklist is empty, ignoring ..."
         return 1
@@ -284,41 +280,45 @@ isCacheEmpty() {
 
 
 preBuildHosts() {
-    # Replace @...@ with the path to the backup hosts
-    sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" "${SCRIPT_DIR_PATH}/bin/components/hosts_header" > "${TMP_DIR_PATH}/hosts"
+    {
+        # Replace @...@ with the path to the backup hosts
+        sed "s|#@.\+#@|${HOSTS_FILE_BACKUP_PATH}|g" "${SCRIPT_DIR_PATH}/bin/components/hosts_header"
 
-    echo -e "" >> "${TMP_DIR_PATH}/hosts"
+        echo ""
 
-    # Add hosts.original
-    cat "${HOSTS_FILE_BACKUP_PATH}" >> "${TMP_DIR_PATH}/hosts" \
-        || echo "${PREFIX}You may want to add your hostname to ${HOSTS_FILE_PATH}" 1>&2
+        # Add hosts.original
+        cat "${HOSTS_FILE_BACKUP_PATH}" \
+            || echo "${PREFIX}You may want to add your hostname to ${HOSTS_FILE_PATH}" 1>&2
 
-    echo -e "" >> "${TMP_DIR_PATH}/hosts"
+        echo ""
 
-    # Add hosts_title
-    cat "${SCRIPT_DIR_PATH}/bin/components/hosts_title" >> "${TMP_DIR_PATH}/hosts"
+        # Add hosts_title
+        cat "${SCRIPT_DIR_PATH}/bin/components/hosts_title"
+    } > "${TMP_DIR_PATH}/hosts"
 
     return 0
 }
 
 
 buildHostsFile() {
-    echo -e "" >> "${TMP_DIR_PATH}/hosts"
+    {
+        echo ""
 
-    # Add the fetched ad-domains to the hosts file
-    cat "${TMP_DIR_PATH}/cache" >> "${TMP_DIR_PATH}/hosts"
+        # Add the fetched ad-domains to the hosts file
+        cat "${TMP_DIR_PATH}/cache"
 
-    echo -e "" >> "${TMP_DIR_PATH}/hosts"
+        echo ""
 
-    # Add the hosts_header to the hosts file in the temporary folder, filter out the line with @ and replace with HOSTS_FILE_BACKUP_PATH
-    sed "s|@.\+@|${HOSTS_FILE_BACKUP_PATH}|g" "${SCRIPT_DIR_PATH}/bin/components/hosts_header" >> "${TMP_DIR_PATH}/hosts"
+        # Add the hosts_header to the hosts file in the temporary folder, filter out the line with @ and replace with HOSTS_FILE_BACKUP_PATH
+        sed "s|#@.\+#@|${HOSTS_FILE_BACKUP_PATH}|g" "${SCRIPT_DIR_PATH}/bin/components/hosts_header"
+    } >> "${TMP_DIR_PATH}/hosts"
 
     return 0
 }
 
 
 countBlockedDomains() {
-    readonly COUNT_BLOCKED="$(cat ${TMP_DIR_PATH}/cache | wc -l)"
+    readonly COUNT_BLOCKED="$(wc -l < "${TMP_DIR_PATH}/cache")"
 
     return 0
 }

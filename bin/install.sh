@@ -51,7 +51,7 @@ installCronjob() {
     fi
 
     # Replace the @ place holder line with SCRIPT_DIR_PATH and copy the content to cron's directory
-    sed "s|@.*|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" > "${CRONTAB_DIR_PATH}/80adsorber"
+    sed "s|^#@.\+#@$|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" > "${CRONTAB_DIR_PATH}/80adsorber"
     chmod u=rwx,g=rx,o=rx "${CRONTAB_DIR_PATH}/80adsorber"
 
     INSTALLED_SCHEDULER="cronjob"
@@ -77,15 +77,14 @@ installSystemd() {
     echo "${PREFIX}Installing Systemd service ..."
 
     # Replace the @ place holder line with SCRIPT_DIR_PATH and copy to its systemd directory
-    sed "s|@ExecStart.*|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" > "${SYSTEMD_DIR_PATH}/adsorber.service"
+    sed "s|^#@ExecStart.\+#@$|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" > "${SYSTEMD_DIR_PATH}/adsorber.service"
     cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.timer"
 
     chmod u=rwx,g=rx,o=rx "${SYSTEMD_DIR_PATH}/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.timer"
 
-    printf "${PREFIX}"
     # Enable the systemd service
     systemctl daemon-reload \
-        && systemctl enable adsorber.timer \
+        && systemctl enable adsorber.timer | printf "%s" "${PREFIX}" \
         && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start Systemd service." 1>&2
 
     INSTALLED_SCHEDULER="systemd"
@@ -96,7 +95,7 @@ installSystemd() {
 
 promptInstall() {
     if [ -z "${REPLY_TO_PROMPT}" ]; then
-        read -p "${PREFIX_INPUT}Do you really want to install Adsorber? [Y/n]: " REPLY_TO_PROMPT
+        read -r -p "${PREFIX_INPUT}Do you really want to install Adsorber? [Y/n]: " REPLY_TO_PROMPT
     fi
 
     case "${REPLY_TO_PROMPT}" in
@@ -116,7 +115,7 @@ promptInstall() {
 
 promptScheduler() {
     if [ -z "${REPLY_TO_SCHEDULER_PROMPT}" ]; then
-        read -p "${PREFIX_INPUT}What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
+        read -r -p "${PREFIX_INPUT}What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
     fi
 
     case "${REPLY_TO_SCHEDULER_PROMPT}" in

@@ -50,7 +50,7 @@ removeSystemd() {
     if [ -f "${SYSTEMD_DIR_PATH}/adsorber.service" ] || [ -f "${SYSTEMD_DIR_PATH}/adsorber.timer" ]; then
 
         systemctl stop adsorber.timer 2>/dev/null
-        systemctl disable adsorber.timer | ( printf "${PREFIX}" && cat )
+        systemctl disable adsorber.timer | ( printf "%s" "${PREFIX}" && cat )
         systemctl stop adsorber.service 2>/dev/null 1>&2
         systemctl disable adsorber.service 2>/dev/null 1>&2 # The service is not enabled by default
 
@@ -83,7 +83,7 @@ removeCronjob() {
 
 promptRemove() {
     if [ -z "${REPLY_TO_PROMPT}" ]; then
-        read -p "${PREFIX_INPUT}Do you really want to remove Adsorber? [Y/n] " REPLY_TO_PROMPT
+        read -r -p "${PREFIX_INPUT}Do you really want to remove Adsorber? [Y/n] " REPLY_TO_PROMPT
     fi
 
     case "${REPLY_TO_PROMPT}" in
