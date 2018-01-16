@@ -46,7 +46,7 @@ showUsage() {
     fi
 
     if [ "${WRONG_OPTION}" != "" ]; then
-        echo "Adsorber: Invalid option: ${WRONG_OPTION[@]}" 1>&2
+        echo "Adsorber: Invalid option: ${WRONG_OPTION[*]}" 1>&2
     fi
 
     echo "Usage: ${0} [install|remove|update|revert] {options}" 1>&2
@@ -105,6 +105,13 @@ showVersion() {
 }
 
 
+duplicateOption() {
+    echo "Adsorber: Duplicate option: '${option}'"
+
+    exit 1
+}
+
+
 sourceFiles() {
     . "${SCRIPT_DIR_PATH}/bin/install.sh"
     . "${SCRIPT_DIR_PATH}/bin/remove.sh"
@@ -122,25 +129,25 @@ for option in "${@}"; do
 
     case "${option}" in
         -[Ss] | --systemd )
-            readonly REPLY_TO_SCHEDULER_PROMPT="systemd"
+            readonly REPLY_TO_SCHEDULER_PROMPT="systemd" 2>/dev/null || duplicateOption
             ;;
         -[Cc] | --cron )
-            readonly REPLY_TO_SCHEDULER_PROMPT="cronjob"
+            readonly REPLY_TO_SCHEDULER_PROMPT="cronjob" 2>/dev/null || duplicateOption
             ;;
         -[Nn][Ss] | --no-scheduler )
-            readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler"
+            readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler" 2>/dev/null || duplicateOption
             ;;
         -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
-            readonly REPLY_TO_PROMPT="yes"
+            readonly REPLY_TO_PROMPT="yes" 2>/dev/null || duplicateOption
             ;;
         -[Ff] | --force )
-            readonly REPLY_TO_FORCE_PROMPT="yes"
+            readonly REPLY_TO_FORCE_PROMPT="yes" 2>/dev/null || duplicateOption
             ;;
         "" )
             : # Do nothing
             ;;
         * )
-            readonly WRONG_OPTION+=("'${option}'")
+            WRONG_OPTION+=("'${option}'")
             ;;
     esac
 
