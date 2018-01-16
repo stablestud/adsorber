@@ -13,6 +13,9 @@ readonly VERSION="0.2.2"
 
 readonly OPERATION="${1}"
 
+# For better error messages, from http://wiki.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful:
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+
 if [ "${#}" -ne 0 ]; then
     shift
 fi
