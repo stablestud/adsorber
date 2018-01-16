@@ -48,7 +48,7 @@ checkBackupExist() {
             * )
                 echo -e "${PREFIX_WARNING}Aborted." 1>&2
                 errorCleanUp
-                exit 1
+                exit 130
                 ;;
         esac
     fi
@@ -75,7 +75,7 @@ readSourceList() {
 
         if [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
             echo -e "${PREFIX_FATAL}Missing 'sources.list' and blacklist. To fix run '${0} install'.${COLOUR_RESET}" 1>&2
-            exit 1
+            exit 127
         fi
 
         echo "${PREFIX}No sources to fetch from, ignoring ..."
@@ -235,7 +235,7 @@ applyWhiteList() {
             else
                 echo -e "${PREFIX_FATAL}Wrong USE_PARTIAL_MATCHING set, either set it to 'true' or 'false'.${COLOUR_RESET}" 1>&2
                 errorCleanUp
-                exit 1
+                exit 127
             fi
 
         done < "${TMP_DIR_PATH}/whitelist-sorted"
@@ -332,7 +332,7 @@ applyHostsFile() {
         || {
             echo -e "${PREFIX_FATAL}Couldn't apply hosts file. Aborting.${COLOUR_RESET}" 1>&2
             errorCleanUp
-            exit 1
+            exit 126
     }
 
     echo -e "${PREFIX_INFO}Successfully applied new hosts file with ${COUNT_BLOCKED} blocked domains.${COLOUR_RESET}"
@@ -372,7 +372,7 @@ update() {
         * )
             echo -e "${PREFIX_FATAL}Wrong PRIMARY_LIST set in adsorber.conf. Choose either 'whitelist' or 'blacklist'${COLOUR_RESET}" 1>&2
             errorCleanUp
-            exit 1
+            exit 127
             ;;
     esac
 

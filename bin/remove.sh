@@ -56,7 +56,7 @@ removeSystemd() {
 
         rm "${SYSTEMD_DIR_PATH}/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.service" \
             || {
-                echo -e "${PREFIX_WARNING}Couldn't remove Systemd service files." 1>&2
+                echo -e "${PREFIX_WARNING}Couldn't remove systemd service files." 1>&2
                 return 1
         }
 
@@ -72,7 +72,7 @@ removeSystemd() {
 removeCronjob() {
     if [ -f "${CRONTAB_DIR_PATH}/80adsorber" ]; then
         rm "${CRONTAB_DIR_PATH}/80adsorber" \
-            && echo "${PREFIX}Removed Adsorber's Cronjob."
+            && echo "${PREFIX}Removed Adsorber's cronjob."
     else
         echo "${PREFIX}Cronjob not installed. Skipping ..." 1>&2
     fi
@@ -93,7 +93,7 @@ promptRemove() {
         * )
             echo -e "${PREFIX_WARNING}Remove cancelled." 1>&2
             errorCleanUp
-            exit 1
+            exit 130
             ;;
     esac
 

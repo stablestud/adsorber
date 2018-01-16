@@ -90,7 +90,7 @@ copyConfig() {
         sed "s|@.*|# Config file for Adsorber v${VERSION}|g" "${SCRIPT_DIR_PATH}/bin/default/default-adsorber.conf" > "${SCRIPT_DIR_PATH}/adsorber.conf"
 
         errorCleanUp
-        exit 1
+        exit 126
     fi
 
     return 0
@@ -123,10 +123,10 @@ readConfig() {
 
 isVariableSet() {
     if [ -z "${HOSTS_FILE_PATH}" ] || [ -z "${HOSTS_FILE_BACKUP_PATH}" ] || [ -z "${CRONTAB_DIR_PATH}" ] || [ -z "${SYSTEMD_DIR_PATH}" ]; then
-        echo -e "! Missing setting(s) in adsorber.conf." 1>&2
+        echo -e "${PREFIX_FATAL}Missing setting(s) in adsorber.conf." 1>&2
         echo "${PREFIX}Please delete adsorber.conf and run '${0} install' to create a new config file." 1>&2
         errorCleanUp
-        exit 1
+        exit 127
     fi
 
     if [ -z "${PRIMARY_LIST}" ]; then
@@ -149,9 +149,9 @@ isVariableSet() {
 
 isVariableValid() {
     if [ ! -f "${HOSTS_FILE_PATH}" ]; then
-        echo -e "! Wrong HOSTS_FILE_PATH set in adsorber.conf. Can't access: ${HOSTS_FILE_PATH}" 1>&2
+        echo -e "${PREFIX_FATAL}Wrong HOSTS_FILE_PATH set in adsorber.conf. Can't access: ${HOSTS_FILE_PATH}" 1>&2
         errorCleanUp
-        exit 1
+        exit 126
     fi
 
     return 0

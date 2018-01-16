@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# A(d)sorber's Cron file
+# A(d)sorber's cron file
 # Updates the hosts file once a week.
 #
 # For more information: https://github.com/stablestud/adsorber

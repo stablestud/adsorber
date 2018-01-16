@@ -63,13 +63,13 @@ showHelp() {
     echo "           (with the help of the hosts file)"
     echo ""
     echo "Operations:"
-    echo "  install - setup necessary things needed for adsorber"
+    echo "  install - setup necessary things needed for Adsorber"
     echo "              e.g., create backup file of hosts file,"
     echo "                    create scheduler which updates the host file once a week."
     echo "  update  - update hosts file with newest ad servers"
     echo "  revert  - revert hosts file to its original state"
     echo "            (it does not remove the schedule, so this should be used temporary)"
-    echo "  remove  - completely remove changes made by adsorber"
+    echo "  remove  - completely remove changes made by Adsorber"
     echo "              e.g., remove scheduler (if set)"
     echo "                    revert hosts file (if not already done)"
     echo "  version - show version of this shell script"
@@ -108,7 +108,7 @@ showVersion() {
 duplicateOption() {
     echo "Adsorber: Duplicate option: '${option}'"
 
-    exit 1
+    exit 127
 }
 
 

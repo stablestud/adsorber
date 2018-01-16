@@ -125,7 +125,6 @@ To change the content of <strong>placed</strong> files go to:
 
 ## Todo for future releases
 
-* Add proper exit codes as in [Reserved Exit Codes](http://tldp.org/LDP/abs/html/exitcodes.html#EXITCODESREF)
 * Add testing framework (travis etc.)
 * Make script shell independent
 * Create .deb

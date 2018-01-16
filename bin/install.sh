@@ -42,12 +42,12 @@ backupHostsFile() {
 
 
 installCronjob() {
-    echo "${PREFIX}Installing Cronjob ..."
+    echo "${PREFIX}Installing cronjob ..."
 
     if [ ! -d "${CRONTAB_DIR_PATH}" ]; then
         echo -e "${PREFIX_FATAL}Wrong CRONTAB_DIR_PATH set. Can't access: ${CRONTAB_DIR_PATH}.${COLOUR_RESET}" 1>&2
         errorCleanUp
-        exit 1
+        exit 126
     fi
 
     # Replace the @ place holder line with SCRIPT_DIR_PATH and copy the content to cron's directory
@@ -65,16 +65,16 @@ installSystemd() {
     if [ ! -d "${SYSTEMD_DIR_PATH}" ]; then
         echo -e "${PREFIX_FATAL}Wrong SYSTEMD_DIR_PATH set. Can't access: ${SYSTEMD_DIR_PATH}.${COLOUR_RESET}" 1>&2
         errorCleanUp
-        exit 1
+        exit 126
     fi
 
-    # Remove Systemd service if already installed (requires remove.sh)
+    # Remove systemd service if already installed (requires remove.sh)
     if [ -f "${SYSTEMD_DIR_PATH}/adsorber.service" ] || [ -f "${SYSTEMD_DIR_PATH}/adsorber.timer" ]; then
-        echo "${PREFIX}Removing previous installed Systemd service ..."
+        echo "${PREFIX}Removing previous installed systemd service ..."
         removeSystemd
     fi
 
-    echo "${PREFIX}Installing Systemd service ..."
+    echo "${PREFIX}Installing systemd service ..."
 
     # Replace the @ place holder line with SCRIPT_DIR_PATH and copy to its systemd directory
     sed "s|^#@ExecStart.\+#@$|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" > "${SYSTEMD_DIR_PATH}/adsorber.service"
@@ -85,7 +85,7 @@ installSystemd() {
     # Enable the systemd service
     systemctl daemon-reload \
         && systemctl enable adsorber.timer | printf "%s" "${PREFIX}" \
-        && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start Systemd service." 1>&2
+        && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start systemd service." 1>&2
 
     INSTALLED_SCHEDULER="systemd"
 
@@ -105,7 +105,7 @@ promptInstall() {
         * )
             echo -e "${PREFIX_WARNING}Installation cancelled." 1>&2
             errorCleanUp
-            exit 1
+            exit 130
             ;;
     esac
 

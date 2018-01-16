@@ -1,5 +1,5 @@
 [Unit]
-Description=Adsorber timer that runs the Adsorber service weekly.
+Description=Timer that runs the Adsorber service weekly.
 Documentation=https://github.com/stablestud/Adsorber
 Requires=network-online.target
 
