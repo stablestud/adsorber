@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Author:     stablestud <adsorber@stablestud.org>
+# Author:     stablestud
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
@@ -56,7 +56,7 @@ removeSystemd() {
 
         rm "${SYSTEMD_DIR_PATH}/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.service" \
             || {
-                echo -e "${PREFIX_WARNING}Couldn't remove systemd service files." 1>&2
+                echo -e "${PREFIX_WARNING}Couldn't remove systemd service files at ${SYSTEMD_DIR_PATH}." 1>&2
                 return 1
         }
 

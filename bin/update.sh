@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Author:     stablestud <adsorber@stablestud.org>
+# Author:     stablestud
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
@@ -356,7 +356,7 @@ update() {
 
         cp "${TMP_DIR_PATH}/fetched-sorted" "${TMP_DIR_PATH}/cache"
     else
-        # Create empty cache file
+        # Create empty cache file for the domains.
         printf "" >> "${TMP_DIR_PATH}/cache"
     fi
 
