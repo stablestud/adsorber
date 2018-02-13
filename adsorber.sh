@@ -9,7 +9,7 @@ readonly TMP_DIR_PATH="/tmp/adsorber"
 readonly SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
 readonly SOURCELIST_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
 
-readonly VERSION="0.2.2"
+readonly VERSION="0.2.3"
 
 readonly OPERATION="${1}"
 
@@ -194,6 +194,6 @@ case "${OPERATION}" in
         ;;
 esac
 
-echo -e "${PREFIX_TITLE}Finished.${COLOUR_RESET}"
+echo -e "${PREFIX_TITLE}Successfully finished.${COLOUR_RESET}"
 
 exit 0

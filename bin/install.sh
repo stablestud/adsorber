@@ -12,7 +12,7 @@
 # HOSTS_FILE_PATH             /etc/hosts              bin/config.sh, adsorber.sh
 # HOSTS_FILE_BACKUP_PATH      /etc/hosts.original     bin/config.sh, adsorber.sh
 # PREFIX                      '  ' (two spaces)       bin/colours.sh
-# PREFIX_INPUT                '  '                    bin/colours.sh
+# PREFIX_INPUT                '  ' (two spaces)       bin/colours.sh
 # PREFIX_FATAL                '\033[0;91mE '          bin/colours.sh
 # PREFIX_TITLE                \033[1;37m              bin/colours.sh
 # PREFIX_WARNING              '- '                    bin/colours.sh
@@ -29,10 +29,12 @@
 # errorCleanUp       bin/remove.sh
 # removeSystemd      bin/remove.sh
 
+
 backupHostsFile() {
     if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
         cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
             && echo "${PREFIX}Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
+            readonly BACKEDUP="true"
     else
         echo "${PREFIX}Backup already exist, no need to backup."
     fi
@@ -54,7 +56,7 @@ installCronjob() {
     sed "s|^#@.\+#@$|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" > "${CRONTAB_DIR_PATH}/80adsorber"
     chmod u=rwx,g=rx,o=rx "${CRONTAB_DIR_PATH}/80adsorber"
 
-    INSTALLED_SCHEDULER="cronjob"
+    readonly INSTALLED_SCHEDULER="cronjob"
 
     return 0
 }
@@ -87,7 +89,7 @@ installSystemd() {
         && systemctl enable adsorber.timer | printf "%s" "${PREFIX}" \
         && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start systemd service." 1>&2
 
-    INSTALLED_SCHEDULER="systemd"
+    readonly INSTALLED_SCHEDULER="systemd"
 
     return 0
 }

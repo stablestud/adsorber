@@ -6,18 +6,21 @@
 
 # The following variables are declared in adsorber.conf, adsorber.sh or bin/config.sh.
 # If you run this file independently following variables need to be set:
-# ---variable:-------    ---default value:----   ---defined in:--------------
-# CRONTAB_DIR_PATH       /etc/cron.weekly        bin/config.sh, adsorber.conf
-# COLOUR_RESET           \033[0m                 bin/colours.sh
-# INSTALLED_SCHEDULER    Null (not set)          bin/install.sh
-# PREFIX                 '  ' (two spaces)       bin/colours.sh
-# PREFIX_INPUT           '  '                    bin/colours.sh
-# PREFIX_TITLE           \033[1;37m              bin/colours.sh
-# PREFIX_WARNING         '- '                    bin/colours.sh
-# REPLY_TO_PROMPT        Null (not set)          bin/install.sh, adsorber.sh
-# SCRIPT_DIR_PATH        script root directory   adsorber.sh
+# ---variable:-------     ---default value:----   ---defined in:--------------
+# BACKEDUP                Null (not set)          bin/install.sh
+# CRONTAB_DIR_PATH        /etc/cron.weekly        bin/config.sh, adsorber.conf
+# COLOUR_RESET            \033[0m                 bin/colours.sh
+# HOSTS_FILE_BACKUP_PATH  /etc/hosts.original     bin/config.sh, adsorber.conf
+# INSTALLED_SCHEDULER     Null (not set)          bin/install.sh
+# PREFIX                  '  ' (two spaces)       bin/colours.sh
+# PREFIX_INPUT            '  '                    bin/colours.sh
+# PREFIX_TITLE            \033[1;37m              bin/colours.sh
+# PREFIX_WARNING          '- '                    bin/colours.sh
+# REPLY_TO_PROMPT         Null (not set)          bin/install.sh, adsorber.sh
+# SCRIPT_DIR_PATH         script root directory   adsorber.sh
 #   (e.g., /home/user/Downloads/adsorber)
-# SYSTEMD_DIR_PATH       /etc/systemd/system     bin/config.sh, adsorber.conf
+# SYSTEMD_DIR_PATH        /etc/systemd/system     bin/config.sh, adsorber.conf
+
 
 errorCleanUp() {
     echo "${PREFIX_WARNING}Cleaning up ..."
@@ -32,6 +35,10 @@ errorCleanUp() {
             ;;
     esac
 
+    if [ "${BACKEDUP}" == "true" ]; then
+        rm -f "${HOSTS_FILE_BACKUP_PATH}"
+    fi
+    
     rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
 
     return 0
@@ -40,7 +47,7 @@ errorCleanUp() {
 
 cleanUp() {
     echo "${PREFIX}Cleaning up ..."
-
+    
     rm -rf "${TMP_DIR_PATH}" 2>/dev/null 1>&2
 
     return 0

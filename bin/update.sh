@@ -14,10 +14,12 @@
 # PREFIX                   '  ' (two spaces)              bin/colours.sh
 # PREFIX_FATAL             '\033[0;91mE '                 bin/colours.sh
 # PREFIX_INFO              '\033[0;97m  '                 bin/colours.sh
-# PREFIX_INPUT             '  '                           bin/colours.sh
+# PREFIX_INPUT             '  ' (two spaces)             bin/colours.sh
 # PREFIX_TITLE             \033[1;37m                     bin/colours.sh
 # PREFIX_WARNING           '- '                           bin/colours.sh
 # PRIMARY_LIST             blacklist                      bin/config.sh, adsorber.conf
+# HTTP_PROXY               Null (not set)                 bin/config.sh, adsorber.conf
+# HTTPS_PROXY              Null (not set)                 bin/config.sh, adsorber.conf
 # REPLY_TO_FORCE_PROMPT    Null (not set)                 bin/install.sh
 # SCRIPT_DIR_PATH          script root directory          adsorber.sh
 #   (e.g., /home/user/Downloads/adsorber)
@@ -128,6 +130,21 @@ readBlackList() {
 }
 
 
+setProxy() {
+    if [ ! -z "${HTTP_PROXY}" ]; then
+        echo "${PREFIX}Using HTTP proxy: [${HTTP_PROXY}]"
+        export http_proxy="${HTTP_PROXY}"
+    fi
+    
+    if [ ! -z "${HTTPS_PROXY}" ]; then
+        echo "${PREFIX}Using HTTPS proxy: [${HTTPS_PROXY}]"
+	    export https_proxy="${HTTPS_PROXY}"
+	fi
+	
+	return 0;
+}
+	
+
 fetchSources() {
     local total_count=0
     local successful_count=0
@@ -165,9 +182,9 @@ fetchSources() {
     if [ "${successful_count}" -eq 0 ]; then
         echo -e "${PREFIX_WARNING}Nothing to apply [${successful_count}/${total_count}]." 1>&2
         return 1
-    elif [ "${IGNORE_DOWNLOAD_ERROR}" == "false" ] && [ "${successful_count}" == "${total_count}" ]; then
+    elif [ "${IGNORE_DOWNLOAD_ERROR}" == "false" ] && [ ! "${successful_count}" == "${total_count}" ]; then
         echo -e "${PREFIX_WARNING}Couldn't fetch all hosts sources [${successful_count}/${total_count}]. Aborting ..."
-        cleanUp
+        errorCleanUp
         exit 1
     else
         echo -e "${PREFIX_INFO}Successfully fetched ${successful_count} out of ${total_count} hosts sources.${COLOUR_RESET}"
@@ -271,7 +288,7 @@ isCacheEmpty() {
         return 0
     else
         echo -e "${PREFIX_WARNING}Nothing to apply." 1>&2
-        cleanUp
+        errorCleanUp
         exit 1
     fi
 
@@ -348,6 +365,7 @@ update() {
     createTmpDir
     readBlackList
     readWhiteList
+	setProxy
 
     if readSourceList; then
         fetchSources

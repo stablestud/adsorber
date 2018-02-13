@@ -30,16 +30,18 @@
 SETTING_STRING[0]="PRIMARY_LIST"
 SETTING_STRING[1]="USE_PARTIAL_MATCHING"
 SETTING_STRING[2]="IGNORE_DOWNLOAD_ERROR"
-SETTING_STRING[3]="HOSTS_FILE_PATH"
-SETTING_STRING[4]="HOSTS_FILE_BACKUP_PATH"
-SETTING_STRING[5]="CRONTAB_DIR_PATH"
-SETTING_STRING[6]="SYSTEMD_DIR_PATH"
+SETTING_STRING[3]="HTTP_PROXY"
+SETTING_STRING[4]="HTTPS_PROXY"
+SETTING_STRING[5]="HOSTS_FILE_PATH"
+SETTING_STRING[6]="HOSTS_FILE_BACKUP_PATH"
+SETTING_STRING[7]="CRONTAB_DIR_PATH"
+SETTING_STRING[8]="SYSTEMD_DIR_PATH"
 
 readonly SETTING_STRING
 
 
 configCreateTmpDir() {
-    if [ ! -d ${TMP_DIR_PATH} ]; then
+    if [ ! -d "${TMP_DIR_PATH}" ]; then
         mkdir "${TMP_DIR_PATH}"
     else
         echo "${PREFIX}Removing previous tmp folder ..."
@@ -147,7 +149,9 @@ isVariableSet() {
     return 0
 }
 
+
 isVariableValid() {
+	# TODO: Check if proxy is valid ( with ping )
     if [ ! -f "${HOSTS_FILE_PATH}" ]; then
         echo -e "${PREFIX_FATAL}Wrong HOSTS_FILE_PATH set in adsorber.conf. Can't access: ${HOSTS_FILE_PATH}" 1>&2
         errorCleanUp
@@ -157,9 +161,13 @@ isVariableValid() {
     return 0
 }
 
+
 printVariables() {
     echo -e "  - PRIMARY_LIST: ${PRIMARY_LIST}"
     echo -e "  - USE_PARTIAL_MATCHING: ${USE_PARTIAL_MATCHING}"
+    echo -e "  - IGNORE_DOWNLOAD_ERROR: ${IGNORE_DOWNLOAD_ERROR}"
+    echo -e "  - HTTP_PROXY: ${HTTP_PROXY}"
+    echo -e "  - HTTPS_PROXY: ${HTTPS_PROXY}"
     echo -e "  - HOSTS_FILE_PATH:: ${HOSTS_FILE_PATH}"
     echo -e "  - HOSTS_FILE_BACKUP_PATH: ${HOSTS_FILE_BACKUP_PATH}"
     echo -e "  - CRONTAB_DIR_PATH: ${CRONTAB_DIR_PATH}"
