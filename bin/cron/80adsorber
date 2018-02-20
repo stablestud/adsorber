@@ -4,6 +4,7 @@
 # Updates the hosts file once a week.
 #
 # For more information: https://github.com/stablestud/adsorber
+# Or send me an email: <adsorber@stablestud.org>
 #
 # adsorber.sh install --cron:
 # This file is going to be copied into /etc/cron.weekly/ if not other specified.

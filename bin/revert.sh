@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Author:     stablestud
+# Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
@@ -21,25 +21,27 @@
 # errorCleanUp       bin/remove.sh
 
 
-revertHostsFile() {
-    if [ -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
-        cp "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
-            && echo "${PREFIX}Successfully reverted ${HOSTS_FILE_PATH}." \
-            && echo "${PREFIX}To reapply please run './adsorber.sh update'."
-    else
-        echo -e "${PREFIX_FATAL}Can not restore hosts file. Original hosts file does not exist.${COLOUR_RESET}" 1>&2
-        errorCleanUp
-        exit 1
-    fi
+revertHostsFile()
+{
+        if [ -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
+                cp "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
+                        && echo "${PREFIX}Successfully reverted ${HOSTS_FILE_PATH}." \
+                        && echo "${PREFIX}To reapply please run './adsorber.sh update'."
+        else
+                echo -e "${PREFIX_FATAL}Can not restore hosts file. Original hosts file does not exist.${COLOUR_RESET}" 1>&2
+                errorCleanUp
+                exit 1
+        fi
 
-    return 0
+        return 0
 }
 
 
-revert() {
-    echo -e "${PREFIX_TITLE}Reverting ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
-    revertHostsFile
-    cleanUp
+revert()
+{
+        echo -e "${PREFIX_TITLE}Reverting ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
+        revertHostsFile
+        cleanUp
 
-    return 0
+        return 0
 }
