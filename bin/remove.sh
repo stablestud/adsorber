@@ -13,7 +13,7 @@
 # HOSTS_FILE_BACKUP_PATH  /etc/hosts.original     bin/config.sh, adsorber.conf
 # INSTALLED_SCHEDULER     Null (not set)          bin/install.sh
 # PREFIX                  '  ' (two spaces)       bin/colours.sh
-# PREFIX_INPUT            '  '                    bin/colours.sh
+# PREFIX_INPUT            '  ' (two spaces)       bin/colours.sh
 # PREFIX_TITLE            \033[1;37m              bin/colours.sh
 # PREFIX_WARNING          '- '                    bin/colours.sh
 # REPLY_TO_PROMPT         Null (not set)          bin/install.sh, adsorber.sh

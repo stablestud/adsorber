@@ -29,7 +29,7 @@
 # USE_PARTIAL_MATCHING     true                           bin/config.sh, adsorber.conf
 
 # The following functions are defined in different files.
-# If you run this file independently following functions need to emulated:
+# If you run this file independently following functions need to be emulated:
 # ---function:-----  ---function defined in:---
 # cleanUp            bin/remove.sh
 # errorCleanUp       bin/remove.sh
