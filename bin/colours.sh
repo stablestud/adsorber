@@ -40,7 +40,7 @@ readonly COLOUR_RESET='\033[0m'         # Default colour
 #readonly UBLUE='\033[4;34m'        # Blue
 #readonly UPURPLE='\033[4;35m'      # Purple
 #readonly UCYAN='\033[4;36m'        # Cyan
-#readonly UWHITE='\033[4;37m'       # White
+readonly UWHITE='\033[4;37m'       # White
 
 # Background
 #readonly BG_BLACK='\033[40m'       # Black

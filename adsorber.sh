@@ -38,6 +38,10 @@ checkForWrongParameters()
                 showUsage
         fi
 
+        if [ "${OPTION_HELP}" == "true"  ]; then
+                showSpecificHelp
+        fi
+
         return 0
 }
 
@@ -94,17 +98,83 @@ showHelp()
 }
 
 
+showSpecificHelp()
+{
+        case "${OPERATION}" in
+                install )
+                        echo -e "${UWHITE}adsorber.sh install {options}${COLOUR_RESET}:"
+                        echo ""
+                        echo "You should run this command first."
+                        echo ""
+                        echo "The command will:"
+                        echo " - backup your /etc/hosts file to /etc/hosts.original"
+                        echo "   (if not other specified in adsorber.sh)"
+                        echo " - install a scheduler which updates your hosts file with ad-server domains"
+                        echo "   once a week. (either systemd, cronjob or none)"
+                        echo " - install the newest ad-server domains in your hosts file."
+                        echo ""
+                        echo "Possible options are:"
+                        echo " -s, --systemd"
+                        echo " -c, --cronjob"
+                        echo " -ns, --no-scheduler"
+                        echo " -y, --yes, --assume-yes"
+                        ;;
+                update )
+                        echo -e "${UWHITE}adsorber.sh update {options}${COLOUR_RESET}:"
+                        echo ""
+                        echo "To keep the hosts file up-to-date."
+                        echo ""
+                        echo "The command will:"
+                        echo " - install the newest ad-server domains in your hosts file."
+                        echo ""
+                        echo "Possible option:"
+                        echo " -f, --force"
+                        ;;
+                revert )
+                        echo -e "${UWHITE}adsorber.sh revert {options}${COLOUR_RESET}:"
+                        echo ""
+                        echo "To restore the hosts file temporary."
+                        echo ""
+                        echo "The command will:"
+                        echo " - copy /etc/hosts.original to /etc/hosts, overwriting the modified /etc/hosts by adsorber."
+                        echo ""
+                        echo "Important: If you have a scheduler installed,"
+                        echo "it'll reapply ad-server domains to your hosts file after a while."
+                        echo "For this reason this command is used to temporary disable Adsorber"
+                        echo "(if it's blocking some sites you need access for a short period of time)."
+                        echo "To reapply run asdorber.sh update"
+                        ;;
+                remove )
+                        echo -e "${UWHITE}adsorber remove {options}${COLOUR_RESET}:"
+                        echo ""
+                        echo "To completely remove changes made by Adsorber."
+                        echo ""
+                        echo "The command will:"
+                        echo " - remove all schedulers (systemd, cronjob)"
+                        echo " - restore the hosts file to it's original state"
+                        echo " - remove all leftovers"
+                        echo ""
+                        echo "Possible options are:"
+                        echo " -y, --yes, --assume-yes"
+                        echo " -f, --force"
+                        ;;
+        esac
+
+        exit 0
+}
+
+
 showVersion()
 {
-        echo "A(d)sorber ${VERSION}
-
-        License MIT
-        Copyright (c) 2017 stablestud
-        This is free software: you are free to change and redistribute it.
-        There is NO WARRANTY, to the extent permitted by law.
-
-        Written by stablestud - and hopefully in the future with many others. ;)
-        Repository: https://github.com/stablestud/adsorber"
+        echo "A(d)sorber ${VERSION}"
+        echo ""
+        echo "  License MIT"
+        echo "  Copyright (c) 2017 stablestud <adsorber@stablestud.org>"
+        echo "  This is free software: you are free to change and redistribute it."
+        echo "  There is NO WARRANTY, to the extent permitted by law."
+        echo ""
+        echo "Written by stablestud - and hopefully in the future with many others. ;)"
+        echo "Repository: https://github.com/stablestud/adsorber"
 
         exit 0
 }
@@ -152,6 +222,9 @@ for option in "${@}"; do
                         ;;
                 "" )
                         : # Do nothing
+                        ;;
+                -[Hh] | --help | help )
+                        readonly OPTION_HELP="true"
                         ;;
                 * )
                         WRONG_OPTION+=("'${option}'")
