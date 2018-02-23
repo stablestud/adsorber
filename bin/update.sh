@@ -359,7 +359,7 @@ applyHostsFile()
         echo "${PREFIX}Applying new hosts file ..."
 
         # Replace systems hosts file with the modified version
-        cat "${TMP_DIR_PATH}/hosts" > "${HOSTS_FILE_PATH}" \
+        cp "${TMP_DIR_PATH}/hosts" "${HOSTS_FILE_PATH}" \
                 || {
                         echo -e "${PREFIX_FATAL}Couldn't apply hosts file. Aborting.${COLOUR_RESET}" 1>&2
                         errorCleanUp
@@ -389,7 +389,7 @@ update()
 
                 cp "${TMP_DIR_PATH}/fetched-sorted" "${TMP_DIR_PATH}/cache"
         else
-                # Create empty cache file for the domains.
+                # Create empty cache file for the ad-domains.
                 printf "" >> "${TMP_DIR_PATH}/cache"
         fi
 

@@ -38,6 +38,10 @@ checkForWrongParameters()
                 showUsage
         fi
 
+        if [ "${OPTION_HELP}" == "true"  ]; then
+                showSpecificHelp
+        fi
+
         return 0
 }
 
@@ -94,17 +98,84 @@ showHelp()
 }
 
 
+showSpecificHelp()
+{
+        case "${OPERATION}" in
+                install )
+                        echo -e "${UWHITE}adsorber.sh install {options}${COLOUR_RESET}:"
+                        echo ""
+                        echo "You should run this command first."
+                        echo ""
+                        echo "The command will:"
+                        echo " - backup your /etc/hosts file to /etc/hosts.original"
+                        echo "   (if not other specified in adsorber.conf)"
+                        echo " - install a scheduler which updates your hosts file with ad-server domains"
+                        echo "   once a week. (either systemd, cronjob or none)"
+                        echo " - install the newest ad-server domains in your hosts file."
+                        echo ""
+                        echo "Possible options are:"
+                        echo " -s, --systemd            - use Systemd ..."
+                        echo " -c, --cronjob            - use Cronjob as scheduler"
+                        echo " -ns, --no-scheduler      - skip scheduler creation"
+                        echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
+                        ;;
+                update )
+                        echo -e "${UWHITE}adsorber.sh update {options}${COLOUR_RESET}:"
+                        echo ""
+                        echo "To keep the hosts file up-to-date."
+                        echo ""
+                        echo "The command will:"
+                        echo " - install the newest ad-server domains in your hosts file."
+                        echo ""
+                        echo "Possible option:"
+                        echo " -f, --force      - force the update if no /etc/hosts backup"
+                        echo "                    has been created (dangerous)"
+                        ;;
+                revert )
+                        echo -e "${UWHITE}adsorber.sh revert {options}${COLOUR_RESET}:"
+                        echo ""
+                        echo "To restore the hosts file temporary, without removing the backup."
+                        echo ""
+                        echo "The command will:"
+                        echo " - copy /etc/hosts.original to /etc/hosts, overwriting the modified /etc/hosts by adsorber."
+                        echo ""
+                        echo "Important: If you have a scheduler installed it'll re-apply ad-server domains to your hosts"
+                        echo "file when triggered."
+                        echo "For this reason this command is used to temporary disable Adsorber."
+                        echo "(e.g. when it's blocking some sites you need access for a short period of time)"
+                        echo ""
+                        echo "To re-apply run 'asdorber.sh update'"
+                        ;;
+                remove )
+                        echo -e "${UWHITE}adsorber remove {options}${COLOUR_RESET}:"
+                        echo ""
+                        echo "To completely remove changes made by Adsorber."
+                        echo ""
+                        echo "The command will:"
+                        echo " - remove all schedulers (systemd, cronjob)"
+                        echo " - restore the hosts file to it's original state"
+                        echo " - remove all leftovers"
+                        echo ""
+                        echo "Possible option:"
+                        echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
+                        ;;
+        esac
+
+        exit 0
+}
+
+
 showVersion()
 {
-        echo "A(d)sorber ${VERSION}
-
-        License MIT
-        Copyright (c) 2017 stablestud
-        This is free software: you are free to change and redistribute it.
-        There is NO WARRANTY, to the extent permitted by law.
-
-        Written by stablestud - and hopefully in the future with many others. ;)
-        Repository: https://github.com/stablestud/adsorber"
+        echo "A(d)sorber ${VERSION}"
+        echo ""
+        echo "  License MIT"
+        echo "  Copyright (c) 2017 stablestud <adsorber@stablestud.org>"
+        echo "  This is free software: you are free to change and redistribute it."
+        echo "  There is NO WARRANTY, to the extent permitted by law."
+        echo ""
+        echo "Written by stablestud - and hopefully in the future with many others. ;)"
+        echo "Repository: https://github.com/stablestud/adsorber"
 
         exit 0
 }
@@ -112,7 +183,16 @@ showVersion()
 
 duplicateOption()
 {
-        echo "Adsorber: Duplicate option: '${option}'"
+        if [ "${1}" == "scheduler" ]; then
+                echo "Adsorber: Duplicate option for scheduler: '${option}'"
+                echo "You may only select one:"
+                echo "  -s,  --systemd           - use Systemd ..."
+                echo "  -c,  --cron              - use Cronjob as scheduler (use with 'install')"
+                echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'install')"
+        else
+                echo "Adsorber: Duplicate option: '${option}'"
+                showUsage
+        fi
 
         exit 127
 }
@@ -130,19 +210,20 @@ sourceFiles()
         return 0
 }
 
+
 sourceFiles
 
 for option in "${@}"; do
 
         case "${option}" in
                 -[Ss] | --systemd )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="systemd" 2>/dev/null || duplicateOption
+                        readonly REPLY_TO_SCHEDULER_PROMPT="systemd" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Cc] | --cron )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="cronjob" 2>/dev/null || duplicateOption
+                        readonly REPLY_TO_SCHEDULER_PROMPT="cronjob" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Nn][Ss] | --no-scheduler )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler" 2>/dev/null || duplicateOption
+                        readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
                         readonly REPLY_TO_PROMPT="yes" 2>/dev/null || duplicateOption
@@ -152,6 +233,9 @@ for option in "${@}"; do
                         ;;
                 "" )
                         : # Do nothing
+                        ;;
+                -[Hh] | --help | help )
+                        readonly OPTION_HELP="true" 2>/dev/null
                         ;;
                 * )
                         WRONG_OPTION+=("'${option}'")
@@ -201,6 +285,6 @@ case "${OPERATION}" in
                 ;;
 esac
 
-echo -e "${PREFIX_TITLE}Successfully finished.${COLOUR_RESET}"
+echo -e "${PREFIX_TITLE}Finished successfully.${COLOUR_RESET}"
 
 exit 0
