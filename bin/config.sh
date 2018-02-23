@@ -4,7 +4,7 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# The following variables are declared in adsorber.conf, adsorber.sh or bin/config.sh.
+# The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:--------   ---default value:------------   ----declared in:------------
 # COLOUR_RESET           \033[0m                         bin/colours.sh
@@ -40,7 +40,7 @@ SETTING_STRING[8]="SYSTEMD_DIR_PATH"
 readonly SETTING_STRING
 
 
-configCreateTmpDir()
+config::CreateTmpDir()
 {
         if [ ! -d "${TMP_DIR_PATH}" ]; then
                 mkdir "${TMP_DIR_PATH}"
@@ -54,7 +54,7 @@ configCreateTmpDir()
 }
 
 
-copySourceList()
+config::CopySourceList()
 {
         if [ ! -f "${SCRIPT_DIR_PATH}/sources.list" ] || [ ! -s "${SCRIPT_DIR_PATH}/sources.list" ]; then
                 cp "${SCRIPT_DIR_PATH}/bin/default/default-sources.list" "${SCRIPT_DIR_PATH}/sources.list" \
@@ -65,7 +65,7 @@ copySourceList()
 }
 
 
-copyWhiteList()
+config::CopyWhiteList()
 {
         if [ ! -f "${SCRIPT_DIR_PATH}/whitelist" ] || [ ! -s "${SCRIPT_DIR_PATH}/whitelist" ]; then
                 cp "${SCRIPT_DIR_PATH}/bin/default/default-whitelist" "${SCRIPT_DIR_PATH}/whitelist" \
@@ -76,7 +76,7 @@ copyWhiteList()
 }
 
 
-copyBlackList()
+config::CopyBlackList()
 {
         if [ ! -f "${SCRIPT_DIR_PATH}/blacklist" ] || [ ! -s "${SCRIPT_DIR_PATH}/blacklist" ]; then
                 cp "${SCRIPT_DIR_PATH}/bin/default/default-blacklist" "${SCRIPT_DIR_PATH}/blacklist" \
@@ -87,7 +87,7 @@ copyBlackList()
 }
 
 
-copyConfig()
+config::CopyConfig()
 {
         if [ -s "${SCRIPT_DIR_PATH}/adsorber.conf" ]; then
                 cp "${SCRIPT_DIR_PATH}/adsorber.conf" "${TMP_DIR_PATH}/config"
@@ -104,21 +104,26 @@ copyConfig()
 }
 
 
-filterConfig()
+config::FilterConfig()
 {
         local i
 
         for i in "${SETTING_STRING[@]}"; do
                 # keep only lines starting with value out of SETTING_STRING
                 sed -n "/^${i}/p" "${TMP_DIR_PATH}/config" \
-                        >> "${TMP_DIR_PATH}/config-filtered"
+                        >> "${TMP_DIR_PATH}/config-filtered" \
+                        || {
+                                echo -e "${PREFIX_FATAL}Couldn't filter config file.${COLOUR_RESET}"
+                                errorCleanUp
+                                exit 1
+                        }
         done
 
         return 0
 }
 
 
-readConfig()
+config::ReadConfig()
 {
         local line
 
@@ -130,7 +135,7 @@ readConfig()
 }
 
 
-isVariableSet()
+config::IsVariableSet()
 {
         if [ -z "${HOSTS_FILE_PATH}" ] || [ -z "${HOSTS_FILE_BACKUP_PATH}" ] || [ -z "${CRONTAB_DIR_PATH}" ] || [ -z "${SYSTEMD_DIR_PATH}" ]; then
                 echo -e "${PREFIX_FATAL}Missing setting(s) in adsorber.conf." 1>&2
@@ -158,7 +163,7 @@ isVariableSet()
 }
 
 
-isVariableValid()
+config::IsVariableValid()
 {
         # TODO: Check if proxy is valid ( with ping )
         if [ ! -f "${HOSTS_FILE_PATH}" ]; then
@@ -171,7 +176,7 @@ isVariableValid()
 }
 
 
-printVariables()
+config::PrintVariables()
 {
         echo -e "  - PRIMARY_LIST: ${PRIMARY_LIST}"
         echo -e "  - USE_PARTIAL_MATCHING: ${USE_PARTIAL_MATCHING}"
@@ -192,16 +197,16 @@ printVariables()
 config()
 {
         echo -e "${PREFIX_TITLE}Reading configuration ... ${COLOUR_RESET}"
-        configCreateTmpDir
-        copySourceList
-        copyWhiteList
-        copyBlackList
-        copyConfig
-        filterConfig
-        readConfig
-        isVariableSet
-        isVariableValid
-        #printVariables # used for debugging
+        config::CreateTmpDir
+        config::CopySourceList
+        config::CopyWhiteList
+        config::CopyBlackList
+        config::CopyConfig
+        config::FilterConfig
+        config::ReadConfig
+        config::IsVariableSet
+        config::IsVariableValid
+        #config::PrintVariables # used for debugging
 
         return 0
 }

@@ -4,7 +4,7 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# The following variables are declared in adsorber.conf, adsorber.sh or bin/config.sh.
+# The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:-------     ---default value:----   ---defined in:--------------
 # BACKEDUP                Null (not set)          bin/install.sh
@@ -26,13 +26,13 @@ errorCleanUp()
 {
         echo "${PREFIX_WARNING}Cleaning up ..."
 
-        # Remove scheduler if installed
+        # Remove scheduler if installed in the same run
         case "${INSTALLED_SCHEDULER}" in
                 cronjob )
-                        removeCronjob
+                        remove::Cronjob
                         ;;
                 systemd )
-                        removeSystemd
+                        remove::Systemd
                         ;;
         esac
 
@@ -55,7 +55,8 @@ cleanUp()
         return 0
 }
 
-removeSystemd()
+
+remove::Systemd()
 {
         if [ -f "${SYSTEMD_DIR_PATH}/adsorber.service" ] || [ -f "${SYSTEMD_DIR_PATH}/adsorber.timer" ]; then
 
@@ -79,7 +80,7 @@ removeSystemd()
 }
 
 
-removeCronjob()
+remove::Cronjob()
 {
         if [ -f "${CRONTAB_DIR_PATH}/80adsorber" ]; then
                 rm "${CRONTAB_DIR_PATH}/80adsorber" \
@@ -92,7 +93,7 @@ removeCronjob()
 }
 
 
-promptRemove()
+remove::Prompt()
 {
         if [ -z "${REPLY_TO_PROMPT}" ]; then
                 read -r -p "${PREFIX_INPUT}Do you really want to remove Adsorber? [Y/n] " REPLY_TO_PROMPT
@@ -113,7 +114,7 @@ promptRemove()
 }
 
 
-removeHostsFile()
+remove::HostsFile()
 {
         if [ -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
                 mv "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
@@ -132,10 +133,10 @@ removeHostsFile()
 remove()
 {
         echo -e "${PREFIX_TITLE}Removing Adsorber ...${COLOUR_RESET}"
-        promptRemove
-        removeSystemd
-        removeCronjob
-        removeHostsFile
+        remove::Prompt
+        remove::Systemd
+        remove::Cronjob
+        remove::HostsFile
         cleanUp
 
         return 0

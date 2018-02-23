@@ -34,13 +34,13 @@ readonly COLOUR_RESET='\033[0m'         # Default colour
 
 # Underline
 #readonly UBLACK='\033[4;30m'       # Black
-#readonly URRED='\033[4;31m'         # Red
+#readonly URRED='\033[4;31m'        # Red
 #readonly UGREEn='\033[4;32m'       # Green
 #readonly UYELLOW='\033[4;33m'      # Yellow
 #readonly UBLUE='\033[4;34m'        # Blue
 #readonly UPURPLE='\033[4;35m'      # Purple
 #readonly UCYAN='\033[4;36m'        # Cyan
-readonly UWHITE='\033[4;37m'       # White
+readonly UWHITE='\033[4;37m'        # White
 
 # Background
 #readonly BG_BLACK='\033[40m'       # Black

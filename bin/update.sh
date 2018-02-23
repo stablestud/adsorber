@@ -4,7 +4,7 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# The following variables are declared in adsorber.conf, adsorber.sh or bin/config.sh.
+# The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:----------   ---default value:-----------   ---declared in:-------------
 # COLOUR_RESET             \033[0m                        bin/colours.sh
@@ -14,13 +14,13 @@
 # PREFIX                   '  ' (two spaces)              bin/colours.sh
 # PREFIX_FATAL             '\033[0;91mE '                 bin/colours.sh
 # PREFIX_INFO              '\033[0;97m  '                 bin/colours.sh
-# PREFIX_INPUT             '  ' (two spaces)             bin/colours.sh
+# PREFIX_INPUT             '  ' (two spaces)              bin/colours.sh
 # PREFIX_TITLE             \033[1;37m                     bin/colours.sh
 # PREFIX_WARNING           '- '                           bin/colours.sh
 # PRIMARY_LIST             blacklist                      bin/config.sh, adsorber.conf
 # HTTP_PROXY               Null (not set)                 bin/config.sh, adsorber.conf
 # HTTPS_PROXY              Null (not set)                 bin/config.sh, adsorber.conf
-# REPLY_TO_FORCE_PROMPT    Null (not set)                 bin/install.sh
+# REPLY_TO_FORCE_PROMPT    Null (not set)                 bin/install.sh, adsorber.sh
 # SCRIPT_DIR_PATH          script root directory          adsorber.sh
 #   (e.g., /home/user/Downloads/adsorber)
 # SOURCELIST_FILE_PATH     SCRIPT_DIR_PATH/sources.list   adsorber.sh
@@ -35,7 +35,7 @@
 # errorCleanUp       bin/remove.sh
 
 
-checkBackupExist()
+update::CheckBackupExist()
 {
         if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
 
@@ -60,7 +60,7 @@ checkBackupExist()
 }
 
 
-createTmpDir()
+update::CreateTmpDir()
 {
         if [ ! -d "${TMP_DIR_PATH}" ]; then
                 mkdir "${TMP_DIR_PATH}"
@@ -74,7 +74,7 @@ createTmpDir()
 }
 
 
-readSourceList()
+update::ReadSourceList()
 {
         if [ ! -s "${SOURCELIST_FILE_PATH}" ]; then
 
@@ -103,7 +103,7 @@ readSourceList()
 }
 
 
-readWhiteList()
+update::ReadWhiteList()
 {
         if [ ! -f "${SCRIPT_DIR_PATH}/whitelist" ]; then
                 echo "${PREFIX}Whitelist does not exist, ignoring ..." 1>&2
@@ -111,15 +111,15 @@ readWhiteList()
         else
                 cp "${SCRIPT_DIR_PATH}/whitelist" "${TMP_DIR_PATH}/whitelist"
 
-                filterDomains "whitelist" "whitelist-filtered"
-                sortDomains "whitelist-filtered" "whitelist-sorted"
+                update::FilterDomains "whitelist" "whitelist-filtered"
+                update::SortDomains "whitelist-filtered" "whitelist-sorted"
         fi
 
         return 0
 }
 
 
-readBlackList()
+update::ReadBlackList()
 {
         if [ ! -f "${SCRIPT_DIR_PATH}/blacklist" ]; then
                 echo "${PREFIX}Blacklist does not exist, ignoring ..." 1>&2
@@ -127,15 +127,15 @@ readBlackList()
         else
                 cp "${SCRIPT_DIR_PATH}/blacklist" "${TMP_DIR_PATH}/blacklist"
 
-                filterDomains "blacklist" "blacklist-filtered"
-                sortDomains "blacklist-filtered" "blacklist-sorted"
+                update::FilterDomains "blacklist" "blacklist-filtered"
+                update::SortDomains "blacklist-filtered" "blacklist-sorted"
         fi
 
         return 0
 }
 
 
-setProxy()
+update::SetProxy()
 {
         if [ ! -z "${HTTP_PROXY}" ]; then
                 echo "${PREFIX}Using HTTP proxy: [${HTTP_PROXY}]"
@@ -151,7 +151,7 @@ setProxy()
 }
 
 
-fetchSources()
+update::FetchSources()
 {
         local total_count=0
         local successful_count=0
@@ -201,7 +201,7 @@ fetchSources()
 }
 
 
-filterDomains()
+update::FilterDomains()
 {
         local input_file="${1}"
         local output_file="${2}"
@@ -226,7 +226,7 @@ filterDomains()
 }
 
 
-sortDomains()
+update::SortDomains()
 {
         local input_file="${1}"
         local output_file="${2}"
@@ -238,7 +238,7 @@ sortDomains()
 }
 
 
-applyWhiteList()
+update::ApplyWhiteList()
 {
         local domain
 
@@ -274,7 +274,7 @@ applyWhiteList()
 }
 
 
-mergeBlackList()
+update::MergeBlackList()
 {
         if [ ! -s "${TMP_DIR_PATH}/blacklist-sorted" ]; then
                 echo "${PREFIX}Blacklist is empty, ignoring ..."
@@ -284,8 +284,8 @@ mergeBlackList()
 
                 cat "${TMP_DIR_PATH}/cache" "${TMP_DIR_PATH}/blacklist-sorted" >> "${TMP_DIR_PATH}/merged-blacklist"
 
-                filterDomains "merged-blacklist" "merged-blacklist-filtered"
-                sortDomains "merged-blacklist-filtered" "merged-blacklist-sorted"
+                update::FilterDomains "merged-blacklist" "merged-blacklist-filtered"
+                update::SortDomains "merged-blacklist-filtered" "merged-blacklist-sorted"
 
                 cp "${TMP_DIR_PATH}/merged-blacklist-sorted" "${TMP_DIR_PATH}/cache"
         fi
@@ -294,7 +294,7 @@ mergeBlackList()
 }
 
 
-isCacheEmpty()
+update::IsCacheEmpty()
 {
         if [ ! -s "${TMP_DIR_PATH}/cache" ]; then
                 echo -e "${PREFIX_WARNING}Nothing to apply." 1>&2
@@ -306,7 +306,7 @@ isCacheEmpty()
 }
 
 
-preBuildHosts()
+update::PreBuildHostsFile()
 {
         {
                 # Replace @...@ with the path to the backup hosts
@@ -328,7 +328,7 @@ preBuildHosts()
 }
 
 
-buildHostsFile()
+update::BuildHostsFile()
 {
         {
                 echo ""
@@ -346,7 +346,7 @@ buildHostsFile()
 }
 
 
-countBlockedDomains()
+update::CountAppliedDomains()
 {
         readonly COUNT_BLOCKED="$(wc -l < "${TMP_DIR_PATH}/cache")"
 
@@ -354,7 +354,7 @@ countBlockedDomains()
 }
 
 
-applyHostsFile()
+update::ApplyHostsFile()
 {
         echo "${PREFIX}Applying new hosts file ..."
 
@@ -376,16 +376,16 @@ update()
 {
         echo -e "${PREFIX_TITLE}Updating ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
 
-        checkBackupExist
-        createTmpDir
-        readBlackList
-        readWhiteList
-        setProxy
+        update::CheckBackupExist
+        update::CreateTmpDir
+        update::ReadBlackList
+        update::ReadWhiteList
+        update::SetProxy
 
-        if readSourceList; then
-                fetchSources
-                filterDomains "fetched" "fetched-filtered"
-                sortDomains "fetched-filtered" "fetched-sorted"
+        if update::ReadSourceList; then
+                update::FetchSources
+                update::FilterDomains "fetched" "fetched-filtered"
+                update::SortDomains "fetched-filtered" "fetched-sorted"
 
                 cp "${TMP_DIR_PATH}/fetched-sorted" "${TMP_DIR_PATH}/cache"
         else
@@ -395,12 +395,12 @@ update()
 
         case "${PRIMARY_LIST}" in
                 whitelist )
-                        mergeBlackList
-                        applyWhiteList
+                        update::MergeBlackList
+                        update::ApplyWhiteList
                         ;;
                 blacklist )
-                        applyWhiteList
-                        mergeBlackList
+                        update::ApplyWhiteList
+                        update::MergeBlackList
                         ;;
                 * )
                         echo -e "${PREFIX_FATAL}Wrong PRIMARY_LIST set in adsorber.conf. Choose either 'whitelist' or 'blacklist'${COLOUR_RESET}" 1>&2
@@ -409,11 +409,11 @@ update()
                         ;;
         esac
 
-        isCacheEmpty
-        preBuildHosts
-        buildHostsFile
-        countBlockedDomains
-        applyHostsFile
+        update::IsCacheEmpty
+        update::PreBuildHostsFile
+        update::BuildHostsFile
+        update::CountAppliedDomains
+        update::ApplyHostsFile
         cleanUp
 
         return 0

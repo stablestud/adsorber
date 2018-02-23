@@ -56,7 +56,7 @@ showUsage()
                 echo "Adsorber: Invalid option: ${WRONG_OPTION[*]}" 1>&2
         fi
 
-        echo "Usage: ${0} [install|remove|update|revert] {options}" 1>&2
+        echo "Usage: ${0} [install|remove|update|restore|revert] {options}" 1>&2
         echo "Try --help for more information." 1>&2
 
         exit 127
@@ -73,13 +73,13 @@ showHelp()
         echo "Operations:"
         echo "  install - setup necessary things needed for Adsorber"
         echo "              e.g., create backup file of hosts file,"
-        echo "                    create scheduler which updates the host file once a week."
+        echo "                    create scheduler which updates the host file once a week"
         echo "  update  - update hosts file with newest ad servers"
-        echo "  revert  - revert hosts file to its original state"
+        echo "  restore - restore hosts file to its original state"
         echo "            (it does not remove the schedule, so this should be used temporary)"
         echo "  remove  - completely remove changes made by Adsorber"
         echo "              e.g., remove scheduler (if set)"
-        echo "                    revert hosts file (if not already done)"
+        echo "                    restore hosts file (if not already done) to its original state"
         echo "  version - show version of this shell script"
         echo "  help    - show this help"
         echo ""
@@ -131,8 +131,8 @@ showSpecificHelp()
                         echo " -f, --force      - force the update if no /etc/hosts backup"
                         echo "                    has been created (dangerous)"
                         ;;
-                revert )
-                        echo -e "${UWHITE}adsorber.sh revert {options}${COLOUR_RESET}:"
+                restore )
+                        echo -e "${UWHITE}adsorber.sh restore {options}${COLOUR_RESET}:"
                         echo ""
                         echo "To restore the hosts file temporary, without removing the backup."
                         echo ""
@@ -203,7 +203,7 @@ sourceFiles()
         . "${SCRIPT_DIR_PATH}/bin/install.sh"
         . "${SCRIPT_DIR_PATH}/bin/remove.sh"
         . "${SCRIPT_DIR_PATH}/bin/update.sh"
-        . "${SCRIPT_DIR_PATH}/bin/revert.sh"
+        . "${SCRIPT_DIR_PATH}/bin/restore.sh"
         . "${SCRIPT_DIR_PATH}/bin/config.sh"
         . "${SCRIPT_DIR_PATH}/bin/colours.sh"
 
@@ -264,11 +264,11 @@ case "${OPERATION}" in
                 config
                 update
                 ;;
-        revert )
+        restore )
                 checkForWrongParameters
                 checkRoot
                 config
-                revert
+                restore
                 ;;
         -[Hh] | help | --help )
                 showHelp

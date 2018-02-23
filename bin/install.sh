@@ -4,13 +4,13 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# The following variables are declared in adsorber.conf, adsorber.sh or bin/config.sh.
+# The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:-------------   ---default value:----   ---defined in:--------------
 # CRONTAB_DIR_PATH            /etc/cron.weekly        bin/config.sh, adsorber.conf
 # COLOUR_RESET                \033[0m                 bin/colours.sh
-# HOSTS_FILE_PATH             /etc/hosts              bin/config.sh, adsorber.sh
-# HOSTS_FILE_BACKUP_PATH      /etc/hosts.original     bin/config.sh, adsorber.sh
+# HOSTS_FILE_PATH             /etc/hosts              bin/config.sh, adsorber.conf
+# HOSTS_FILE_BACKUP_PATH      /etc/hosts.original     bin/config.sh, adsorber.conf
 # PREFIX                      '  ' (two spaces)       bin/colours.sh
 # PREFIX_INPUT                '  ' (two spaces)       bin/colours.sh
 # PREFIX_FATAL                '\033[0;91mE '          bin/colours.sh
@@ -27,10 +27,10 @@
 # ---function:-----  ---function defined in:---
 # cleanUp            bin/remove.sh
 # errorCleanUp       bin/remove.sh
-# removeSystemd      bin/remove.sh
+# remove::Systemd      bin/remove.sh
 
 
-backupHostsFile()
+install::BackupHostsFile()
 {
         if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
                 cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
@@ -44,7 +44,7 @@ backupHostsFile()
 }
 
 
-installCronjob()
+install::Cronjob()
 {
         echo "${PREFIX}Installing cronjob ..."
 
@@ -64,7 +64,7 @@ installCronjob()
 }
 
 
-installSystemd()
+install::Systemd()
 {
 
         if [ ! -d "${SYSTEMD_DIR_PATH}" ]; then
@@ -76,7 +76,7 @@ installSystemd()
         # Remove systemd service if already installed (requires remove.sh)
         if [ -f "${SYSTEMD_DIR_PATH}/adsorber.service" ] || [ -f "${SYSTEMD_DIR_PATH}/adsorber.timer" ]; then
                 echo "${PREFIX}Removing previous installed systemd service ..."
-                removeSystemd
+                remove::Systemd
         fi
 
         echo "${PREFIX}Installing systemd service ..."
@@ -98,7 +98,7 @@ installSystemd()
 }
 
 
-promptInstall()
+install::Prompt()
 {
         if [ -z "${REPLY_TO_PROMPT}" ]; then
                 read -r -p "${PREFIX_INPUT}Do you really want to install Adsorber? [Y/n]: " REPLY_TO_PROMPT
@@ -119,7 +119,7 @@ promptInstall()
 }
 
 
-promptScheduler()
+install::PromptScheduler()
 {
         if [ -z "${REPLY_TO_SCHEDULER_PROMPT}" ]; then
                 read -r -p "${PREFIX_INPUT}What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
@@ -127,10 +127,10 @@ promptScheduler()
 
         case "${REPLY_TO_SCHEDULER_PROMPT}" in
                 [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
-                        installSystemd
+                        install::Systemd
                         ;;
                 [Cc] | [Cc]ron | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab )
-                        installCronjob
+                        install::Cronjob
                         ;;
                 * )
                         echo "${PREFIX}Skipping scheduler creation ..."
@@ -144,9 +144,9 @@ promptScheduler()
 install()
 {
         echo -e "${PREFIX_TITLE}Installing Adsorber ...${COLOUR_RESET}"
-        promptInstall
-        backupHostsFile
-        promptScheduler
+        install::Prompt
+        install::BackupHostsFile
+        install::PromptScheduler
 
         return 0
 }
