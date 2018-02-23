@@ -108,16 +108,16 @@ showSpecificHelp()
                         echo ""
                         echo "The command will:"
                         echo " - backup your /etc/hosts file to /etc/hosts.original"
-                        echo "   (if not other specified in adsorber.sh)"
+                        echo "   (if not other specified in adsorber.conf)"
                         echo " - install a scheduler which updates your hosts file with ad-server domains"
                         echo "   once a week. (either systemd, cronjob or none)"
                         echo " - install the newest ad-server domains in your hosts file."
                         echo ""
                         echo "Possible options are:"
-                        echo " -s, --systemd"
-                        echo " -c, --cronjob"
-                        echo " -ns, --no-scheduler"
-                        echo " -y, --yes, --assume-yes"
+                        echo " -s, --systemd            - use Systemd ..."
+                        echo " -c, --cronjob            - use Cronjob as scheduler"
+                        echo " -ns, --no-scheduler      - skip scheduler creation"
+                        echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
                         ;;
                 update )
                         echo -e "${UWHITE}adsorber.sh update {options}${COLOUR_RESET}:"
@@ -128,21 +128,23 @@ showSpecificHelp()
                         echo " - install the newest ad-server domains in your hosts file."
                         echo ""
                         echo "Possible option:"
-                        echo " -f, --force"
+                        echo " -f, --force      - force the update if no /etc/hosts backup"
+                        echo "                    has been created (dangerous)"
                         ;;
                 revert )
                         echo -e "${UWHITE}adsorber.sh revert {options}${COLOUR_RESET}:"
                         echo ""
-                        echo "To restore the hosts file temporary."
+                        echo "To restore the hosts file temporary, without removing the backup."
                         echo ""
                         echo "The command will:"
                         echo " - copy /etc/hosts.original to /etc/hosts, overwriting the modified /etc/hosts by adsorber."
                         echo ""
-                        echo "Important: If you have a scheduler installed,"
-                        echo "it'll reapply ad-server domains to your hosts file after a while."
-                        echo "For this reason this command is used to temporary disable Adsorber"
-                        echo "(if it's blocking some sites you need access for a short period of time)."
-                        echo "To reapply run asdorber.sh update"
+                        echo "Important: If you have a scheduler installed it'll re-apply ad-server domains to your hosts"
+                        echo "file when triggered."
+                        echo "For this reason this command is used to temporary disable Adsorber."
+                        echo "(e.g. when it's blocking some sites you need access for a short period of time)"
+                        echo ""
+                        echo "To re-apply run 'asdorber.sh update'"
                         ;;
                 remove )
                         echo -e "${UWHITE}adsorber remove {options}${COLOUR_RESET}:"
@@ -154,9 +156,8 @@ showSpecificHelp()
                         echo " - restore the hosts file to it's original state"
                         echo " - remove all leftovers"
                         echo ""
-                        echo "Possible options are:"
-                        echo " -y, --yes, --assume-yes"
-                        echo " -f, --force"
+                        echo "Possible option:"
+                        echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
                         ;;
         esac
 
@@ -182,7 +183,16 @@ showVersion()
 
 duplicateOption()
 {
-        echo "Adsorber: Duplicate option: '${option}'"
+        if [ "${1}" == "scheduler" ]; then
+                echo "Adsorber: Duplicate option for scheduler: '${option}'"
+                echo "You may only select one:"
+                echo "  -s,  --systemd           - use Systemd ..."
+                echo "  -c,  --cron              - use Cronjob as scheduler (use with 'install')"
+                echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'install')"
+        else
+                echo "Adsorber: Duplicate option: '${option}'"
+                showUsage
+        fi
 
         exit 127
 }
@@ -200,19 +210,20 @@ sourceFiles()
         return 0
 }
 
+
 sourceFiles
 
 for option in "${@}"; do
 
         case "${option}" in
                 -[Ss] | --systemd )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="systemd" 2>/dev/null || duplicateOption
+                        readonly REPLY_TO_SCHEDULER_PROMPT="systemd" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Cc] | --cron )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="cronjob" 2>/dev/null || duplicateOption
+                        readonly REPLY_TO_SCHEDULER_PROMPT="cronjob" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Nn][Ss] | --no-scheduler )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler" 2>/dev/null || duplicateOption
+                        readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
                         readonly REPLY_TO_PROMPT="yes" 2>/dev/null || duplicateOption
@@ -224,7 +235,7 @@ for option in "${@}"; do
                         : # Do nothing
                         ;;
                 -[Hh] | --help | help )
-                        readonly OPTION_HELP="true"
+                        readonly OPTION_HELP="true" 2>/dev/null
                         ;;
                 * )
                         WRONG_OPTION+=("'${option}'")
@@ -274,6 +285,6 @@ case "${OPERATION}" in
                 ;;
 esac
 
-echo -e "${PREFIX_TITLE}Successfully finished.${COLOUR_RESET}"
+echo -e "${PREFIX_TITLE}Finished successfully.${COLOUR_RESET}"
 
 exit 0

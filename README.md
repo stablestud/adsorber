@@ -57,7 +57,7 @@ If you encounter any issues please report them to the Github repository.
 #### `adsorber.sh install {options}`:
 You should run this command first.
 The command will:
-* backup your `/etc/hosts` file to `/etc/hosts.original` (if not other specified in `adsorber.sh`)
+* backup your `/etc/hosts` file to `/etc/hosts.original` (if not other specified in `adsorber.conf`)
 * install a scheduler which updates your hosts file with ad-server domains once a week. (either systemd, cronjob or none)
 * install the newest ad-server domains in your hosts file.
 
@@ -74,13 +74,13 @@ The command will:
 Possible option:
 * `-f, --force`
 #### `adsorber.sh revert`:
-To restore the hosts file temporary.
+To restore the hosts file temporary, without removing the backup.
 The command will:
 * copy `/etc/hosts.original` to `/etc/hosts`, overwriting the modified `/etc/hosts` by adsorber.
 
-Important: If you have a scheduler installed, it'll reapply ad-server domains to your hosts file after a while.    
-For this reason this command is used to temporary disable Adsorber (if it's blocking some sites you need access for a short period of time).    
-To reapply run `asdorber.sh update`
+Important: If you have a scheduler installed, it'll re-apply ad-server domains to your hosts file when triggered.    
+For this reason this command is used to temporary disable Adsorber, e.g. when it's blocking some sites you need access for a short period of time.    
+To re-apply run `asdorber.sh update`
 #### `adsorber remove {options}`:
 To completely remove changes made by Adsorber.
 The command will:
@@ -90,7 +90,6 @@ The command will:
 
 Possible options are:
 * `-y, --yes, --assume-yes`
-* `-f, --force`
 
 ### Options:
 

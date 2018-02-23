@@ -34,7 +34,7 @@ backupHostsFile()
 {
         if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
                 cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
-                        && echo "${PREFIX}Successfully backed up ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
+                        && echo "${PREFIX}Successfully created backup of ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
                 readonly BACKEDUP="true"
         else
                 echo "${PREFIX}Backup already exist, no need to backup."
