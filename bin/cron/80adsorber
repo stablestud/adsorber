@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # A(d)sorber's cron file
 # Updates the hosts file once a week.

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
@@ -7,110 +7,110 @@
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:-------------   ---default value:----   ---defined in:--------------
-# CRONTAB_DIR_PATH            /etc/cron.weekly        bin/config.sh, adsorber.conf
-# COLOUR_RESET                \033[0m                 bin/colours.sh
-# HOSTS_FILE_PATH             /etc/hosts              bin/config.sh, adsorber.conf
-# HOSTS_FILE_BACKUP_PATH      /etc/hosts.original     bin/config.sh, adsorber.conf
-# PREFIX                      '  ' (two spaces)       bin/colours.sh
-# PREFIX_INPUT                '  ' (two spaces)       bin/colours.sh
-# PREFIX_FATAL                '\033[0;91mE '          bin/colours.sh
-# PREFIX_TITLE                \033[1;37m              bin/colours.sh
-# PREFIX_WARNING              '- '                    bin/colours.sh
-# REPLY_TO_PROMPT             Null (not set)          bin/install.sh, adsorber.sh
-# REPLY_TO_SCHEDULER_PROMPT   Null (not set)          bin/install.sh, adsorber.sh
-# SCRIPT_DIR_PATH             script root directory   adsorber.sh
+# crontab_dir_path            /etc/cron.weekly        bin/config.sh, adsorber.conf
+# hosts_file_path             /etc/hosts              bin/config.sh, adsorber.conf
+# hosts_file_backup_path      /etc/hosts.original     bin/config.sh, adsorber.conf
+# prefix                      '  ' (two spaces)       bin/colours.sh
+# prefix_input                '  ' (two spaces)       bin/colours.sh
+# prefix_fatal                '\033[0;91mE '          bin/colours.sh
+# prefix_reset            \033[0m                 bin/colours.sh
+# prefix_title                \033[1;37m              bin/colours.sh
+# prefix_warning              '- '                    bin/colours.sh
+# reply_to_prompt             Null (not set)          bin/install.sh, adsorber.sh
+# reply_to_scheduler_prompt   Null (not set)          bin/install.sh, adsorber.sh
+# script_dir_path             script root directory   adsorber.sh
 #   (e.g., /home/user/Downloads/adsorber)
-# SYSTEMD_DIR_PATH            /etc/systemd/system     bin/config.sh, adsorber.conf
+# systemd_dir_path            /etc/systemd/system     bin/config.sh, adsorber.conf
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----  ---function defined in:---
-# cleanUp            bin/remove.sh
-# errorCleanUp       bin/remove.sh
-# remove::Systemd      bin/remove.sh
+# ---function:-----     ---function defined in:---
+# remove_ErrorCleanUp  bin/remove.sh
+# remove_Systemd       bin/remove.sh
 
 
-install::BackupHostsFile()
+install_BackupHostsFile()
 {
-        if [ ! -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
-                cp "${HOSTS_FILE_PATH}" "${HOSTS_FILE_BACKUP_PATH}" \
-                        && echo "${PREFIX}Successfully created backup of ${HOSTS_FILE_PATH} to ${HOSTS_FILE_BACKUP_PATH}."
-                readonly BACKEDUP="true"
+        if [ ! -f "${hosts_file_backup_path}" ]; then
+                cp "${hosts_file_path}" "${hosts_file_backup_path}" \
+                        && echo "${prefix}Successfully created backup of ${hosts_file_path} to ${hosts_file_backup_path}."
+                readonly backedup="true"
         else
-                echo "${PREFIX}Backup already exist, no need to backup."
+                echo "${prefix}Backup already exist, no need to backup."
         fi
 
         return 0
 }
 
 
-install::Cronjob()
+install_Cronjob()
 {
-        echo "${PREFIX}Installing cronjob ..."
+        echo "${prefix}Installing cronjob ..."
 
-        if [ ! -d "${CRONTAB_DIR_PATH}" ]; then
-                echo -e "${PREFIX_FATAL}Wrong CRONTAB_DIR_PATH set. Can't access: ${CRONTAB_DIR_PATH}.${COLOUR_RESET}" 1>&2
-                errorCleanUp
+        if [ ! -d "${crontab_dir_path}" ]; then
+                printf "%bWrong crontab_dir_path set. Can't access: %s.%b\n" "${prefix_fatal}" "${crontab_dir_path}" "${prefix_reset}" 1>&2
+                remove_ErrorCleanUp
                 exit 126
         fi
 
-        # Replace the @ place holder line with SCRIPT_DIR_PATH and copy the content to cron's directory
-        sed "s|^#@.\+#@$|${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/cron/80adsorber" > "${CRONTAB_DIR_PATH}/80adsorber"
-        chmod u=rwx,g=rx,o=rx "${CRONTAB_DIR_PATH}/80adsorber"
+        # Replace the @ place holder line with script_dir_path and copy the content to cron's directory
+        sed "s|^#@.\+#@$|${script_dir_path}\/adsorber\.sh update|g" "${script_dir_path}/bin/cron/80adsorber" > "${crontab_dir_path}/80adsorber"
+        chmod u=rwx,g=rx,o=rx "${crontab_dir_path}/80adsorber"
 
-        readonly INSTALLED_SCHEDULER="cronjob"
+        readonly installed_scheduler="cronjob"
 
         return 0
 }
 
 
-install::Systemd()
+install_Systemd()
 {
 
-        if [ ! -d "${SYSTEMD_DIR_PATH}" ]; then
-                echo -e "${PREFIX_FATAL}Wrong SYSTEMD_DIR_PATH set. Can't access: ${SYSTEMD_DIR_PATH}.${COLOUR_RESET}" 1>&2
-                errorCleanUp
+        if [ ! -d "${systemd_dir_path}" ]; then
+                printf "%bWrong systemd_dir_path set. Can't access: %s.%b\n" "${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
+                remove_ErrorCleanUp
                 exit 126
         fi
 
         # Remove systemd service if already installed (requires remove.sh)
-        if [ -f "${SYSTEMD_DIR_PATH}/adsorber.service" ] || [ -f "${SYSTEMD_DIR_PATH}/adsorber.timer" ]; then
-                echo "${PREFIX}Removing previous installed systemd service ..."
-                remove::Systemd
+        if [ -f "${systemd_dir_path}/adsorber.service" ] || [ -f "${systemd_dir_path}/adsorber.timer" ]; then
+                echo "${prefix}Removing previous installed systemd service ..."
+                remove_Systemd
         fi
 
-        echo "${PREFIX}Installing systemd service ..."
+        echo "${prefix}Installing systemd service ..."
 
-        # Replace the @ place holder line with SCRIPT_DIR_PATH and copy to its systemd directory
-        sed "s|^#@ExecStart.\+#@$|ExecStart=${SCRIPT_DIR_PATH}\/adsorber\.sh update|g" "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.service" > "${SYSTEMD_DIR_PATH}/adsorber.service"
-        cp "${SCRIPT_DIR_PATH}/bin/systemd/adsorber.timer" "${SYSTEMD_DIR_PATH}/adsorber.timer"
+        # Replace the @ place holder line with script_dir_path and copy to its systemd directory
+        sed "s|^#@ExecStart.\+#@$|ExecStart=${script_dir_path}\/adsorber\.sh update|g" "${script_dir_path}/bin/systemd/adsorber.service" > "${systemd_dir_path}/adsorber.service"
+        cp "${script_dir_path}/bin/systemd/adsorber.timer" "${systemd_dir_path}/adsorber.timer"
 
-        chmod u=rwx,g=rx,o=rx "${SYSTEMD_DIR_PATH}/adsorber.service" "${SYSTEMD_DIR_PATH}/adsorber.timer"
+        chmod u=rwx,g=rx,o=rx "${systemd_dir_path}/adsorber.service" "${systemd_dir_path}/adsorber.timer"
 
         # Enable the systemd service
         systemctl daemon-reload \
-                && systemctl enable adsorber.timer | printf "%s" "${PREFIX}" \
-                && systemctl start adsorber.timer || echo -e "${PREFIX_WARNING}Couldn't start systemd service." 1>&2
+                && systemctl enable adsorber.timer | printf "%s" "${prefix}" \
+                && systemctl start adsorber.timer || printf "%bCouldn't start systemd service.\n" "${prefix_warning}" 1>&2
 
-        readonly INSTALLED_SCHEDULER="systemd"
+        readonly installed_scheduler="systemd"
 
         return 0
 }
 
 
-install::Prompt()
+install_Prompt()
 {
-        if [ -z "${REPLY_TO_PROMPT}" ]; then
-                read -r -p "${PREFIX_INPUT}Do you really want to install Adsorber? [Y/n]: " REPLY_TO_PROMPT
+        if [ -z "${reply_to_prompt}" ]; then
+                printf "%bDo you really want to install Adsorber? [Y/n]: %b" "${prefix_input}" "${prefix_reset}"
+                read -r reply_to_prompt
         fi
 
-        case "${REPLY_TO_PROMPT}" in
+        case "${reply_to_prompt}" in
                 [Yy] | [Yy][Ee][Ss] )
                         return 0
                         ;;
                 * )
-                        echo -e "${PREFIX_WARNING}Installation cancelled." 1>&2
-                        errorCleanUp
+                        printf "%bInstallation cancelled.\n" "${prefix_warning}" 1>&2
+                        remove_ErrorCleanUp
                         exit 130
                         ;;
         esac
@@ -119,21 +119,22 @@ install::Prompt()
 }
 
 
-install::PromptScheduler()
+install_PromptScheduler()
 {
-        if [ -z "${REPLY_TO_SCHEDULER_PROMPT}" ]; then
-                read -r -p "${PREFIX_INPUT}What scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: " REPLY_TO_SCHEDULER_PROMPT
+        if [ -z "${reply_to_scheduler_prompt}" ]; then
+                printf "%bWhat scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: %b" "${prefix_input}" "${prefix_reset}"
+                read -r reply_to_scheduler_prompt
         fi
 
-        case "${REPLY_TO_SCHEDULER_PROMPT}" in
+        case "${reply_to_scheduler_prompt}" in
                 [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
-                        install::Systemd
+                        install_Systemd
                         ;;
                 [Cc] | [Cc]ron | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab )
-                        install::Cronjob
+                        install_Cronjob
                         ;;
                 * )
-                        echo "${PREFIX}Skipping scheduler creation ..."
+                        echo "${prefix}Skipping scheduler creation ..."
                         ;;
         esac
 
@@ -143,10 +144,10 @@ install::PromptScheduler()
 
 install()
 {
-        echo -e "${PREFIX_TITLE}Installing Adsorber ...${COLOUR_RESET}"
-        install::Prompt
-        install::BackupHostsFile
-        install::PromptScheduler
+        printf "%bInstalling Adsorber ...%b\n" "${prefix_title}" "${prefix_reset}"
+        install_Prompt
+        install_BackupHostsFile
+        install_PromptScheduler
 
         return 0
 }

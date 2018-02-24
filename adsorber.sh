@@ -1,17 +1,17 @@
-#!/bin/bash
+#!/bin/sh
 
 # Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
 
-readonly TMP_DIR_PATH="/tmp/adsorber"
-readonly SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
-readonly SOURCELIST_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
+readonly tmp_dir_path="/tmp/adsorber"
+readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
+readonly sourcelist_file_path="${script_dir_path}/sources.list"
 
-readonly VERSION="0.2.3"
+readonly version="0.3.0"
 
-readonly OPERATION="${1}"
+readonly operation="${1}"
 
 # For better error messages, from http://wiki.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful:
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
@@ -23,7 +23,7 @@ fi
 
 checkRoot()
 {
-        if [ "${UID}" -ne 0 ]; then
+        if [ "$(id -g)" -ne 0 ]; then
                 echo "This script must be run as root." 1>&2
                 exit 126
         fi
@@ -34,11 +34,11 @@ checkRoot()
 
 checkForWrongParameters()
 {
-        if [ "${WRONG_OPERATION}" != "" ] || [ "${#WRONG_OPTION[@]}" -ne 0 ]; then
+        if [ ! -z "${wrong_operation}" ] || [ ! -z "${wrong_option}" ]; then
                 showUsage
         fi
 
-        if [ "${OPTION_HELP}" == "true"  ]; then
+        if [ "${option_help}" = "true"  ]; then
                 showSpecificHelp
         fi
 
@@ -48,12 +48,12 @@ checkForWrongParameters()
 
 showUsage()
 {
-        if [ "${WRONG_OPERATION}" != "" ]; then
-                echo "Adsorber: Invalid operation: '${WRONG_OPERATION}'" 1>&2
+        if [ ! -z "${wrong_operation}" ]; then
+                echo "Adsorber: Invalid operation: '${wrong_operation}'" 1>&2
         fi
 
-        if [ "${WRONG_OPTION}" != "" ]; then
-                echo "Adsorber: Invalid option: ${WRONG_OPTION[*]}" 1>&2
+        if [ ! -z "${wrong_option}" ]; then
+                echo "Adsorber: Invalid option: '${wrong_option}'" 1>&2
         fi
 
         echo "Usage: ${0} [install|remove|update|restore|revert] {options}" 1>&2
@@ -65,7 +65,7 @@ showUsage()
 
 showHelp()
 {
-        echo "Usage: ${0} [OPERATION] {options}"
+        echo "Usage: ${0} [operation] {options}"
         echo ""
         echo "A(d)sorber blocks ads by 'absorbing' and dumbing them into void."
         echo "           (with the help of the hosts file)"
@@ -100,9 +100,9 @@ showHelp()
 
 showSpecificHelp()
 {
-        case "${OPERATION}" in
+        case "${operation}" in
                 install )
-                        echo -e "${UWHITE}adsorber.sh install {options}${COLOUR_RESET}:"
+                        printf "%badsorber.sh install {options}%b:\n" "${uwhite}" "${prefix_reset}"
                         echo ""
                         echo "You should run this command first."
                         echo ""
@@ -120,7 +120,7 @@ showSpecificHelp()
                         echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
                         ;;
                 update )
-                        echo -e "${UWHITE}adsorber.sh update {options}${COLOUR_RESET}:"
+                        printf "%badsorber.sh update {options}%b:\n" "${uwhite}" "${prefix_reset}"
                         echo ""
                         echo "To keep the hosts file up-to-date."
                         echo ""
@@ -132,7 +132,7 @@ showSpecificHelp()
                         echo "                    has been created (dangerous)"
                         ;;
                 restore )
-                        echo -e "${UWHITE}adsorber.sh restore {options}${COLOUR_RESET}:"
+                        printf "%badsorber.sh restore {options}%b:\n" "${uwhite}" "${prefix_reset}"
                         echo ""
                         echo "To restore the hosts file temporary, without removing the backup."
                         echo ""
@@ -147,7 +147,7 @@ showSpecificHelp()
                         echo "To re-apply run 'asdorber.sh update'"
                         ;;
                 remove )
-                        echo -e "${UWHITE}adsorber remove {options}${COLOUR_RESET}:"
+                        printf "%badsorber remove {options}%b:\n" "${uwhite}" "${prefix_reset}"
                         echo ""
                         echo "To completely remove changes made by Adsorber."
                         echo ""
@@ -167,7 +167,7 @@ showSpecificHelp()
 
 showVersion()
 {
-        echo "A(d)sorber ${VERSION}"
+        echo "A(d)sorber ${version}"
         echo ""
         echo "  License MIT"
         echo "  Copyright (c) 2017 stablestud <adsorber@stablestud.org>"
@@ -183,7 +183,7 @@ showVersion()
 
 duplicateOption()
 {
-        if [ "${1}" == "scheduler" ]; then
+        if [ "${1}" = "scheduler" ]; then
                 echo "Adsorber: Duplicate option for scheduler: '${option}'"
                 echo "You may only select one:"
                 echo "  -s,  --systemd           - use Systemd ..."
@@ -200,13 +200,12 @@ duplicateOption()
 
 sourceFiles()
 {
-        . "${SCRIPT_DIR_PATH}/bin/install.sh"
-        . "${SCRIPT_DIR_PATH}/bin/remove.sh"
-        . "${SCRIPT_DIR_PATH}/bin/update.sh"
-        . "${SCRIPT_DIR_PATH}/bin/restore.sh"
-        . "${SCRIPT_DIR_PATH}/bin/config.sh"
-        . "${SCRIPT_DIR_PATH}/bin/colours.sh"
-
+        . "${script_dir_path}/bin/install.sh"
+        . "${script_dir_path}/bin/remove.sh"
+        . "${script_dir_path}/bin/update.sh"
+        . "${script_dir_path}/bin/restore.sh"
+        . "${script_dir_path}/bin/config.sh"
+        . "${script_dir_path}/bin/colours.sh"
         return 0
 }
 
@@ -217,34 +216,34 @@ for option in "${@}"; do
 
         case "${option}" in
                 -[Ss] | --systemd )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="systemd" 2>/dev/null || duplicateOption "scheduler"
+                        readonly reply_to_scheduler_prompt="systemd" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Cc] | --cron )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="cronjob" 2>/dev/null || duplicateOption "scheduler"
+                        readonly reply_to_scheduler_prompt="cronjob" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Nn][Ss] | --no-scheduler )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler" 2>/dev/null || duplicateOption "scheduler"
+                        readonly reply_to_scheduler_prompt="no-scheduler" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
-                        readonly REPLY_TO_PROMPT="yes" 2>/dev/null || duplicateOption
+                        readonly reply_to_prompt="yes" 2>/dev/null || duplicateOption
                         ;;
                 -[Ff] | --force )
-                        readonly REPLY_TO_FORCE_PROMPT="yes" 2>/dev/null || duplicateOption
+                        readonly reply_to_force_prompt="yes" 2>/dev/null || duplicateOption
                         ;;
                 "" )
                         : # Do nothing
                         ;;
                 -[Hh] | --help | help )
-                        readonly OPTION_HELP="true" 2>/dev/null
+                        readonly option_help="true" 2>/dev/null
                         ;;
                 * )
-                        WRONG_OPTION+=("'${option}'")
+                        readonly wrong_option="${option}" 2>/dev/null
                         ;;
         esac
 
 done
 
-case "${OPERATION}" in
+case "${operation}" in
         install )
                 checkForWrongParameters
                 checkRoot
@@ -280,11 +279,11 @@ case "${OPERATION}" in
                 showUsage
                 ;;
         * )
-                readonly WRONG_OPERATION="${OPERATION}"
+                readonly wrong_operation="${operation}"
                 showUsage
                 ;;
 esac
 
-echo -e "${PREFIX_TITLE}Finished successfully.${COLOUR_RESET}"
+printf "%bFinished successfully.%b\n" "${prefix_title}" "${prefix_reset}"
 
 exit 0

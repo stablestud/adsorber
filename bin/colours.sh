@@ -1,16 +1,16 @@
-#!/bin/bash
+#!/bin/sh
 
 # Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-readonly PREFIX="  "
-readonly PREFIX_FATAL="\033[0;91mE "    # 'E' in intensity red
-readonly PREFIX_INFO="\033[0;97m  "     # Intensity white
-readonly PREFIX_INPUT="  "
-readonly PREFIX_TITLE="\033[1;37m"      # Bold white
-readonly PREFIX_WARNING="- "
-readonly COLOUR_RESET='\033[0m'         # Default colour
+readonly prefix="  "
+readonly prefix_fatal="\033[0;91mE "    # 'E' in intensity red
+readonly prefix_info="\033[0;97m  "     # Intensity white
+readonly prefix_input="  "
+readonly prefix_title="\033[1;37m"      # Bold white
+readonly prefix_warning="- "
+readonly prefix_reset='\033[0m'         # Default colour
 
 # Regular Colors
 #readonly BLACK='\033[0;30m'        # Black
@@ -40,7 +40,7 @@ readonly COLOUR_RESET='\033[0m'         # Default colour
 #readonly UBLUE='\033[4;34m'        # Blue
 #readonly UPURPLE='\033[4;35m'      # Purple
 #readonly UCYAN='\033[4;36m'        # Cyan
-readonly UWHITE='\033[4;37m'        # White
+readonly uwhite='\033[4;37m'        # White
 
 # Background
 #readonly BG_BLACK='\033[40m'       # Black

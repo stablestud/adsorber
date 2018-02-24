@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
@@ -7,29 +7,31 @@
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:----------   ---default value:--   ---declared in:-------------
-# COLOUR_RESET             \033[0m               bin/colours.sh
-# HOSTS_FILE_PATH          /etc/hosts            bin/config.sh, adsorber.conf
-# HOSTS_FILE_BACKUP_PATH   /etc/hosts.original   bin/config.sh, adsorber.conf
-# PREFIX                   '  ' (two spaces)     bin/colours.sh
-# PREFIX_TITLE             \033[1;37m            bin/colours.sh
-# PREFIX_WARNING           '- '                  bin/colours.sh
+# hosts_file_path          /etc/hosts            bin/config.sh, adsorber.conf
+# hosts_file_backup_path   /etc/hosts.original   bin/config.sh, adsorber.conf
+# prefix                   '  ' (two spaces)     bin/colours.sh
+# prefix_reset             \033[0m                 bin/colours.sh
+# prefix_title             \033[1;37m            bin/colours.sh
+# prefix_warning           '- '                  bin/colours.sh
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----  ---function defined in:---
-# cleanUp            bin/remove.sh
-# errorCleanUp       bin/remove.sh
+# ---function:-----     ---function defined in:---
+# remove_CleanUp       bin/remove.sh
+# remove_ErrorCleanUp  bin/remove.sh
 
 
-restore::HostsFile()
+restore_HostsFile()
 {
-        if [ -f "${HOSTS_FILE_BACKUP_PATH}" ]; then
-                cp "${HOSTS_FILE_BACKUP_PATH}" "${HOSTS_FILE_PATH}" \
-                        && echo "${PREFIX}Successfully restored ${HOSTS_FILE_PATH}." \
-                        && echo "${PREFIX}To reapply please run './adsorber.sh update'."
+        if [ -f "${hosts_file_backup_path}" ]; then
+                cp "${hosts_file_backup_path}" "${hosts_file_path}" \
+                        && {
+                                printf "%bSuccessfully restored %s.\n" "${prefix}" "${hosts_file_path}"
+                                printf "%bTo reapply please run './adsorber.sh update'.\n" "${prefix}"
+                        }
         else
-                echo -e "${PREFIX_FATAL}Can not restore hosts file. Original hosts file does not exist.${COLOUR_RESET}" 1>&2
-                errorCleanUp
+                printf "%bCan't restore hosts file. Original hosts file does not exist.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                remove_ErrorCleanUp
                 exit 1
         fi
 
@@ -39,9 +41,9 @@ restore::HostsFile()
 
 restore()
 {
-        echo -e "${PREFIX_TITLE}Restoring ${HOSTS_FILE_PATH} ...${COLOUR_RESET}"
-        restore::HostsFile
-        cleanUp
+        printf "%bRestoring %s ...%b\n" "${prefix_title}" "${hosts_file_path}" "${prefix_reset}"
+        restore_HostsFile
+        remove_CleanUp
 
         return 0
 }
