@@ -13,13 +13,11 @@ readonly version="0.3.0"
 
 readonly operation="${1}"
 
-# For better error messages, from http://wiki.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful:
-export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-
 if [ "${#}" -ne 0 ]; then
         shift
 fi
 
+readonly options="${*}"
 
 checkRoot()
 {
@@ -56,8 +54,8 @@ showUsage()
                 echo "Adsorber: Invalid option: '${wrong_option}'" 1>&2
         fi
 
-        echo "Usage: ${0} [install|remove|update|restore|revert] {options}" 1>&2
-        echo "Try --help for more information." 1>&2
+        echo "Usage: ${0} [install|remove|update|restore|revert] {options}"
+        echo "Try --help for more information."
 
         exit 127
 }
@@ -184,13 +182,13 @@ showVersion()
 duplicateOption()
 {
         if [ "${1}" = "scheduler" ]; then
-                echo "Adsorber: Duplicate option for scheduler: '${option}'"
+                echo "Adsorber: Duplicate option for scheduler: '${option}'" 1>&2
                 echo "You may only select one:"
                 echo "  -s,  --systemd           - use Systemd ..."
                 echo "  -c,  --cron              - use Cronjob as scheduler (use with 'install')"
                 echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'install')"
         else
-                echo "Adsorber: Duplicate option: '${option}'"
+                echo "Adsorber: Duplicate option: '${option}'" 1>&2
                 showUsage
         fi
 
@@ -237,7 +235,7 @@ for option in "${@}"; do
                         readonly option_help="true" 2>/dev/null
                         ;;
                 * )
-                        readonly wrong_option="${option}" 2>/dev/null
+                        wrong_option="${option}" 2>/dev/null
                         ;;
         esac
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# A(d)sorber's cron file
+# A(d)sorber v#@version@# crontab file
 # Updates the hosts file once a week.
 #
 # For more information: https://github.com/stablestud/adsorber
@@ -9,4 +9,4 @@
 # adsorber.sh install --cron:
 # This file is going to be copied into /etc/cron.weekly/ if not other specified.
 
-#@/some/path/adsorber.sh update # line will be overwritten by script (DO NOT EDIT)#@
+#@/some/path/adsorber.sh update@#

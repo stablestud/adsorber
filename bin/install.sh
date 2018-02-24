@@ -13,7 +13,7 @@
 # prefix                      '  ' (two spaces)       bin/colours.sh
 # prefix_input                '  ' (two spaces)       bin/colours.sh
 # prefix_fatal                '\033[0;91mE '          bin/colours.sh
-# prefix_reset            \033[0m                 bin/colours.sh
+# prefix_reset                \033[0m                 bin/colours.sh
 # prefix_title                \033[1;37m              bin/colours.sh
 # prefix_warning              '- '                    bin/colours.sh
 # reply_to_prompt             Null (not set)          bin/install.sh, adsorber.sh
@@ -21,6 +21,7 @@
 # script_dir_path             script root directory   adsorber.sh
 #   (e.g., /home/user/Downloads/adsorber)
 # systemd_dir_path            /etc/systemd/system     bin/config.sh, adsorber.conf
+# version                     0.2.2 or similar        adsorber.sh
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
@@ -54,7 +55,9 @@ install_Cronjob()
         fi
 
         # Replace the @ place holder line with script_dir_path and copy the content to cron's directory
-        sed "s|^#@.\+#@$|${script_dir_path}\/adsorber\.sh update|g" "${script_dir_path}/bin/cron/80adsorber" > "${crontab_dir_path}/80adsorber"
+        sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/cron/80adsorber" \
+                | sed "s|^#@\/some\/path\/adsorber\.sh update@#$|${script_dir_path}\/adsorber\.sh update|g" \
+                > "${crontab_dir_path}/80adsorber"
         chmod u=rwx,g=rx,o=rx "${crontab_dir_path}/80adsorber"
 
         readonly installed_scheduler="cronjob"
@@ -81,7 +84,8 @@ install_Systemd()
         echo "${prefix}Installing systemd service ..."
 
         # Replace the @ place holder line with script_dir_path and copy to its systemd directory
-        sed "s|^#@ExecStart.\+#@$|ExecStart=${script_dir_path}\/adsorber\.sh update|g" "${script_dir_path}/bin/systemd/adsorber.service" > "${systemd_dir_path}/adsorber.service"
+        sed "s|^#@ExecStart=\/some\/path\/adsorber\.sh update@#$|ExecStart=${script_dir_path}\/adsorber\.sh update|g" "${script_dir_path}/bin/systemd/adsorber.service" \
+                > "${systemd_dir_path}/adsorber.service"
         cp "${script_dir_path}/bin/systemd/adsorber.timer" "${systemd_dir_path}/adsorber.timer"
 
         chmod u=rwx,g=rx,o=rx "${systemd_dir_path}/adsorber.service" "${systemd_dir_path}/adsorber.timer"

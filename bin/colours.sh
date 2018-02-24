@@ -7,7 +7,7 @@
 readonly prefix="  "
 readonly prefix_fatal="\033[0;91mE "    # 'E' in intensity red
 readonly prefix_info="\033[0;97m  "     # Intensity white
-readonly prefix_input="  "
+readonly prefix_input="> "
 readonly prefix_title="\033[1;37m"      # Bold white
 readonly prefix_warning="- "
 readonly prefix_reset='\033[0m'         # Default colour

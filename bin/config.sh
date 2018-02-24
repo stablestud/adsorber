@@ -43,6 +43,8 @@ config_CopySourceList()
         if [ ! -f "${script_dir_path}/sources.list" ] || [ ! -s "${script_dir_path}/sources.list" ]; then
                 cp "${script_dir_path}/bin/default/default-sources.list" "${script_dir_path}/sources.list" \
                         && echo "${prefix}Created sources.list: to add new host sources edit this file."
+                        chown --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/sources.list"
+                        chmod --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/sources.list"
         fi
 
         return 0
@@ -54,6 +56,8 @@ config_CopyWhiteList()
         if [ ! -f "${script_dir_path}/whitelist" ] || [ ! -s "${script_dir_path}/whitelist" ]; then
                 cp "${script_dir_path}/bin/default/default-whitelist" "${script_dir_path}/whitelist" \
                         && echo "${prefix}Created whitelist: to allow specific domains edit this file."
+                        chown --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/whitelist"
+                        chmod --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/whitelist"
         fi
 
         return 0
@@ -65,6 +69,8 @@ config_CopyBlackList()
         if [ ! -f "${script_dir_path}/blacklist" ] || [ ! -s "${script_dir_path}/blacklist" ]; then
                 cp "${script_dir_path}/bin/default/default-blacklist" "${script_dir_path}/blacklist" \
                         && echo "${prefix}Created blacklist: to block additional domains edit this file."
+                        chown --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/blacklist"
+                        chmod --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/blacklist"
         fi
 
         return 0
@@ -79,6 +85,8 @@ config_CopyConfig()
                 printf "%b" "${prefix_fatal}No config file found. Creating default.${prefix_reset}\n" 1>&2
                 echo "${prefix}Please re-run the command to continue."
                 sed "s|@.*|# Config file for Adsorber v${version}|g" "${script_dir_path}/bin/default/default-adsorber.conf" > "${script_dir_path}/adsorber.conf"
+                chown --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/adsorber.conf"
+                chmod --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/adsorber.conf"
 
                 remove_ErrorCleanUp
                 exit 126
@@ -98,6 +106,8 @@ config_FilterConfig()
                 sed -n "/^https_proxy=/p" "${tmp_dir_path}/config"
                 sed -n "/^hosts_file_path=/p" "${tmp_dir_path}/config"
                 sed -n "/^hosts_file_backup_path=/p" "${tmp_dir_path}/config"
+                sed -n "/^hosts_file_previous_enable=/p" "${tmp_dir_path}/config"
+                sed -n "/^hosts_file_previous_path=/p" "${tmp_dir_path}/config"
                 sed -n "/^crontab_dir_path=/p" "${tmp_dir_path}/config"
                 sed -n "/^systemd_dir_path=/p" "${tmp_dir_path}/config"
         } > "${tmp_dir_path}/config-filtered"
@@ -134,9 +144,9 @@ config_ReadConfig()
 
 config_IsVariableSet()
 {
-        if [ -z "${hosts_file_path}" ] || [ -z "${hosts_file_backup_path}" ] || [ -z "${crontab_dir_path}" ] || [ -z "${systemd_dir_path}" ]; then
+        if [ -z "${hosts_file_path}" ] || [ -z "${hosts_file_backup_path}" ] || [ -z "${crontab_dir_path}" ] || [ -z "${systemd_dir_path}" ] || [ -z "${hosts_file_previous_path}" ] || [ -z "${hosts_file_previous_enable}" ]; then
                 printf "%bMissing setting(s) in adsorber.conf.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                printf "%bPlease delete adsorber.conf and run '%s install' to create a new config file.%b" "${prefix_fatal}" "${0}" "${prefix_reset}" 1>&2
+                printf "%bPlease delete adsorber.conf and run '%s install' to create a new config file.%b\n" "${prefix_fatal}" "${0}" "${prefix_reset}" 1>&2
                 remove_ErrorCleanUp
                 exit 127
         fi
@@ -163,6 +173,7 @@ config_IsVariableSet()
 config_IsVariableValid()
 {
         # TODO: Check if proxy is valid ( with ping )
+
         if [ ! -f "${hosts_file_path}" ]; then
                 printf "%bWrong hosts_file_path set in adsorber.conf. Can't access: %s\n" "${prefix_fatal}" "${hosts_file_path}" 1>&2
                 remove_ErrorCleanUp
@@ -175,17 +186,20 @@ config_IsVariableValid()
 
 config_PrintVariables()
 {
-        echo " - primary_list: ${primary_list}"
-        echo " - use_partial_matching: ${use_partial_matching}"
-        echo " - ignore_download_error: ${ignore_download_error}"
-        echo " - http_proxy: ${http_proxy}"
-        echo " - https_proxy: ${https_proxy}"
-        echo " - hosts_file_path_ ${hosts_file_path}"
-        echo " - hosts_file_backup_path: ${hosts_file_backup_path}"
-        echo " - crontab_dir_path: ${crontab_dir_path}"
-        echo " - systemd_dir_path: ${systemd_dir_path}"
-        echo " - tmp_dir_path: ${tmp_dir_path}"
-        echo " - script_dir_path: ${script_dir_path}"
+        echo "  Invoked with: ${0} ${operation} ${options}"
+        echo "  - primary_list: ${primary_list}"
+        echo "  - use_partial_matching: ${use_partial_matching}"
+        echo "  - ignore_download_error: ${ignore_download_error}"
+        echo "  - http_proxy: ${http_proxy}"
+        echo "  - https_proxy: ${https_proxy}"
+        echo "  - hosts_file_path: ${hosts_file_path}"
+        echo "  - hosts_file_backup_path: ${hosts_file_backup_path}"
+        echo "  - hosts_file_previous_enable: ${hosts_file_previous_enable}"
+        echo "  - hosts_file_previous_path: ${hosts_file_previous_path}"
+        echo "  - crontab_dir_path: ${crontab_dir_path}"
+        echo "  - systemd_dir_path: ${systemd_dir_path}"
+        echo "  - tmp_dir_path: ${tmp_dir_path}"
+        echo "  - script_dir_path: ${script_dir_path}"
 
         return 0
 }

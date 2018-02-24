@@ -27,6 +27,7 @@
 #   (e.g., /home/user/Downloads/absorber/sources.list)
 # tmp_dir_path             /tmp/adsorber                  adsorber.sh
 # use_partial_matching     true                           bin/config.sh, adsorber.conf
+# version                  0.2.2 or similar               adsorber.sh
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
@@ -84,7 +85,7 @@ update_ReadSourceList()
                         exit 127
                 fi
 
-                echo "${prefix}No sources to fetch from, ignoring ..."
+                echo "${prefix}No sources to fetch from, ignoring ..." 1>&2
                 return 1
         else
                 # Only read sources with http(s) at the beginning
@@ -163,7 +164,7 @@ update_FetchSources()
                         else
                                 printf "%bwget couldn't fetch: %s\n" "${prefix_warning}" "${domain}" 1>&2
                         fi
-                        # Is curl installed? If yes download the hosts files.
+                # Is curl installed? If yes download the hosts files.
                 elif command -v curl 2>/dev/null 1>&2; then
                         if curl "${domain}" -sS -L --connect-timeout 30 --fail --retry 1 >> "${tmp_dir_path}/fetched"; then
                                 successful_count=$((successful_count+1))
@@ -206,7 +207,7 @@ update_FilterDomains()
         # - remove inline '#' comments
         # - replace tabs and multiple spaces with one space
         # - remove domains without a dot (e.g localhost , loopback , ip6-allnodes , etc...)
-        # - remove domains that are redirecting to *.local
+        # - remove domains that are ending with *.local
         sed 's/\r/\n/g' "${tmp_dir_path}/${input_file}" \
                 | sed 's/^\s*127\.0\.[01]\.1/0\.0\.0\.0/g' \
                 | sed -n '/^\s*0\.0\.0\.0\s\+.\+/p' \
@@ -302,12 +303,13 @@ update_IsCacheEmpty()
 }
 
 
-update_PreBuildHostsFile()
+update_BuildHostsFile()
 {
         {
-                # Replace @...@ with the path to the backup hosts
-                sed "s|#@.\+#@|${hosts_file_backup_path}|g" "${script_dir_path}/bin/components/hosts_header"
-
+                # Replace #@...@# with variables
+                sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/components/hosts_header" \
+                        | sed "s|#@date@#|$(date +'%b %e %X')|g" \
+                        | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
                 echo ""
 
                 # Add hosts.original
@@ -318,15 +320,7 @@ update_PreBuildHostsFile()
 
                 # Add hosts_title
                 cat "${script_dir_path}/bin/components/hosts_title"
-        } > "${tmp_dir_path}/hosts"
 
-        return 0
-}
-
-
-update_BuildHostsFile()
-{
-        {
                 echo ""
 
                 # Add the fetched ad-domains to the hosts file
@@ -335,8 +329,10 @@ update_BuildHostsFile()
                 echo ""
 
                 # Add the hosts_header to the hosts file in the temporary folder, filter out the line with @ and replace with hosts_file_backup_path
-                sed "s|#@.\+#@|${hosts_file_backup_path}|g" "${script_dir_path}/bin/components/hosts_header"
-        } >> "${tmp_dir_path}/hosts"
+                sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/components/hosts_header" \
+                        | sed "s|#@date@#|$(date +'%b %e %X')|g" \
+                        | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
+        } > "${tmp_dir_path}/hosts"
 
         return 0
 }
@@ -397,7 +393,6 @@ update()
         esac
 
         update_IsCacheEmpty
-        update_PreBuildHostsFile
         update_BuildHostsFile
         update_ApplyHostsFile
         remove_CleanUp
