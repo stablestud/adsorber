@@ -146,6 +146,13 @@ install_PromptScheduler()
 }
 
 
+install_command()
+{
+        
+        return 0
+}
+
+
 install()
 {
         printf "%bInstalling Adsorber ...%b\n" "${prefix_title}" "${prefix_reset}"

@@ -22,7 +22,7 @@ readonly options="${*}"
 checkRoot()
 {
         if [ "$(id -g)" -ne 0 ]; then
-                echo "This script must be run as root." 1>&2
+                echo "This activity must be run as root." 1>&2
                 exit 126
         fi
 
@@ -54,7 +54,7 @@ showUsage()
                 echo "Adsorber: Invalid option: '${wrong_option}'" 1>&2
         fi
 
-        echo "Usage: ${0} [install|remove|update|restore|revert] {options}"
+        echo "Usage: ${0} <install|update|restore|revert|remove> [<options>]"
         echo "Try --help for more information."
 
         exit 127
@@ -63,7 +63,7 @@ showUsage()
 
 showHelp()
 {
-        echo "Usage: ${0} [operation] {options}"
+        echo "Usage: ${0} <operation> [<options>]"
         echo ""
         echo "A(d)sorber blocks ads by 'absorbing' and dumbing them into void."
         echo "           (with the help of the hosts file)"
@@ -74,10 +74,11 @@ showHelp()
         echo "                    create scheduler which updates the host file once a week"
         echo "  update  - update hosts file with newest ad servers"
         echo "  restore - restore hosts file to its original state"
-        echo "            (it does not remove the schedule, so this should be used temporary)"
+        echo "            (it does not remove the schedule, this should be used temporary)"
+        echo "  revert  - reverts the hosts file to the lastest applied host file."
         echo "  remove  - completely remove changes made by Adsorber"
         echo "              e.g., remove scheduler (if set)"
-        echo "                    restore hosts file (if not already done) to its original state"
+        echo "                    restore hosts file to its original state"
         echo "  version - show version of this shell script"
         echo "  help    - show this help"
         echo ""
@@ -100,7 +101,7 @@ showSpecificHelp()
 {
         case "${operation}" in
                 install )
-                        printf "%badsorber.sh install {options}%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber.sh install [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
                         echo ""
                         echo "You should run this command first."
                         echo ""
@@ -118,7 +119,7 @@ showSpecificHelp()
                         echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
                         ;;
                 update )
-                        printf "%badsorber.sh update {options}%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber.sh update [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
                         echo ""
                         echo "To keep the hosts file up-to-date."
                         echo ""
@@ -130,7 +131,7 @@ showSpecificHelp()
                         echo "                    has been created (dangerous)"
                         ;;
                 restore )
-                        printf "%badsorber.sh restore {options}%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber.sh restore [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
                         echo ""
                         echo "To restore the hosts file temporary, without removing the backup."
                         echo ""
@@ -144,8 +145,11 @@ showSpecificHelp()
                         echo ""
                         echo "To re-apply run 'asdorber.sh update'"
                         ;;
+                revert )
+                        printf "%badsorber.sh revert [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        ;;
                 remove )
-                        printf "%badsorber remove {options}%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber remove [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
                         echo ""
                         echo "To completely remove changes made by Adsorber."
                         echo ""
@@ -202,6 +206,7 @@ sourceFiles()
         . "${script_dir_path}/bin/remove.sh"
         . "${script_dir_path}/bin/update.sh"
         . "${script_dir_path}/bin/restore.sh"
+        . "${script_dir_path}/bin/revert.sh"
         . "${script_dir_path}/bin/config.sh"
         . "${script_dir_path}/bin/colours.sh"
         return 0
@@ -241,11 +246,12 @@ for option in "${@}"; do
 
 done
 
+config_Setup
+
 case "${operation}" in
         install )
                 checkForWrongParameters
                 checkRoot
-                config
                 install
                 update
                 ;;
@@ -266,6 +272,12 @@ case "${operation}" in
                 checkRoot
                 config
                 restore
+                ;;
+        revert )
+                checkForWrongParameters
+                checkRoot
+                config
+                revert
                 ;;
         -[Hh] | help | --help )
                 showHelp

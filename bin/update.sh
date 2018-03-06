@@ -6,28 +6,30 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:----------   ---default value:-----------   ---declared in:-------------
-# hosts_file_path          /etc/hosts                     bin/config.sh, adsorber.conf
-# hosts_file_backup_path   /etc/hosts.original            bin/config.sh, adsorber.conf
-# ignore_download_error    true                           bin/config.sh, adsorber.conf
-# prefix                   '  ' (two spaces)              bin/colours.sh
-# prefix_fatal             '\033[0;91mE '                 bin/colours.sh
-# prefix_info              '\033[0;97m  '                 bin/colours.sh
-# prefix_input             '  ' (two spaces)              bin/colours.sh
-# prefix_reset             \033[0m                        bin/colours.sh
-# prefix_title             \033[1;37m                     bin/colours.sh
-# prefix_warning           '- '                           bin/colours.sh
-# primary_list             blacklist                      bin/config.sh, adsorber.conf
-# http_proxy               Null (not set)                 bin/config.sh, adsorber.conf
-# https_proxy              Null (not set)                 bin/config.sh, adsorber.conf
-# reply_to_force_prompt    Null (not set)                 bin/install.sh, adsorber.sh
-# script_dir_path          script root directory          adsorber.sh
+# ---variable:----------      ---default value:-----------   ---declared in:-------------
+# hosts_file_path             /etc/hosts                     bin/config.sh, adsorber.conf
+# hosts_file_backup_path      /etc/hosts.original            bin/config.sh, adsorber.conf
+# ignore_download_error       true                           bin/config.sh, adsorber.conf
+# prefix                      '  ' (two spaces)              bin/colours.sh
+# prefix_fatal                '\033[0;91mE '                 bin/colours.sh
+# prefix_info                 '\033[0;97m  '                 bin/colours.sh
+# prefix_input                '  ' (two spaces)              bin/colours.sh
+# prefix_reset                \033[0m                        bin/colours.sh
+# prefix_title                \033[1;37m                     bin/colours.sh
+# prefix_warning              '- '                           bin/colours.sh
+# primary_list                blacklist                      bin/config.sh, adsorber.conf
+# http_proxy                  Null (not set)                 bin/config.sh, adsorber.conf
+# https_proxy                 Null (not set)                 bin/config.sh, adsorber.conf
+# hosts_file_previous_enable  true                           bin/config.sh, adsorber.conf
+# hosts_file_previous_path    /etc/hosts.previous            bin/config.sh, adsorber.conf
+# reply_to_force_prompt       Null (not set)                 bin/install.sh, adsorber.sh
+# script_dir_path             script root directory          adsorber.sh
 #   (e.g., /home/user/Downloads/adsorber)
-# sourcelist_file_path     script_dir_path/sources.list   adsorber.sh
+# sourcelist_file_path        script_dir_path/sources.list   adsorber.sh
 #   (e.g., /home/user/Downloads/absorber/sources.list)
-# tmp_dir_path             /tmp/adsorber                  adsorber.sh
-# use_partial_matching     true                           bin/config.sh, adsorber.conf
-# version                  0.2.2 or similar               adsorber.sh
+# tmp_dir_path                /tmp/adsorber                  adsorber.sh
+# use_partial_matching        true                           bin/config.sh, adsorber.conf
+# version                     0.2.2 or similar               adsorber.sh
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
@@ -309,7 +311,9 @@ update_BuildHostsFile()
                 # Replace #@...@# with variables
                 sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/components/hosts_header" \
                         | sed "s|#@date@#|$(date +'%b %e %X')|g" \
+                        | sed "s|#@blocked@#|$(wc -l < ${tmp_dir_path}/cache)|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
+                        
                 echo ""
 
                 # Add hosts.original
@@ -319,7 +323,7 @@ update_BuildHostsFile()
                 echo ""
 
                 # Add hosts_title
-                cat "${script_dir_path}/bin/components/hosts_title"
+                sed "s|#@blocked@#|$(wc -l < ${tmp_dir_path}/cache)|g" "${script_dir_path}/bin/components/hosts_title"
 
                 echo ""
 
@@ -331,10 +335,26 @@ update_BuildHostsFile()
                 # Add the hosts_header to the hosts file in the temporary folder, filter out the line with @ and replace with hosts_file_backup_path
                 sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/components/hosts_header" \
                         | sed "s|#@date@#|$(date +'%b %e %X')|g" \
+                        | sed "s|#@blocked@#|$(wc -l < ${tmp_dir_path}/cache)|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
+                        
         } > "${tmp_dir_path}/hosts"
 
         return 0
+}
+
+
+update_PreviousHostsFile()
+{
+        if [ "${hosts_file_previous_enable}" = "true" ]; then           # Check if we should backup the previous hosts file
+                echo "${prefix}Creating backup of previous hosts file ..."
+                
+                cp "${hosts_file_path}" "${hosts_file_previous_path}"   # Copy current hosts file to /etc/hosts.previous before the new hosts file will be applied
+                echo "" >> "${hosts_file_previous_path}"
+                echo "## This was the hosts file before $(date +'%b %e %X')" >> "${hosts_file_previous_path}"
+        fi
+        
+        return 0;
 }
 
 
@@ -373,7 +393,7 @@ update()
                 cp "${tmp_dir_path}/fetched-sorted" "${tmp_dir_path}/cache"
         else
                 # Create empty cache file for the ad-domains.
-                printf "" >> "${tmp_dir_path}/cache"
+                touch "${tmp_dir_path}/cache"
         fi
 
         case "${primary_list}" in
@@ -394,6 +414,7 @@ update()
 
         update_IsCacheEmpty
         update_BuildHostsFile
+        update_PreviousHostsFile
         update_ApplyHostsFile
         remove_CleanUp
 

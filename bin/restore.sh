@@ -10,7 +10,7 @@
 # hosts_file_path          /etc/hosts            bin/config.sh, adsorber.conf
 # hosts_file_backup_path   /etc/hosts.original   bin/config.sh, adsorber.conf
 # prefix                   '  ' (two spaces)     bin/colours.sh
-# prefix_reset             \033[0m                 bin/colours.sh
+# prefix_reset             \033[0m               bin/colours.sh
 # prefix_title             \033[1;37m            bin/colours.sh
 # prefix_warning           '- '                  bin/colours.sh
 

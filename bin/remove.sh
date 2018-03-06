@@ -38,8 +38,10 @@ remove_ErrorCleanUp()
                 rm "${hosts_file_backup_path}"
         fi
 
-        rm -r "${tmp_dir_path}"
-
+        if [ -d "${tmp_dir_path}" ]; then
+                rm -r "${tmp_dir_path}"
+        fi
+        
         return 0
 }
 
@@ -128,6 +130,19 @@ remove_HostsFile()
 }
 
 
+remove_PreviousHostsFile()
+{
+        if [ -f "${hosts_file_previous_path}" ]; then
+                rm "${hosts_file_previous_path}" \
+                        && echo "${prefix}Removed previous hosts file."
+        else
+                echo "${prefix}Previous hosts file not installed. Ignoring ..."
+        fi
+        
+        return 0
+}
+
+
 remove()
 {
         printf "%bRemoving Adsorber ...%b\n"  "${prefix_title}" "${prefix_reset}"
@@ -135,6 +150,7 @@ remove()
         remove_Systemd
         remove_Cronjob
         remove_HostsFile
+        remove_PreviousHostsFile
         remove_CleanUp
 
         return 0

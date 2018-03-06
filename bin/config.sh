@@ -42,7 +42,7 @@ config_CopySourceList()
 {
         if [ ! -f "${script_dir_path}/sources.list" ] || [ ! -s "${script_dir_path}/sources.list" ]; then
                 cp "${script_dir_path}/bin/default/default-sources.list" "${script_dir_path}/sources.list" \
-                        && echo "${prefix}Created sources.list: to add new host sources edit this file."
+                        && echo "${prefix_warning}Created sources.list: to add new host sources edit this file."
                         chown --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/sources.list"
                         chmod --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/sources.list"
         fi
@@ -55,7 +55,7 @@ config_CopyWhiteList()
 {
         if [ ! -f "${script_dir_path}/whitelist" ] || [ ! -s "${script_dir_path}/whitelist" ]; then
                 cp "${script_dir_path}/bin/default/default-whitelist" "${script_dir_path}/whitelist" \
-                        && echo "${prefix}Created whitelist: to allow specific domains edit this file."
+                        && echo "${prefix_warning}Created whitelist: to allow specific domains edit this file."
                         chown --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/whitelist"
                         chmod --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/whitelist"
         fi
@@ -68,7 +68,7 @@ config_CopyBlackList()
 {
         if [ ! -f "${script_dir_path}/blacklist" ] || [ ! -s "${script_dir_path}/blacklist" ]; then
                 cp "${script_dir_path}/bin/default/default-blacklist" "${script_dir_path}/blacklist" \
-                        && echo "${prefix}Created blacklist: to block additional domains edit this file."
+                        && echo "${prefix_warning}Created blacklist: to block additional domains edit this file."
                         chown --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/blacklist"
                         chmod --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/blacklist"
         fi
@@ -79,16 +79,13 @@ config_CopyBlackList()
 
 config_CopyConfig()
 {
-        if [ -s "${script_dir_path}/adsorber.conf" ]; then
-                cp "${script_dir_path}/adsorber.conf" "${tmp_dir_path}/config"
-        else
-                printf "%b" "${prefix_fatal}No config file found. Creating default.${prefix_reset}\n" 1>&2
-                echo "${prefix}Please re-run the command to continue."
+        if [ ! -s "${script_dir_path}/adsorber.conf" ] || [ ! -f "${script_dir_path}/adsorber.conf" ]; then
+                printf "%bNo config file found. Creating default.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                echo "${prefix_warning}Please re-run the command to continue."
                 sed "s|@.*|# Config file for Adsorber v${version}|g" "${script_dir_path}/bin/default/default-adsorber.conf" > "${script_dir_path}/adsorber.conf"
                 chown --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/adsorber.conf"
                 chmod --reference="${script_dir_path}/adsorber.sh" "${script_dir_path}/adsorber.conf"
 
-                remove_ErrorCleanUp
                 exit 126
         fi
 
@@ -96,8 +93,26 @@ config_CopyConfig()
 }
 
 
+config_Setup()
+{
+        config_CopySourceList
+        config_CopyWhiteList
+        config_CopyBlackList
+        config_CopyConfig
+        
+        return 0
+}
+
+
 config_FilterConfig()
 {
+        cp "${script_dir_path}/adsorber.conf" "${tmp_dir_path}/config" \
+                || {
+                        printf "%bCouldn't process config file.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                        remove_ErrorCleanUp
+                        exit 126
+                }
+        
         {
                 sed -n "/^primary_list=/p" "${tmp_dir_path}/config"
                 sed -n "/^use_partial_matching=/p" "${tmp_dir_path}/config"
