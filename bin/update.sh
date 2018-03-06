@@ -311,7 +311,7 @@ update_BuildHostsFile()
                 # Replace #@...@# with variables
                 sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/components/hosts_header" \
                         | sed "s|#@date@#|$(date +'%b %e %X')|g" \
-                        | sed "s|#@blocked@#|$(wc -l < ${tmp_dir_path}/cache)|g" \
+                        | sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
                         
                 echo ""
@@ -323,7 +323,7 @@ update_BuildHostsFile()
                 echo ""
 
                 # Add hosts_title
-                sed "s|#@blocked@#|$(wc -l < ${tmp_dir_path}/cache)|g" "${script_dir_path}/bin/components/hosts_title"
+                sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" "${script_dir_path}/bin/components/hosts_title"
 
                 echo ""
 
@@ -335,7 +335,7 @@ update_BuildHostsFile()
                 # Add the hosts_header to the hosts file in the temporary folder, filter out the line with @ and replace with hosts_file_backup_path
                 sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/components/hosts_header" \
                         | sed "s|#@date@#|$(date +'%b %e %X')|g" \
-                        | sed "s|#@blocked@#|$(wc -l < ${tmp_dir_path}/cache)|g" \
+                        | sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
                         
         } > "${tmp_dir_path}/hosts"
