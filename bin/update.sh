@@ -313,7 +313,7 @@ update_BuildHostsFile()
                         | sed "s|#@date@#|$(date +'%b %e %X')|g" \
                         | sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
-                        
+
                 echo ""
 
                 # Add hosts.original
@@ -337,7 +337,7 @@ update_BuildHostsFile()
                         | sed "s|#@date@#|$(date +'%b %e %X')|g" \
                         | sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
-                        
+
         } > "${tmp_dir_path}/hosts"
 
         return 0
@@ -348,12 +348,19 @@ update_PreviousHostsFile()
 {
         if [ "${hosts_file_previous_enable}" = "true" ]; then           # Check if we should backup the previous hosts file
                 echo "${prefix}Creating backup of previous hosts file ..."
-                
-                cp "${hosts_file_path}" "${hosts_file_previous_path}"   # Copy current hosts file to /etc/hosts.previous before the new hosts file will be applied
+
+                 # Copy current hosts file to /etc/hosts.previous before the new hosts file will be applied
+                cp "${hosts_file_path}" "${hosts_file_previous_path}" \
+                        || {
+                                printf "%bCouldn't create previous hosts file at %s%b\n" "${prefix_fatal}" "${hosts_file_previous_path}" "${prefix_reset}"
+                                remove_ErrorCleanUp
+                                exit 1
+                        }
+                        
                 echo "" >> "${hosts_file_previous_path}"
                 echo "## This was the hosts file before $(date +'%b %e %X')" >> "${hosts_file_previous_path}"
         fi
-        
+
         return 0;
 }
 

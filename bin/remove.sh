@@ -41,7 +41,7 @@ remove_ErrorCleanUp()
         if [ -d "${tmp_dir_path}" ]; then
                 rm -r "${tmp_dir_path}"
         fi
-        
+
         return 0
 }
 
@@ -136,9 +136,9 @@ remove_PreviousHostsFile()
                 rm "${hosts_file_previous_path}" \
                         && echo "${prefix}Removed previous hosts file."
         else
-                echo "${prefix}Previous hosts file not installed. Ignoring ..."
+                echo "${prefix}Previous hosts file does not exist. Ignoring ..."
         fi
-        
+
         return 0
 }
 

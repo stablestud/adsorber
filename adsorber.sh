@@ -252,6 +252,7 @@ case "${operation}" in
         install )
                 checkForWrongParameters
                 checkRoot
+                config
                 install
                 update
                 ;;

@@ -99,7 +99,7 @@ config_Setup()
         config_CopyWhiteList
         config_CopyBlackList
         config_CopyConfig
-        
+
         return 0
 }
 
@@ -112,7 +112,7 @@ config_FilterConfig()
                         remove_ErrorCleanUp
                         exit 126
                 }
-        
+
         {
                 sed -n "/^primary_list=/p" "${tmp_dir_path}/config"
                 sed -n "/^use_partial_matching=/p" "${tmp_dir_path}/config"
@@ -232,7 +232,7 @@ config()
         config_ReadConfig
         config_IsVariableSet
         config_IsVariableValid
-        #config_PrintVariables # used for debugging
+        config_PrintVariables # used for debugging
 
         return 0
 }
