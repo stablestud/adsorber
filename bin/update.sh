@@ -144,11 +144,11 @@ update_FetchSources()
         total_count=0
         successful_count=0
 
-        if [ ! -z "${http_proxy}" ]; then
+        if [ -n "${http_proxy}" ]; then
                 echo "${prefix}Using HTTP proxy: ${http_proxy}"
         fi
 
-        if [ ! -z "${https_proxy}" ]; then
+        if [ -n "${https_proxy}" ]; then
                 echo "${prefix}Using HTTPS proxy: ${https_proxy}"
         fi
 
@@ -184,7 +184,7 @@ update_FetchSources()
         if [ "${successful_count}" -eq 0 ]; then
                 printf "%bNothing to apply [%d/%d].\n" "${prefix_warning}" "${successful_count}" "${total_count}" 1>&2
                 return 1
-        elif [ "${ignore_download_error}" = "false" ] && [ ! "${successful_count}" = "${total_count}" ]; then
+        elif [ "${ignore_download_error}" = "false" ] && [ "${successful_count}" -ne "${total_count}" ]; then
                 printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\n" "${prefix_warning}" "${successful_count}" "${total_count}" 1>&2
                 remove_ErrorCleanUp
                 exit 1
@@ -194,6 +194,7 @@ update_FetchSources()
 
         unset total_count
         unset successful_count
+        
         return 0
 }
 
@@ -221,6 +222,7 @@ update_FilterDomains()
 
         unset input_file
         unset output_file
+
         return 0
 }
 
@@ -235,6 +237,7 @@ update_SortDomains()
 
         unset input_file
         unset output_file
+
         return 0
 }
 
@@ -255,13 +258,9 @@ update_ApplyWhiteList()
                         if [ "${use_partial_matching}" = "true" ]; then
                                 # Filter out domains from whitelist, also for sub-domains
                                 sed -i "/\.*${domain}$/d" "${tmp_dir_path}/applied-whitelist"
-                        elif [ "${use_partial_matching}" = "false" ]; then
+                        else
                                 # Filter out domains from whitelist, ignoring sub-domains
                                 sed -i "/\s\+${domain}$/d" "${tmp_dir_path}/applied-whitelist"
-                        else
-                                printf "%bWrong use_partial_matching set, either set it to 'true' or 'false'.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                                remove_ErrorCleanUp
-                                exit 127
                         fi
 
                 done < "${tmp_dir_path}/whitelist-sorted"
@@ -314,23 +313,23 @@ update_BuildHostsFile()
                         | sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
 
-                echo ""
+                echo
 
                 # Add hosts.original
                 cat "${hosts_file_backup_path}" \
                         || echo "${prefix}You may want to add your hostname to ${hosts_file_path}" 1>&2
 
-                echo ""
+                echo
 
                 # Add hosts_title
                 sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" "${script_dir_path}/bin/components/hosts_title"
 
-                echo ""
+                echo
 
                 # Add the fetched ad-domains to the hosts file
                 cat "${tmp_dir_path}/cache"
 
-                echo ""
+                echo
 
                 # Add the hosts_header to the hosts file in the temporary folder, filter out the line with @ and replace with hosts_file_backup_path
                 sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/components/hosts_header" \
@@ -347,7 +346,7 @@ update_BuildHostsFile()
 update_PreviousHostsFile()
 {
         if [ "${hosts_file_previous_enable}" = "true" ]; then           # Check if we should backup the previous hosts file
-                echo "${prefix}Creating backup of previous hosts file ..."
+                echo "${prefix}Creating previous hosts file ..."
 
                  # Copy current hosts file to /etc/hosts.previous before the new hosts file will be applied
                 cp "${hosts_file_path}" "${hosts_file_previous_path}" \
@@ -356,7 +355,7 @@ update_PreviousHostsFile()
                                 remove_ErrorCleanUp
                                 exit 1
                         }
-                        
+
                 echo "" >> "${hosts_file_previous_path}"
                 echo "## This was the hosts file before $(date +'%b %e %X')" >> "${hosts_file_previous_path}"
         fi

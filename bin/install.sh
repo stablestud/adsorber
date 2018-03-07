@@ -126,7 +126,7 @@ install_Prompt()
 install_PromptScheduler()
 {
         if [ -z "${reply_to_scheduler_prompt}" ]; then
-                printf "%bWhat scheduler should be used to update hosts file automatically? [(S)ystemd/(C)ron/(N)one]: %b" "${prefix_input}" "${prefix_reset}"
+                printf "%bWhat scheduler should be used to update the host file automatically? [(S)ystemd/(C)ron/(N)one]: %b" "${prefix_input}" "${prefix_reset}"
                 read -r reply_to_scheduler_prompt
         fi
 
@@ -148,7 +148,7 @@ install_PromptScheduler()
 
 install_command()
 {
-        
+
         return 0
 }
 

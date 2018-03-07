@@ -32,7 +32,7 @@ checkRoot()
 
 checkForWrongParameters()
 {
-        if [ ! -z "${wrong_operation}" ] || [ ! -z "${wrong_option}" ]; then
+        if [ -n "${wrong_operation}" ] || [ -n "${wrong_option}" ]; then
                 showUsage
         fi
 
@@ -46,11 +46,11 @@ checkForWrongParameters()
 
 showUsage()
 {
-        if [ ! -z "${wrong_operation}" ]; then
+        if [ -n "${wrong_operation}" ]; then
                 echo "Adsorber: Invalid operation: '${wrong_operation}'" 1>&2
         fi
 
-        if [ ! -z "${wrong_option}" ]; then
+        if [ -n "${wrong_option}" ]; then
                 echo "Adsorber: Invalid option: '${wrong_option}'" 1>&2
         fi
 
@@ -89,7 +89,8 @@ showHelp()
         echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
         echo "  -f,  --force             - force the update if no /etc/hosts backup"
         echo "                             has been created (dangerous)"
-        echo ""
+        echo "  -h,  --help              - show specific help of specified operations"
+        echo
         echo "Documentation: https://github.com/stablestud/adsorber"
         echo "If you encounter any issues please report them to the Github repository."
 
@@ -102,64 +103,81 @@ showSpecificHelp()
         case "${operation}" in
                 install )
                         printf "%badsorber.sh install [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
-                        echo ""
+                        echo
                         echo "You should run this command first."
-                        echo ""
+                        echo
                         echo "The command will:"
                         echo " - backup your /etc/hosts file to /etc/hosts.original"
                         echo "   (if not other specified in adsorber.conf)"
                         echo " - install a scheduler which updates your hosts file with ad-server domains"
                         echo "   once a week. (either systemd, cronjob or none)"
                         echo " - install the newest ad-server domains in your hosts file."
-                        echo ""
-                        echo "Possible options are:"
-                        echo " -s, --systemd            - use Systemd ..."
-                        echo " -c, --cronjob            - use Cronjob as scheduler"
-                        echo " -ns, --no-scheduler      - skip scheduler creation"
-                        echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
+                        echo
+                        echo "Possible options:"
+                        echo " -s,  --systemd            - use Systemd ..."
+                        echo " -c,  --cronjob            - use Cronjob as scheduler"
+                        echo " -ns, --no-scheduler       - skip scheduler creation"
+                        echo " -y,  --yes, --assume-yes  - answer all prompts with 'yes'"
+                        echo " -h,  --help               - show this help screen"
                         ;;
                 update )
                         printf "%badsorber.sh update [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
-                        echo ""
+                        echo
                         echo "To keep the hosts file up-to-date."
-                        echo ""
+                        echo
                         echo "The command will:"
                         echo " - install the newest ad-server domains in your hosts file."
-                        echo ""
-                        echo "Possible option:"
+                        echo
+                        echo "Possible options:"
                         echo " -f, --force      - force the update if no /etc/hosts backup"
                         echo "                    has been created (dangerous)"
+                        echo " -h, --help       - show this help screen"
                         ;;
                 restore )
                         printf "%badsorber.sh restore [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
-                        echo ""
+                        echo
                         echo "To restore the hosts file temporary, without removing the backup."
-                        echo ""
+                        echo
                         echo "The command will:"
                         echo " - copy /etc/hosts.original to /etc/hosts, overwriting the modified /etc/hosts by adsorber."
-                        echo ""
+                        echo
                         echo "Important: If you have a scheduler installed it'll re-apply ad-server domains to your hosts"
                         echo "file when triggered."
                         echo "For this reason this command is used to temporary disable Adsorber."
                         echo "(e.g. when it's blocking some sites you need access for a short period of time)"
-                        echo ""
-                        echo "To re-apply run 'asdorber.sh update'"
+                        echo
+                        echo "To re-apply run 'adsorber.sh update'"
+                        echo
+                        echo "Possible option:"
+                        echo " -h, --help       - show this help screen"
                         ;;
                 revert )
                         printf "%badsorber.sh revert [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        echo
+                        echo "To revert to the last hosts file, good use if the"
+                        echo "current host file was corrupted."
+                        echo
+                        echo "The command will:"
+                        echo " - copy /etc/hosts.previous to /etc/hosts, overwriting the current host file."
+                        echo
+                        echo "To get the latest ad-domains run 'adsorber.sh update'"
+                        echo
+                        echo "Possible option:"
+                        echo " -h, --help       - show this help screen"
                         ;;
                 remove )
                         printf "%badsorber remove [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
-                        echo ""
+                        echo
                         echo "To completely remove changes made by Adsorber."
-                        echo ""
+                        echo
                         echo "The command will:"
                         echo " - remove all schedulers (systemd, cronjob)"
                         echo " - restore the hosts file to it's original state"
                         echo " - remove all leftovers"
-                        echo ""
-                        echo "Possible option:"
+                        echo
+                        echo "Possible options:"
                         echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
+                        echo " -h, --help               - show this help screen"
                         ;;
         esac
 
@@ -246,7 +264,7 @@ for option in "${@}"; do
 
 done
 
-config_Setup
+config_Copy
 
 case "${operation}" in
         install )

@@ -21,7 +21,7 @@
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
 # ---function:-----     ---function defined in:---
-# remove_ErrorCleanUp  bin/remove.sh
+# remove_ErrorCleanUp   bin/remove.sh
 
 
 config_CreateTmpDir()
@@ -93,7 +93,7 @@ config_CopyConfig()
 }
 
 
-config_Setup()
+config_Copy()
 {
         config_CopySourceList
         config_CopyWhiteList
@@ -137,13 +137,13 @@ config_ReadConfig()
                 case "${line}" in
                         http_proxy* )
                                 readonly "set_${line}"
-                                if [ ! -z "$set_http_proxy" ]; then
+                                if [ -n "$set_http_proxy" ]; then
                                         export "${line}"
                                 fi
                                 ;;
                         https_proxy* )
                                 readonly "set_${line}"
-                                if [ ! -z "$set_https_proxy" ]; then
+                                if [ -n "$set_https_proxy" ]; then
                                         export "${line}"
                                 fi
                                 ;;
@@ -189,8 +189,47 @@ config_IsVariableValid()
 {
         # TODO: Check if proxy is valid ( with ping )
 
+        if [ "${primary_list}" != "blacklist" ] && [ "${primary_list}" != "whitelist" ]; then
+                printf "%bWrong 'primary_list' set in adsorber.conf. Choose either 'blacklist' or 'whitelist'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                wrongVariable="true"
+        fi
+
+        if [ "${use_partial_matching}" != "true" ] && [ "${use_partial_matching}" != "false" ]; then
+                printf "%bWrong 'use_partial_matching' set in adsorber.conf. Possible options: 'true' or 'false'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                wrongVariable="true"
+        fi
+
+        if [ "${ignore_download_error}" != "true" ] && [ "${ignore_download_error}" != "false" ]; then
+                printf "%bWrong 'ignore_download_error' set in adsorber.conf. Possible options: 'true' or 'false'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                wrongVariable="true"
+        fi
+
         if [ ! -f "${hosts_file_path}" ]; then
-                printf "%bWrong hosts_file_path set in adsorber.conf. Can't access: %s\n" "${prefix_fatal}" "${hosts_file_path}" 1>&2
+                printf "%bWrong 'hosts_file_path' set in adsorber.conf. Can't access: %s%b\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
+                wrongVariable="true"
+        fi
+
+        if [ ! -d "$(dirname "${hosts_file_backup_path}")" ]; then
+                printf "%bWrong 'hosts_file_backup_path' set in adsorber.conf. Can't access: %s%b\n" "${prefix_fatal}" "$(dirname "${hosts_file_backup_path}")" "${prefix_reset}" 1>&2
+                wrongVariable="true"
+        fi
+
+        if [ "${hosts_file_previous_enable}" != "true" ] && [ "${hosts_file_previous_enable}" != "false" ]; then
+                printf "%bWrong 'hosts_file_previous_enable' set in adsorber.conf. Possible options: 'true' or 'false'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                wrongVariable="true"
+        fi
+
+        if [ ! -d "$(dirname "${hosts_file_previous_path}")" ]; then
+                printf "%bWrong 'hosts_file_previous_path' set in adsorber.conf. Can't access: %s%b\n" "${prefix_fatal}" "$(dirname "${hosts_file_previous_path}")" "${prefix_reset}" 1>&2
+                wrongVariable="true"
+        fi
+
+        if [ ! -d "$(dirname "${tmp_dir_path}")" ]; then
+                printf "%bWrong 'tmp_dir_path' set in adsorber.conf. Can't access: %s%b\n" "${prefix_fatal}" "$(dirname "${tmp_dir_path}")" "${prefix_reset}" 1>&2
+                wrongVariable="true"
+        fi
+
+        if [ -n "${wrongVariable}" ]; then      # When wrongVariable is set then ...
                 remove_ErrorCleanUp
                 exit 126
         fi
@@ -232,7 +271,7 @@ config()
         config_ReadConfig
         config_IsVariableSet
         config_IsVariableValid
-        config_PrintVariables # used for debugging
+        #config_PrintVariables # used for debugging
 
         return 0
 }
