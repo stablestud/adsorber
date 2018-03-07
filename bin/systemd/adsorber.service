@@ -1,9 +1,9 @@
 [Unit]
 Description=Adsorber service to update the hosts file periodically.
-Documentation=https://github.com/stablestud/Adsorber
+Documentation=https://github.com/stablestud/adsorber
 After=network.target
 
 [Service]
 Type=oneshot
 User=root
-#@ExecStart=/some/path/adsorber.sh update - line will be overwritten by script (DO NOT EDIT)#@
+#@ExecStart=/some/path/adsorber.sh update@#

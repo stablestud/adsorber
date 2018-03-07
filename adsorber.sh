@@ -1,30 +1,28 @@
-#!/bin/bash
+#!/bin/sh
 
 # Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
 
-readonly TMP_DIR_PATH="/tmp/adsorber"
-readonly SCRIPT_DIR_PATH="$(cd "$(dirname "${0}")" && pwd)"
-readonly SOURCELIST_FILE_PATH="${SCRIPT_DIR_PATH}/sources.list"
+readonly tmp_dir_path="/tmp/adsorber"
+readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
+readonly sourcelist_file_path="${script_dir_path}/sources.list"
 
-readonly VERSION="0.2.3"
+readonly version="0.3.0"
 
-readonly OPERATION="${1}"
-
-# For better error messages, from http://wiki.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful:
-export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+readonly operation="${1}"
 
 if [ "${#}" -ne 0 ]; then
         shift
 fi
 
+readonly options="${*}"
 
 checkRoot()
 {
-        if [ "${UID}" -ne 0 ]; then
-                echo "This script must be run as root." 1>&2
+        if [ "$(id -g)" -ne 0 ]; then
+                echo "This activity must be run as root." 1>&2
                 exit 126
         fi
 
@@ -34,11 +32,11 @@ checkRoot()
 
 checkForWrongParameters()
 {
-        if [ "${WRONG_OPERATION}" != "" ] || [ "${#WRONG_OPTION[@]}" -ne 0 ]; then
+        if [ -n "${wrong_operation}" ] || [ -n "${wrong_option}" ]; then
                 showUsage
         fi
 
-        if [ "${OPTION_HELP}" == "true"  ]; then
+        if [ "${option_help}" = "true"  ]; then
                 showSpecificHelp
         fi
 
@@ -48,16 +46,16 @@ checkForWrongParameters()
 
 showUsage()
 {
-        if [ "${WRONG_OPERATION}" != "" ]; then
-                echo "Adsorber: Invalid operation: '${WRONG_OPERATION}'" 1>&2
+        if [ -n "${wrong_operation}" ]; then
+                echo "Adsorber: Invalid operation: '${wrong_operation}'" 1>&2
         fi
 
-        if [ "${WRONG_OPTION}" != "" ]; then
-                echo "Adsorber: Invalid option: ${WRONG_OPTION[*]}" 1>&2
+        if [ -n "${wrong_option}" ]; then
+                echo "Adsorber: Invalid option: '${wrong_option}'" 1>&2
         fi
 
-        echo "Usage: ${0} [install|remove|update|revert] {options}" 1>&2
-        echo "Try --help for more information." 1>&2
+        echo "Usage: ${0} <install|update|restore|revert|remove> [<options>]"
+        echo "Try --help for more information."
 
         exit 127
 }
@@ -65,7 +63,7 @@ showUsage()
 
 showHelp()
 {
-        echo "Usage: ${0} [OPERATION] {options}"
+        echo "Usage: ${0} <operation> [<options>]"
         echo ""
         echo "A(d)sorber blocks ads by 'absorbing' and dumbing them into void."
         echo "           (with the help of the hosts file)"
@@ -73,13 +71,14 @@ showHelp()
         echo "Operations:"
         echo "  install - setup necessary things needed for Adsorber"
         echo "              e.g., create backup file of hosts file,"
-        echo "                    create scheduler which updates the host file once a week."
+        echo "                    create scheduler which updates the host file once a week"
         echo "  update  - update hosts file with newest ad servers"
-        echo "  revert  - revert hosts file to its original state"
-        echo "            (it does not remove the schedule, so this should be used temporary)"
+        echo "  restore - restore hosts file to its original state"
+        echo "            (it does not remove the schedule, this should be used temporary)"
+        echo "  revert  - reverts the hosts file to the lastest applied host file."
         echo "  remove  - completely remove changes made by Adsorber"
         echo "              e.g., remove scheduler (if set)"
-        echo "                    revert hosts file (if not already done)"
+        echo "                    restore hosts file to its original state"
         echo "  version - show version of this shell script"
         echo "  help    - show this help"
         echo ""
@@ -90,7 +89,8 @@ showHelp()
         echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
         echo "  -f,  --force             - force the update if no /etc/hosts backup"
         echo "                             has been created (dangerous)"
-        echo ""
+        echo "  -h,  --help              - show specific help of specified operations"
+        echo
         echo "Documentation: https://github.com/stablestud/adsorber"
         echo "If you encounter any issues please report them to the Github repository."
 
@@ -100,64 +100,84 @@ showHelp()
 
 showSpecificHelp()
 {
-        case "${OPERATION}" in
+        case "${operation}" in
                 install )
-                        echo -e "${UWHITE}adsorber.sh install {options}${COLOUR_RESET}:"
-                        echo ""
+                        printf "%badsorber.sh install [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        echo
                         echo "You should run this command first."
-                        echo ""
+                        echo
                         echo "The command will:"
                         echo " - backup your /etc/hosts file to /etc/hosts.original"
                         echo "   (if not other specified in adsorber.conf)"
                         echo " - install a scheduler which updates your hosts file with ad-server domains"
                         echo "   once a week. (either systemd, cronjob or none)"
                         echo " - install the newest ad-server domains in your hosts file."
-                        echo ""
-                        echo "Possible options are:"
-                        echo " -s, --systemd            - use Systemd ..."
-                        echo " -c, --cronjob            - use Cronjob as scheduler"
-                        echo " -ns, --no-scheduler      - skip scheduler creation"
-                        echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
+                        echo
+                        echo "Possible options:"
+                        echo " -s,  --systemd            - use Systemd ..."
+                        echo " -c,  --cronjob            - use Cronjob as scheduler"
+                        echo " -ns, --no-scheduler       - skip scheduler creation"
+                        echo " -y,  --yes, --assume-yes  - answer all prompts with 'yes'"
+                        echo " -h,  --help               - show this help screen"
                         ;;
                 update )
-                        echo -e "${UWHITE}adsorber.sh update {options}${COLOUR_RESET}:"
-                        echo ""
+                        printf "%badsorber.sh update [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        echo
                         echo "To keep the hosts file up-to-date."
-                        echo ""
+                        echo
                         echo "The command will:"
                         echo " - install the newest ad-server domains in your hosts file."
-                        echo ""
-                        echo "Possible option:"
+                        echo
+                        echo "Possible options:"
                         echo " -f, --force      - force the update if no /etc/hosts backup"
                         echo "                    has been created (dangerous)"
+                        echo " -h, --help       - show this help screen"
                         ;;
-                revert )
-                        echo -e "${UWHITE}adsorber.sh revert {options}${COLOUR_RESET}:"
-                        echo ""
+                restore )
+                        printf "%badsorber.sh restore [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        echo
                         echo "To restore the hosts file temporary, without removing the backup."
-                        echo ""
+                        echo
                         echo "The command will:"
                         echo " - copy /etc/hosts.original to /etc/hosts, overwriting the modified /etc/hosts by adsorber."
-                        echo ""
+                        echo
                         echo "Important: If you have a scheduler installed it'll re-apply ad-server domains to your hosts"
                         echo "file when triggered."
                         echo "For this reason this command is used to temporary disable Adsorber."
                         echo "(e.g. when it's blocking some sites you need access for a short period of time)"
-                        echo ""
-                        echo "To re-apply run 'asdorber.sh update'"
+                        echo
+                        echo "To re-apply run 'adsorber.sh update'"
+                        echo
+                        echo "Possible option:"
+                        echo " -h, --help       - show this help screen"
+                        ;;
+                revert )
+                        printf "%badsorber.sh revert [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        echo
+                        echo "To revert to the last hosts file, good use if the"
+                        echo "current host file was corrupted."
+                        echo
+                        echo "The command will:"
+                        echo " - copy /etc/hosts.previous to /etc/hosts, overwriting the current host file."
+                        echo
+                        echo "To get the latest ad-domains run 'adsorber.sh update'"
+                        echo
+                        echo "Possible option:"
+                        echo " -h, --help       - show this help screen"
                         ;;
                 remove )
-                        echo -e "${UWHITE}adsorber remove {options}${COLOUR_RESET}:"
-                        echo ""
+                        printf "%badsorber remove [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        echo
                         echo "To completely remove changes made by Adsorber."
-                        echo ""
+                        echo
                         echo "The command will:"
                         echo " - remove all schedulers (systemd, cronjob)"
                         echo " - restore the hosts file to it's original state"
                         echo " - remove all leftovers"
-                        echo ""
-                        echo "Possible option:"
+                        echo
+                        echo "Possible options:"
                         echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
+                        echo " -h, --help               - show this help screen"
                         ;;
         esac
 
@@ -167,7 +187,7 @@ showSpecificHelp()
 
 showVersion()
 {
-        echo "A(d)sorber ${VERSION}"
+        echo "A(d)sorber ${version}"
         echo ""
         echo "  License MIT"
         echo "  Copyright (c) 2017 stablestud <adsorber@stablestud.org>"
@@ -183,14 +203,14 @@ showVersion()
 
 duplicateOption()
 {
-        if [ "${1}" == "scheduler" ]; then
-                echo "Adsorber: Duplicate option for scheduler: '${option}'"
+        if [ "${1}" = "scheduler" ]; then
+                echo "Adsorber: Duplicate option for scheduler: '${option}'" 1>&2
                 echo "You may only select one:"
                 echo "  -s,  --systemd           - use Systemd ..."
                 echo "  -c,  --cron              - use Cronjob as scheduler (use with 'install')"
                 echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'install')"
         else
-                echo "Adsorber: Duplicate option: '${option}'"
+                echo "Adsorber: Duplicate option: '${option}'" 1>&2
                 showUsage
         fi
 
@@ -200,13 +220,13 @@ duplicateOption()
 
 sourceFiles()
 {
-        . "${SCRIPT_DIR_PATH}/bin/install.sh"
-        . "${SCRIPT_DIR_PATH}/bin/remove.sh"
-        . "${SCRIPT_DIR_PATH}/bin/update.sh"
-        . "${SCRIPT_DIR_PATH}/bin/revert.sh"
-        . "${SCRIPT_DIR_PATH}/bin/config.sh"
-        . "${SCRIPT_DIR_PATH}/bin/colours.sh"
-
+        . "${script_dir_path}/bin/install.sh"
+        . "${script_dir_path}/bin/remove.sh"
+        . "${script_dir_path}/bin/update.sh"
+        . "${script_dir_path}/bin/restore.sh"
+        . "${script_dir_path}/bin/revert.sh"
+        . "${script_dir_path}/bin/config.sh"
+        . "${script_dir_path}/bin/colours.sh"
         return 0
 }
 
@@ -217,34 +237,36 @@ for option in "${@}"; do
 
         case "${option}" in
                 -[Ss] | --systemd )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="systemd" 2>/dev/null || duplicateOption "scheduler"
+                        readonly reply_to_scheduler_prompt="systemd" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Cc] | --cron )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="cronjob" 2>/dev/null || duplicateOption "scheduler"
+                        readonly reply_to_scheduler_prompt="cronjob" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Nn][Ss] | --no-scheduler )
-                        readonly REPLY_TO_SCHEDULER_PROMPT="no-scheduler" 2>/dev/null || duplicateOption "scheduler"
+                        readonly reply_to_scheduler_prompt="no-scheduler" 2>/dev/null || duplicateOption "scheduler"
                         ;;
                 -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
-                        readonly REPLY_TO_PROMPT="yes" 2>/dev/null || duplicateOption
+                        readonly reply_to_prompt="yes" 2>/dev/null || duplicateOption
                         ;;
                 -[Ff] | --force )
-                        readonly REPLY_TO_FORCE_PROMPT="yes" 2>/dev/null || duplicateOption
+                        readonly reply_to_force_prompt="yes" 2>/dev/null || duplicateOption
                         ;;
                 "" )
                         : # Do nothing
                         ;;
                 -[Hh] | --help | help )
-                        readonly OPTION_HELP="true" 2>/dev/null
+                        readonly option_help="true" 2>/dev/null
                         ;;
                 * )
-                        WRONG_OPTION+=("'${option}'")
+                        wrong_option="${option}" 2>/dev/null
                         ;;
         esac
 
 done
 
-case "${OPERATION}" in
+config_Copy
+
+case "${operation}" in
         install )
                 checkForWrongParameters
                 checkRoot
@@ -264,6 +286,12 @@ case "${OPERATION}" in
                 config
                 update
                 ;;
+        restore )
+                checkForWrongParameters
+                checkRoot
+                config
+                restore
+                ;;
         revert )
                 checkForWrongParameters
                 checkRoot
@@ -280,11 +308,11 @@ case "${OPERATION}" in
                 showUsage
                 ;;
         * )
-                readonly WRONG_OPERATION="${OPERATION}"
+                readonly wrong_operation="${operation}"
                 showUsage
                 ;;
 esac
 
-echo -e "${PREFIX_TITLE}Finished successfully.${COLOUR_RESET}"
+printf "%bFinished successfully.%b\n" "${prefix_title}" "${prefix_reset}"
 
 exit 0
