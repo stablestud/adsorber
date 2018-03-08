@@ -6,8 +6,8 @@
 
 
 readonly tmp_dir_path="/tmp/adsorber"
-readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
-readonly sourcelist_file_path="${script_dir_path}/sources.list"
+readonly binary_dir_path="$(cd "$(dirname "${0}")" && pwd)"             # Should be /usr/local/bin by default
+readonly config_dir_path="${binary_dir_path}/../../etc/adsorber/"       # Presumly /usr/local/etc
 
 readonly version="0.3.0"
 
@@ -220,13 +220,15 @@ duplicateOption()
 
 sourceFiles()
 {
-        . "${script_dir_path}/bin/install.sh"
-        . "${script_dir_path}/bin/remove.sh"
-        . "${script_dir_path}/bin/update.sh"
-        . "${script_dir_path}/bin/restore.sh"
-        . "${script_dir_path}/bin/revert.sh"
-        . "${script_dir_path}/bin/config.sh"
-        . "${script_dir_path}/bin/colours.sh"
+        . "${binary_dir_path}/install.sh"
+        . "${binary_dir_path}/remove.sh"
+        . "${binary_dir_path}/update.sh"
+        . "${binary_dir_path}/restore.sh"
+        . "${binary_dir_path}/revert.sh"
+        . "${binary_dir_path}/config.sh"
+        . "${binary_dir_path}/colours.sh"
+        . "${binary_dir_path}/cron/cron.sh"
+        . "${binary_dir_path}/systemd/systemd.sh"
         return 0
 }
 

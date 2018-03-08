@@ -10,9 +10,9 @@ Cronjob_install()
                 exit 126
         fi
 
-        # Replace the @ place holder line with script_dir_path and copy the content to cron's directory
-        sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/cron/80adsorber" \
-                | sed "s|^#@\/some\/path\/adsorber\.sh update@#$|${script_dir_path}\/adsorber\.sh update|g" \
+        # Replace the @ place holder line with binary_dir_path and copy the content to cron's directory
+        sed "s|#@version@#|${version}|g" "${binary_dir_path}/bin/cron/80adsorber" \
+                | sed "s|^#@\/some\/path\/adsorber\.sh update@#$|${binary_dir_path}\/adsorber\.sh update|g" \
                 > "${crontab_dir_path}/80adsorber"
         chmod u=rwx,g=rx,o=rx "${crontab_dir_path}/80adsorber"
 

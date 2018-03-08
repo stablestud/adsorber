@@ -18,7 +18,7 @@
 # prefix_warning              '- '                    bin/colours.sh
 # reply_to_prompt             Null (not set)          bin/install.sh, adsorber.sh
 # reply_to_scheduler_prompt   Null (not set)          bin/install.sh, adsorber.sh
-# script_dir_path             script root directory   adsorber.sh
+# binary_dir_path             script root directory   adsorber.sh
 #   (e.g., /home/user/Downloads/adsorber)
 # systemd_dir_path            /etc/systemd/system     bin/config.sh, adsorber.conf
 # version                     0.2.2 or similar        adsorber.sh

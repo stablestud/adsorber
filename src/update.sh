@@ -23,10 +23,10 @@
 # hosts_file_previous_enable  true                           bin/config.sh, adsorber.conf
 # hosts_file_previous_path    /etc/hosts.previous            bin/config.sh, adsorber.conf
 # reply_to_force_prompt       Null (not set)                 bin/install.sh, adsorber.sh
-# script_dir_path             script root directory          adsorber.sh
-#   (e.g., /home/user/Downloads/adsorber)
-# sourcelist_file_path        script_dir_path/sources.list   adsorber.sh
-#   (e.g., /home/user/Downloads/absorber/sources.list)
+# binary_dir_path             script root directory          adsorber.sh
+#   (e.g., /usr/local/bin/adsorber)
+# sourcelist_file_path        config_dir_path/sources.list   adsorber.sh
+#   (e.g., /usr/local/etc/absorber/sources.list)
 # tmp_dir_path                /tmp/adsorber                  adsorber.sh
 # use_partial_matching        true                           bin/config.sh, adsorber.conf
 # version                     0.2.2 or similar               adsorber.sh
@@ -82,7 +82,7 @@ update_ReadSourceList()
 {
         if [ ! -s "${sourcelist_file_path}" ]; then
 
-                if [ ! -s "${script_dir_path}/blacklist" ]; then
+                if [ ! -s "${binary_dir_path}/blacklist" ]; then
                         printf "%bMissing 'sources.list' and blacklist. To fix run '%s install'.%b\n" "${prefix_fatal}" "${0}" "${prefix_reset}" 1>&2
                         exit 127
                 fi
@@ -109,11 +109,11 @@ update_ReadSourceList()
 
 update_ReadWhiteList()
 {
-        if [ ! -f "${script_dir_path}/whitelist" ]; then
+        if [ ! -f "${binary_dir_path}/whitelist" ]; then
                 echo "${prefix}Whitelist does not exist, ignoring ..." 1>&2
                 return 1
         else
-                cp "${script_dir_path}/whitelist" "${tmp_dir_path}/whitelist"
+                cp "${binary_dir_path}/whitelist" "${tmp_dir_path}/whitelist"
 
                 update_FilterDomains "whitelist" "whitelist-filtered"
                 update_SortDomains "whitelist-filtered" "whitelist-sorted"
@@ -125,11 +125,11 @@ update_ReadWhiteList()
 
 update_ReadBlackList()
 {
-        if [ ! -f "${script_dir_path}/blacklist" ]; then
+        if [ ! -f "${binary_dir_path}/blacklist" ]; then
                 echo "${prefix}Blacklist does not exist, ignoring ..." 1>&2
                 return 1
         else
-                cp "${script_dir_path}/blacklist" "${tmp_dir_path}/blacklist"
+                cp "${binary_dir_path}/blacklist" "${tmp_dir_path}/blacklist"
 
                 update_FilterDomains "blacklist" "blacklist-filtered"
                 update_SortDomains "blacklist-filtered" "blacklist-sorted"
@@ -308,7 +308,7 @@ update_BuildHostsFile()
 {
         {
                 # Replace #@...@# with variables
-                sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/components/hosts_header" \
+                sed "s|#@version@#|${version}|g" "${binary_dir_path}/bin/components/hosts_header" \
                         | sed "s|#@date@#|$(date +'%b %e %X')|g" \
                         | sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
@@ -322,7 +322,7 @@ update_BuildHostsFile()
                 echo
 
                 # Add hosts_title
-                sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" "${script_dir_path}/bin/components/hosts_title"
+                sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" "${binary_dir_path}/bin/components/hosts_title"
 
                 echo
 
@@ -332,7 +332,7 @@ update_BuildHostsFile()
                 echo
 
                 # Add the hosts_header to the hosts file in the temporary folder, filter out the line with @ and replace with hosts_file_backup_path
-                sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/components/hosts_header" \
+                sed "s|#@version@#|${version}|g" "${binary_dir_path}/bin/components/hosts_header" \
                         | sed "s|#@date@#|$(date +'%b %e %X')|g" \
                         | sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
