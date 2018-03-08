@@ -27,10 +27,10 @@ remove_ErrorCleanUp()
         # Remove scheduler if installed in the same run
         case "${installed_scheduler}" in
                 cronjob )
-                        remove_Cronjob
+                        Cronjob_remove
                         ;;
                 systemd )
-                        remove_Systemd
+                        Systemd_remove
                         ;;
         esac
 
@@ -51,43 +51,6 @@ remove_CleanUp()
         echo "${prefix}Cleaning up ..."
 
         rm -r "${tmp_dir_path}"
-        return 0
-}
-
-
-remove_Systemd()
-{
-        if [ -f "${systemd_dir_path}/adsorber.service" ] || [ -f "${systemd_dir_path}/adsorber.timer" ]; then
-
-                systemctl stop adsorber.timer 2>/dev/null
-                systemctl disable adsorber.timer | ( printf "%b" "${prefix}" && cat ) # Add "${prefix} to the output stream"
-                systemctl stop adsorber.service 2>/dev/null 1>&2
-                systemctl disable adsorber.service 2>/dev/null 1>&2 # The service is not enabled by default
-
-                rm "${systemd_dir_path}/adsorber.timer" "${systemd_dir_path}/adsorber.service" \
-                        || {
-                                printf "%bCouldn't remove systemd service files at %s\n." "${prefix_warning}" "${systemd_dir_path}" 1>&2
-                                return 1
-                        }
-
-                systemctl daemon-reload
-        else
-                echo "${prefix}Systemd service not installed. Skipping ..."
-        fi
-
-        return 0
-}
-
-
-remove_Cronjob()
-{
-        if [ -f "${crontab_dir_path}/80adsorber" ]; then
-                rm "${crontab_dir_path}/80adsorber" \
-                        && echo "${prefix}Removed Adsorber's cronjob."
-        else
-                echo "${prefix}Cronjob not installed. Skipping ..."
-        fi
-
         return 0
 }
 

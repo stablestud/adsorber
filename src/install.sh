@@ -44,63 +44,6 @@ install_BackupHostsFile()
 }
 
 
-install_Cronjob()
-{
-        echo "${prefix}Installing cronjob ..."
-
-        if [ ! -d "${crontab_dir_path}" ]; then
-                printf "%bWrong crontab_dir_path set. Can't access: %s.%b\n" "${prefix_fatal}" "${crontab_dir_path}" "${prefix_reset}" 1>&2
-                remove_ErrorCleanUp
-                exit 126
-        fi
-
-        # Replace the @ place holder line with script_dir_path and copy the content to cron's directory
-        sed "s|#@version@#|${version}|g" "${script_dir_path}/bin/cron/80adsorber" \
-                | sed "s|^#@\/some\/path\/adsorber\.sh update@#$|${script_dir_path}\/adsorber\.sh update|g" \
-                > "${crontab_dir_path}/80adsorber"
-        chmod u=rwx,g=rx,o=rx "${crontab_dir_path}/80adsorber"
-
-        readonly installed_scheduler="cronjob"
-
-        return 0
-}
-
-
-install_Systemd()
-{
-
-        if [ ! -d "${systemd_dir_path}" ]; then
-                printf "%bWrong systemd_dir_path set. Can't access: %s.%b\n" "${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
-                remove_ErrorCleanUp
-                exit 126
-        fi
-
-        # Remove systemd service if already installed (requires remove.sh)
-        if [ -f "${systemd_dir_path}/adsorber.service" ] || [ -f "${systemd_dir_path}/adsorber.timer" ]; then
-                echo "${prefix}Removing previous installed systemd service ..."
-                remove_Systemd
-        fi
-
-        echo "${prefix}Installing systemd service ..."
-
-        # Replace the @ place holder line with script_dir_path and copy to its systemd directory
-        sed "s|^#@ExecStart=\/some\/path\/adsorber\.sh update@#$|ExecStart=${script_dir_path}\/adsorber\.sh update|g" "${script_dir_path}/bin/systemd/adsorber.service" \
-                > "${systemd_dir_path}/adsorber.service"
-        cp "${script_dir_path}/bin/systemd/adsorber.timer" "${systemd_dir_path}/adsorber.timer"
-
-        chmod u=rwx,g=rx,o=rx "${systemd_dir_path}/adsorber.service" "${systemd_dir_path}/adsorber.timer"
-
-        # Enable the systemd service
-        systemctl daemon-reload \
-                && systemctl enable adsorber.timer | printf "%s" "${prefix}" \
-                && systemctl start adsorber.timer || printf "%bCouldn't start systemd service.\n" "${prefix_warning}" 1>&2
-
-        readonly installed_scheduler="systemd"
-
-        return 0
-}
-
-
 install_Prompt()
 {
         if [ -z "${reply_to_prompt}" ]; then
@@ -132,10 +75,10 @@ install_PromptScheduler()
 
         case "${reply_to_scheduler_prompt}" in
                 [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
-                        install_Systemd
+                        Systemd_install
                         ;;
                 [Cc] | [Cc]ron | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab )
-                        install_Cronjob
+                        Cronjob_install
                         ;;
                 * )
                         echo "${prefix}Skipping scheduler creation ..."
