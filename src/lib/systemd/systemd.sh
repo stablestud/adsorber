@@ -18,9 +18,9 @@ Systemd_install()
         echo "${prefix}Installing systemd service ..."
 
         # Replace the @ place holder line with binary_dir_path and copy to its systemd directory
-        sed "s|^#@ExecStart=\/some\/path\/adsorber\.sh update@#$|ExecStart=${binary_dir_path}\/adsorber\.sh update|g" "${binary_dir_path}/bin/systemd/adsorber.service" \
+        sed "s|^#@ExecStart=\/some\/path\/adsorber update@#$|ExecStart=${executable_dir_path}\/adsorber update|g" "${library_dir_path}/systemd/adsorber.service" \
                 > "${systemd_dir_path}/adsorber.service"
-        cp "${binary_dir_path}/bin/systemd/adsorber.timer" "${systemd_dir_path}/adsorber.timer"
+        cp "${library_dir_path}/systemd/adsorber.timer" "${systemd_dir_path}/adsorber.timer"
 
         chmod u=rwx,g=rx,o=rx "${systemd_dir_path}/adsorber.service" "${systemd_dir_path}/adsorber.timer"
 
@@ -40,7 +40,7 @@ Systemd_remove()
         if [ -f "${systemd_dir_path}/adsorber.service" ] || [ -f "${systemd_dir_path}/adsorber.timer" ]; then
 
                 systemctl stop adsorber.timer 2>/dev/null
-                systemctl disable adsorber.timer | ( printf "%b" "${prefix}" && cat ) # Add "${prefix} to the output stream"
+                systemctl disable adsorber.timer | ( printf "%b" "${prefix}" && cat ) # Add "${prefix}" to the output stream
                 systemctl stop adsorber.service 2>/dev/null 1>&2
                 systemctl disable adsorber.service 2>/dev/null 1>&2 # The service is not enabled by default
 

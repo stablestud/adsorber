@@ -41,10 +41,10 @@ config_CreateTmpDir()
 config_CopySourceList()
 {
         if [ ! -f "${config_dir_path}/sources.list" ] || [ ! -s "${config_dir_path}/sources.list" ]; then
-                cp "${binary_dir_path}/bin/default/default-sources.list" "${config_dir_path}/sources.list" \
+                cp "${shareable_dir_path}/default/default-sources.list" "${config_dir_path}/sources.list" \
                         && echo "${prefix_warning}Created sources.list: to add new host sources edit this file."
-                        chown --reference="${binary_dir_path}/adsorber.sh" "${config_dir_path}/sources.list"
-                        chmod --reference="${binary_dir_path}/adsorber.sh" "${config_dir_path}/sources.list"
+                chown root:root -R "${config_dir_path}/sources.list"
+                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/sources.list"
         fi
 
         return 0
@@ -53,11 +53,11 @@ config_CopySourceList()
 
 config_CopyWhiteList()
 {
-        if [ ! -f "${binary_dir_path}/whitelist" ] || [ ! -s "${binary_dir_path}/whitelist" ]; then
-                cp "${binary_dir_path}/bin/default/default-whitelist" "${binary_dir_path}/whitelist" \
+        if [ ! -f "${config_dir_path}/whitelist" ] || [ ! -s "${config_dir_path}/whitelist" ]; then
+                cp "${shareable_dir_path}/default/default-whitelist" "${config_dir_path}/whitelist" \
                         && echo "${prefix_warning}Created whitelist: to allow specific domains edit this file."
-                        chown --reference="${binary_dir_path}/adsorber.sh" "${binary_dir_path}/whitelist"
-                        chmod --reference="${binary_dir_path}/adsorber.sh" "${binary_dir_path}/whitelist"
+                chown root:root -R "${config_dir_path}/whitelist"
+                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/whitelist"
         fi
 
         return 0
@@ -66,11 +66,11 @@ config_CopyWhiteList()
 
 config_CopyBlackList()
 {
-        if [ ! -f "${binary_dir_path}/blacklist" ] || [ ! -s "${binary_dir_path}/blacklist" ]; then
-                cp "${binary_dir_path}/bin/default/default-blacklist" "${binary_dir_path}/blacklist" \
+        if [ ! -f "${config_dir_path}/blacklist" ] || [ ! -s "${config_dir_path}/blacklist" ]; then
+                cp "${shareable_dir_path}/default/default-blacklist" "${config_dir_path}/blacklist" \
                         && echo "${prefix_warning}Created blacklist: to block additional domains edit this file."
-                        chown --reference="${binary_dir_path}/adsorber.sh" "${binary_dir_path}/blacklist"
-                        chmod --reference="${binary_dir_path}/adsorber.sh" "${binary_dir_path}/blacklist"
+                chown root:root -R "${config_dir_path}/blacklist"
+                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/blacklist"
         fi
 
         return 0
@@ -79,13 +79,13 @@ config_CopyBlackList()
 
 config_CopyConfig()
 {
-        if [ ! -s "${binary_dir_path}/adsorber.conf" ] || [ ! -f "${binary_dir_path}/adsorber.conf" ]; then
+        if [ ! -s "${config_dir_path}/adsorber.conf" ] || [ ! -f "${config_dir_path}/adsorber.conf" ]; then
                 printf "%bNo config file found. Creating default.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 echo "${prefix_warning}Please re-run the command to continue."
-                sed "s|@.*|# Config file for Adsorber v${version}|g" "${binary_dir_path}/bin/default/default-adsorber.conf" > "${binary_dir_path}/adsorber.conf"
-                chown --reference="${binary_dir_path}/adsorber.sh" "${binary_dir_path}/adsorber.conf"
-                chmod --reference="${binary_dir_path}/adsorber.sh" "${binary_dir_path}/adsorber.conf"
+                sed "s|@.*|# Config file for Adsorber v${version}|g" "${shareable_dir_path}/default/default-adsorber.conf" > "${config_dir_path}/adsorber.conf"
 
+                chown root:root -R "${config_dir_path}/adsorber.conf"
+                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/adsorber.conf"
                 exit 126
         fi
 
@@ -93,20 +93,9 @@ config_CopyConfig()
 }
 
 
-config_Copy()
-{
-        config_CopySourceList
-        config_CopyWhiteList
-        config_CopyBlackList
-        config_CopyConfig
-
-        return 0
-}
-
-
 config_FilterConfig()
 {
-        cp "${binary_dir_path}/adsorber.conf" "${tmp_dir_path}/config" \
+        cp "${config_dir_path}/adsorber.conf" "${tmp_dir_path}/config" \
                 || {
                         printf "%bCouldn't process config file.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                         remove_ErrorCleanUp

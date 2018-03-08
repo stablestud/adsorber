@@ -6,8 +6,12 @@
 
 
 readonly tmp_dir_path="/tmp/adsorber"
-readonly binary_dir_path="$(cd "$(dirname "${0}")" && pwd)"             # Should be /usr/local/bin by default
-readonly config_dir_path="${binary_dir_path}/../../etc/adsorber/"       # Presumly /usr/local/etc
+
+## NOTE: following values will be changed when installed with 'install.sh' ##
+readonly executable_dir_path="$(cd "$(dirname "${0}")" && pwd)"
+readonly library_dir_path="${executable_dir_path}/../lib/"
+readonly shareable_dir_path="${executable_dir_path}/../share/"
+readonly config_dir_path="${executable_dir_path}/../../"
 
 readonly version="0.3.0"
 
@@ -22,7 +26,7 @@ readonly options="${*}"
 checkRoot()
 {
         if [ "$(id -g)" -ne 0 ]; then
-                echo "This activity must be run as root." 1>&2
+                echo "For this Adsorber must be run as root." 1>&2
                 exit 126
         fi
 
@@ -72,6 +76,7 @@ showHelp()
         echo "  install - setup necessary things needed for Adsorber"
         echo "              e.g., create backup file of hosts file,"
         echo "                    create scheduler which updates the host file once a week"
+        echo "            However this should've be done automatically."
         echo "  update  - update hosts file with newest ad servers"
         echo "  restore - restore hosts file to its original state"
         echo "            (it does not remove the schedule, this should be used temporary)"
@@ -220,15 +225,15 @@ duplicateOption()
 
 sourceFiles()
 {
-        . "${binary_dir_path}/install.sh"
-        . "${binary_dir_path}/remove.sh"
-        . "${binary_dir_path}/update.sh"
-        . "${binary_dir_path}/restore.sh"
-        . "${binary_dir_path}/revert.sh"
-        . "${binary_dir_path}/config.sh"
-        . "${binary_dir_path}/colours.sh"
-        . "${binary_dir_path}/cron/cron.sh"
-        . "${binary_dir_path}/systemd/systemd.sh"
+        . "${library_dir_path}/install.sh"
+        . "${library_dir_path}/remove.sh"
+        . "${library_dir_path}/update.sh"
+        . "${library_dir_path}/restore.sh"
+        . "${library_dir_path}/revert.sh"
+        . "${library_dir_path}/config.sh"
+        . "${library_dir_path}/colours.sh"
+        . "${library_dir_path}/cron/cron.sh"
+        . "${library_dir_path}/systemd/systemd.sh"
         return 0
 }
 
@@ -265,8 +270,6 @@ for option in "${@}"; do
         esac
 
 done
-
-config_Copy
 
 case "${operation}" in
         install )
