@@ -12,7 +12,7 @@ Systemd_install()
         # Remove systemd service if already installed (requires remove.sh)
         if [ -f "${systemd_dir_path}/adsorber.service" ] || [ -f "${systemd_dir_path}/adsorber.timer" ]; then
                 echo "${prefix}Removing previous installed systemd service ..."
-                remove_Systemd
+                Systemd_remove
         fi
 
         echo "${prefix}Installing systemd service ..."

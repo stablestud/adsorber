@@ -110,8 +110,8 @@ remove()
 {
         printf "%bRemoving Adsorber ...%b\n"  "${prefix_title}" "${prefix_reset}"
         remove_Prompt
-        remove_Systemd
-        remove_Cronjob
+        Systemd_remove
+        Cronjob_remove
         remove_HostsFile
         remove_PreviousHostsFile
         remove_CleanUp

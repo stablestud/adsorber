@@ -204,7 +204,7 @@ update_FilterDomains()
         input_file="${1}"
         output_file="${2}"
 
-        # - replace OSX '\r' and MS-DOS '\r\n' with Unix '\n' (linebreak)
+        # - replace OSX '\r' (CR) and MS-DOS '\r\n' (CR,LF) with Unix '\n' (LF) (newline)
         # - replace 127.0.0.1 and 127.0.1.1 with 0.0.0.0
         # - only keep lines starting with 0.0.0.0
         # - remove inline '#' comments

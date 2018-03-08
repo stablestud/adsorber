@@ -242,7 +242,10 @@ config_PrintVariables()
         echo "  - crontab_dir_path: ${crontab_dir_path}"
         echo "  - systemd_dir_path: ${systemd_dir_path}"
         echo "  - tmp_dir_path: ${tmp_dir_path}"
-        echo "  - binary_dir_path: ${binary_dir_path}"
+        echo "  - executable_dir_path: ${executable_dir_path}"
+        echo "  - library_dir_path: ${library_dir_path}"
+        echo "  - shareable_dir_path: ${shareable_dir_path}"
+        echo "  - config_dir_path: ${config_dir_path}"
 
         return 0
 }

@@ -19,15 +19,14 @@ readonly config_dir_path="/usr/local/etc/adsorber/"
 # Define the location of the log file. Not in use (yet).
 #readonly log_file_path="/var/log/adsorber.log"
 
-# Resolve installation directory
-# Get the path where this file is located.
+# Resolve source directory.
 readonly source_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
 # Check if user is root, if not exit.
 checkRoot()
 {
         if [ "$(id -g)" -ne 0 ]; then
-                echo "To install Adsorber you must be root." 1>&2
+                echo "You need to be root to install Adsorber." 1>&2
                 exit 126
         fi
 
@@ -36,13 +35,31 @@ checkRoot()
 
 echo "Placing executable to ${executable_dir_path}"
 
-cp
+cp "${source_dir_path}/src/adsorber" "${executable_dir_path}/adsorber"
+sed -n -i "s|^readonly library_dir_path=\"${executable_dir_path}/lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${executable_dir_path}/adsorber"
+sed -n -i "s|^readonly shareable_dir_path=\"${executable_dir_path}/share/\"$|readonly shareable_dir_path=\"${shareable_dir_path}\"|g" "${executable_dir_path}/adsorber"
+sed -n -i "s|^readonly config_dir_path=\"${executable_dir_path}/\.\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" "${executable_dir_path}/adsorber"
 
 echo "Placing libraries to ${library_dir_path}"
 
+mkdir "${library_dir_path}"
+cp -r "${source_dir_path}/src/lib/*" "${library_dir_path}"
+
 echo "Placing shareables to ${shareable_dir_path}"
+
+mkdir "${shareable_dir_path}"
+cp -r "${source_dir_path}/src/share/*" "${shareable_dir_path}"
 
 echo "Placing config files to ${config_dir_path}"
 
+mkdir "${config_dir_path}"
+cp -r "${source_dir_path}/src/share/default-adsorber.conf" "${config_dir_path}"
+cp -r "${source_dir_path}/src/share/default-blacklist" "${config_dir_path}"
+cp -r "${source_dir_path}/src/share/default-whitelist" "${config_dir_path}"
+cp -r "${source_dir_path}/src/share/default-sources.list" "${config_dir_path}"
+
+echo "Running Adsorber..."
+
+adsorber install --assume-yes --systemd
 
 echo "You can now delete this folder."

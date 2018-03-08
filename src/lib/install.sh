@@ -27,7 +27,7 @@
 # If you run this file independently following functions need to be emulated:
 # ---function:-----     ---function defined in:---
 # remove_ErrorCleanUp  bin/remove.sh
-# remove_Systemd       bin/remove.sh
+# Systemd_remove       bin/remove.sh
 
 
 install_BackupHostsFile()
