@@ -9,12 +9,14 @@ if ! command -v shellcheck 2>/dev/null 1>&2; then
         echo "Shellcheck must be installed."
 fi
 
+echo "Running shellcheck ..."
+
 shellcheck -e SC2154 -e SC1090 -e SC2163 \
-        "${script_dir_path}/../adsorber.sh" \
-        "${script_dir_path}/../bin/config.sh" \
-        "${script_dir_path}/../bin/install.sh" \
-        "${script_dir_path}/../bin/update.sh" \
-        "${script_dir_path}/../bin/revert.sh" \
-        "${script_dir_path}/../bin/restore.sh" \
-        "${script_dir_path}/../bin/remove.sh" \
-        "${script_dir_path}/../bin/colours.sh"
+        "${script_dir_path}/../src/adsorber.sh" \
+        "${script_dir_path}/../src/config.sh" \
+        "${script_dir_path}/../src/install.sh" \
+        "${script_dir_path}/../src/update.sh" \
+        "${script_dir_path}/../src/revert.sh" \
+        "${script_dir_path}/../src/restore.sh" \
+        "${script_dir_path}/../src/remove.sh" \
+        "${script_dir_path}/../src/colours.sh"
