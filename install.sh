@@ -64,6 +64,13 @@ chmod -R u=rwx,g=rx,o=rx "${config_dir_path}"
 
 echo "Running Adsorber..."
 
-adsorber install --assume-yes --systemd
+adsorber install --assume-yes --systemd \
+        || {
+                printf "\033[0;93mAdsorber was installed on your system, however something went wrong at\n"
+                printf "running Adsorber.\n"
+                printf "If a proxy server is in use, please change the config file\n"
+                printf "to the appropriate proxy server.\n\033[0m"
+                echo "Run 'adsorber install' to try again."
+        }
 
 echo "You can now delete this folder."

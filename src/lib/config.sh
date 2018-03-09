@@ -263,7 +263,7 @@ config()
         config_ReadConfig
         config_IsVariableSet
         config_IsVariableValid
-        #config_PrintVariables # used for debugging
+        config_PrintVariables # used for debugging
 
         return 0
 }
