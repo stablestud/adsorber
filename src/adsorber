@@ -9,9 +9,9 @@ readonly tmp_dir_path="/tmp/adsorber"
 
 ## NOTE: following values will be changed when installed with 'install.sh' ##
 readonly executable_dir_path="$(cd "$(dirname "${0}")" && pwd)"
-readonly library_dir_path="${executable_dir_path}/lib/"
-readonly shareable_dir_path="${executable_dir_path}/share/"
-readonly config_dir_path="${executable_dir_path}/../"
+readonly library_dir_path="${executable_dir_path}/lib"
+readonly shareable_dir_path="${executable_dir_path}/share"
+readonly config_dir_path="${executable_dir_path}/.."
 
 readonly version="0.4.0"
 
