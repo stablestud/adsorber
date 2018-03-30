@@ -183,9 +183,11 @@ update_FetchSources()
 
         if [ "${successful_count}" -eq 0 ]; then
                 printf "%bNothing to apply [%d/%d].\n" "${prefix_warning}" "${successful_count}" "${total_count}" 1>&2
+                echo "Perhaps a proxy server must be set?" 1>&2
                 return 1
         elif [ "${ignore_download_error}" = "false" ] && [ "${successful_count}" -ne "${total_count}" ]; then
                 printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\n" "${prefix_warning}" "${successful_count}" "${total_count}" 1>&2
+                echo "Perhaps a proxy server must be set?" 1>&2
                 remove_ErrorCleanUp
                 exit 1
         else

@@ -9,9 +9,9 @@ readonly tmp_dir_path="/tmp/adsorber"
 
 ## NOTE: following values will be changed when installed with 'install.sh' ##
 readonly executable_dir_path="$(cd "$(dirname "${0}")" && pwd)"
-readonly library_dir_path="${executable_dir_path}/lib/"
-readonly shareable_dir_path="${executable_dir_path}/share/"
-readonly config_dir_path="${executable_dir_path}/../"
+readonly library_dir_path="${executable_dir_path}/lib"
+readonly shareable_dir_path="${executable_dir_path}/share"
+readonly config_dir_path="${executable_dir_path}/.."
 
 readonly version="0.4.0"
 
@@ -58,7 +58,7 @@ showUsage()
                 echo "Adsorber: Invalid option: '${wrong_option}'" 1>&2
         fi
 
-        echo "Usage: ${0} <install|update|restore|revert|remove> [<options>]"
+        echo "Usage: adsorber <install|update|restore|revert|remove> [<options>]"
         echo "Try --help for more information."
 
         exit 127
@@ -67,7 +67,7 @@ showUsage()
 
 showHelp()
 {
-        echo "Usage: ${0} <operation> [<options>]"
+        echo "Usage: adsorber <operation> [<options>]"
         echo ""
         echo "A(d)sorber blocks ads by 'absorbing' and dumbing them into void."
         echo "           (with the help of the hosts file)"
@@ -107,7 +107,7 @@ showSpecificHelp()
 {
         case "${operation}" in
                 install )
-                        printf "%badsorber.sh install [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber install [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "You should run this command first."
                         echo
@@ -126,7 +126,7 @@ showSpecificHelp()
                         echo " -h,  --help               - show this help screen"
                         ;;
                 update )
-                        printf "%badsorber.sh update [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber update [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To keep the hosts file up-to-date."
                         echo
@@ -139,7 +139,7 @@ showSpecificHelp()
                         echo " -h, --help       - show this help screen"
                         ;;
                 restore )
-                        printf "%badsorber.sh restore [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber restore [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To restore the hosts file temporary, without removing the backup."
                         echo
@@ -157,7 +157,7 @@ showSpecificHelp()
                         echo " -h, --help       - show this help screen"
                         ;;
                 revert )
-                        printf "%badsorber.sh revert [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber revert [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To revert to the last hosts file, good use if the"
                         echo "current host file was corrupted."
