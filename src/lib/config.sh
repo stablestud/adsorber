@@ -4,6 +4,11 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
+# Variable naming:
+# under_score        - used for global variables which are accessible between functions.
+# _extra_under_score - used for local function variables. Should be unset afterwards.
+#          (Note the underscore in the beginning of _extra_under_score!)
+
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:--------   ---default value:------------   ----declared in:------------
@@ -12,13 +17,14 @@
 # prefix_title           \033[1;37m                      bin/colours.sh
 # prefix_warning         '- '                            bin/colours.sh
 # primary_list           blacklist                       bin/config.sh, adsorber.conf
-# binary_dir_path        script root directory           adsorber.sh
-#   (e.g., /home/user/Downloads/adsorber)
-# tmp_dir_path           /tmp/adsorber                   adsorber.sh
+# tmp_dir_path           /tmp/adsorber                   src/bin/adsorber
 # use_partial_matching   true                            bin/config.sh, adsorber.conf
 # version                0.2.2 or similar                adsorber.sh
 # options
 # operations
+# shareable_dir_path
+# config_dir_path
+# debug
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
@@ -28,6 +34,8 @@
 
 config_CreateTmpDir()
 {
+        # Create a temporary folder in which I can manipulate files without
+        # distracting the environment
         if [ ! -d "${tmp_dir_path}" ]; then
                 mkdir "${tmp_dir_path}"
         else
@@ -124,25 +132,32 @@ config_FilterConfig()
 
 config_ReadConfig()
 {
-        while read -r line; do
-                case "${line}" in
+        while read -r _line; do
+                case "${_line}" in      # TODO FIXME
                         http_proxy* )
-                                readonly "set_${line}"
+                                # set_
+                                readonly "set_${_line}"
                                 if [ -n "$set_http_proxy" ]; then
-                                        export "${line}"
+                                        export "${_line}"
                                 fi
                                 ;;
                         https_proxy* )
-                                readonly "set_${line}"
+                                readonly "set_${_line}"
                                 if [ -n "$set_https_proxy" ]; then
-                                        export "${line}"
+                                        export "${_line}"
                                 fi
                                 ;;
                         * )
-                                readonly "${line}"
+                                if [ -n- "${_line}" ]; then
+                                        readonly "${_line}"
+                                else
+                                        printf "%b%s is defined in " "${prefix_warning}" "${_line}"
+                                if
                                 ;;
                 esac
         done < "${tmp_dir_path}/config-filtered"
+
+        unset _line
 
         return 0
 }

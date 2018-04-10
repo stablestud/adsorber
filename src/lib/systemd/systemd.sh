@@ -72,7 +72,7 @@ Systemd_install()
         readonly installed_scheduler="systemd"
 
         echo "${prefix}Initialized Systemd service ..."
-        
+
         return 0
 }
 
@@ -84,7 +84,6 @@ Systemd_remove()
                  # Disable timer and add "${prefix}" to the output stream, to format it so it can fit the Adsorber 'style'
                 systemctl stop adsorber.timer 2>/dev/null
                 systemctl disable adsorber.timer 2>/dev/null \
-                        && echo "${prefix}Removing Systemd service ..."
 
                 # Disable service
                 systemctl stop adsorber.service 2>/dev/null 1>&2
@@ -99,6 +98,8 @@ Systemd_remove()
 
                 # Let systemd know that files have been changed
                 systemctl daemon-reload 2>/dev/null
+
+                echo "${prefix}Removed Adsorber's Systemd service."
         else
                 echo "${prefix}Systemd service not installed. Skipping ..."
         fi

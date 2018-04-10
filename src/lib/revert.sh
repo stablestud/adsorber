@@ -14,7 +14,7 @@
 # ---variable:----------   ---default value:--   ---declared in:-------------
 # hosts_file_path          /etc/hosts            src/lib/config.sh, adsorber.conf
 # hosts_file_previous_path /etc/hosts.previous   src/lib/config.sh, adsorber.conf
-# prefix_info              '  ' (two spaces)     src/lib/colours.sh
+# prefix                   '  ' (two spaces)     src/lib/colours.sh
 # prefix_fatal             '\033[0;91mE '        src/lib/colours.sh
 # prefix_reset             \033[0m               src/lib/colours.sh
 # prefix_title             \033[1;37m            src/lib/colours.sh

@@ -32,7 +32,11 @@ readonly options="${*}"
 checkRoot()
 {
         if [ "$(id -g)" -ne 0 ]; then
-                echo "Give me some more power!" 1>&2
+                if command -v whoami 2>/dev/null 1>&2; then
+                        echo "$(whoami), I require way more more power then this! How about... root ..? ;)" 1>&2
+                else
+                        echo "I require way more power then this! Maybe ... root ..? ;)" 1>&2
+                fi
                 exit 126
         fi
 
