@@ -33,6 +33,7 @@ Cronjob_install()
         # Check if crontabs directory variable is correctly set, if not abort and call the error clean-up function
         if [ ! -d "${crontab_dir_path}" ]; then
                 printf "%bWrong crontab_dir_path set. Can't access: %s.%b\n" "${prefix_fatal}" "${crontab_dir_path}" "${prefix_reset}" 1>&2
+                echo "${prefix}Is a cron service installed? If not use systemd if possible."
                 remove_ErrorCleanUp
                 exit 126
         fi

@@ -17,6 +17,8 @@
 # tmp_dir_path           /tmp/adsorber                   adsorber.sh
 # use_partial_matching   true                            bin/config.sh, adsorber.conf
 # version                0.2.2 or similar                adsorber.sh
+# options
+# operations
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
@@ -263,7 +265,10 @@ config()
         config_ReadConfig
         config_IsVariableSet
         config_IsVariableValid
-        config_PrintVariables # used for debugging
+
+        if [ "${debug}" = "true" ]; then
+                config_PrintVariables # used for debugging
+        fi
 
         return 0
 }

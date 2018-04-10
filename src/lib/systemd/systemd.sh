@@ -31,6 +31,7 @@ Systemd_install()
         # Check if the variable systemd_dir_path is valid, if not abort and call error clean-up function
         if [ ! -d "${systemd_dir_path}" ]; then
                 printf "%bWrong systemd_dir_path set. Can't access: %s.%b\n" "${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
+                echo "${prefix}Is Systemd installed? If not use cron instead."
                 remove_ErrorCleanUp
                 exit 126
         fi
@@ -53,15 +54,25 @@ Systemd_install()
         chmod u=rwx,g=rx,o=rx "${systemd_dir_path}/adsorber.service" "${systemd_dir_path}/adsorber.timer"
         chown root:root "${systemd_dir_path}/adsorber.service" "${systemd_dir_path}/adsorber.timer"
 
-        # Enable the systemd service and enable it to start at boot up
-        systemctl daemon-reload \
-                && systemctl enable adsorber.timer | printf "%s" "${prefix}" \
-                && systemctl start adsorber.timer || printf "%bCouldn't start systemd service.\n" "${prefix_warning}" 1>&2
+        # Enable the systemd service and enable it to start at boot-up
+        systemctl daemon-reload 2>/dev/null \
+                && systemctl enable adsorber.timer 2>/dev/null \
+                && systemctl start adsorber.timer 2>/dev/null \
+                        || {
+                                # Systemd couldn't be run, probably it's a systemd-less system like Gentoo
+                                printf "%bCouldn't start systemd service.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                                echo "${prefix}Is Systemd installed? If not use cron instead."
+                                Systemd_remove
+                                remove_ErrorCleanUp
+                                exit 126
+                        }
 
         # Make known that we have installed the systemd service in this run,
         # if we fail now, systemd will be also removed (see remove_ErrorCleanUp)
         readonly installed_scheduler="systemd"
 
+        echo "${prefix}Initialized Systemd service ..."
+        
         return 0
 }
 
@@ -72,7 +83,8 @@ Systemd_remove()
 
                  # Disable timer and add "${prefix}" to the output stream, to format it so it can fit the Adsorber 'style'
                 systemctl stop adsorber.timer 2>/dev/null
-                systemctl disable adsorber.timer | ( printf "%b" "${prefix}" && cat )
+                systemctl disable adsorber.timer 2>/dev/null \
+                        && echo "${prefix}Removing Systemd service ..."
 
                 # Disable service
                 systemctl stop adsorber.service 2>/dev/null 1>&2
@@ -81,12 +93,12 @@ Systemd_remove()
                 # Remove leftover service files.
                 rm "${systemd_dir_path}/adsorber.timer" "${systemd_dir_path}/adsorber.service" \
                         || {
-                                printf "%bCouldn't remove systemd service files at %s\n." "${prefix_warning}" "${systemd_dir_path}" 1>&2
+                                printf "%bCouldn't remove systemd service files at %s%b\n." "${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
                                 return 1
                         }
 
                 # Let systemd know that files have been changed
-                systemctl daemon-reload
+                systemctl daemon-reload 2>/dev/null
         else
                 echo "${prefix}Systemd service not installed. Skipping ..."
         fi

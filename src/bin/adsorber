@@ -10,8 +10,9 @@
 #          (Note the underscore in the beginning of _extra_under_score!)
 
 readonly tmp_dir_path="/tmp/adsorber"
+readonly debug="true"
 
-## NOTE: following values will be changed when installed with 'install_to_system.sh' ##
+# NOTE: following values will be changed when installed with 'install_to_system.sh' #
 readonly executable_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 readonly library_dir_path="${executable_dir_path}/../lib"
 readonly shareable_dir_path="${executable_dir_path}/../share"
@@ -20,18 +21,18 @@ readonly config_dir_path="${executable_dir_path}/../.."
 
 readonly version="0.4.0"
 
-readonly _operation="${1}"
+readonly operation="${1}"
 
 if [ "${#}" -ne 0 ]; then
         shift
 fi
 
-readonly _options="${*}"
+readonly options="${*}"
 
 checkRoot()
 {
         if [ "$(id -g)" -ne 0 ]; then
-                echo "Only root has the power to do this." 1>&2
+                echo "Give me some more power!" 1>&2
                 exit 126
         fi
 
@@ -110,7 +111,7 @@ showHelp()
 
 showSpecificHelp()
 {
-        case "${_operation}" in
+        case "${operation}" in
                 install )
                         printf "%badsorber install [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
                         echo
@@ -249,25 +250,45 @@ for _option in "${@}"; do
 
         case "${_option}" in
                 -[Ss] | --systemd )
-                        readonly reply_to_scheduler_prompt="systemd" 2>/dev/null || duplicateOption "scheduler"
+                        if [ -z "${reply_to_scheduler_prompt}" ]; then
+                                readonly reply_to_scheduler_prompt="systemd"
+                        else
+                                duplicateOption "scheduler"
+                        fi
                         ;;
                 -[Cc] | --cron )
-                        readonly reply_to_scheduler_prompt="cronjob" 2>/dev/null || duplicateOption "scheduler"
+                        if [ -z "${reply_to_scheduler_prompt}" ]; then
+                                readonly reply_to_scheduler_prompt="cronjob"
+                        else
+                                duplicateOption "scheduler"
+                        fi
                         ;;
                 -[Nn][Ss] | --no-scheduler )
-                        readonly reply_to_scheduler_prompt="no-scheduler" 2>/dev/null || duplicateOption "scheduler"
+                        if [ -z "${reply_to_scheduler_prompt}" ]; then
+                                readonly reply_to_scheduler_prompt="no-scheduler"
+                        else
+                                duplicateOption "scheduler"
+                        fi
                         ;;
                 -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
-                        readonly reply_to_prompt="yes" 2>/dev/null || duplicateOption
+                        if [ -z "${reply_to_prompt}" ]; then
+                                readonly reply_to_prompt="yes"
+                        else
+                                duplicateOption
+                        fi
                         ;;
                 -[Ff] | --force )
-                        readonly reply_to_force_prompt="yes" 2>/dev/null || duplicateOption
+                        if [ -z "${reply_to_force_prompt}" ]; then
+                                readonly reply_to_force_prompt="yes"
+                        else
+                                duplicateOption
+                        fi
                         ;;
                 "" )
                         : # Do nothing
                         ;;
                 -[Hh] | --help | help )
-                        readonly _option_help="true" 2>/dev/null
+                        _option_help="true"
                         ;;
                 * )
                         _wrong_option="${_option}" 2>/dev/null
@@ -276,7 +297,7 @@ for _option in "${@}"; do
 
 done
 
-case "${_operation}" in
+case "${operation}" in
         install )
                 checkForWrongParameters
                 checkRoot
@@ -318,7 +339,7 @@ case "${_operation}" in
                 showUsage
                 ;;
         * )
-                readonly _wrong_operation="${_operation}"
+                readonly _wrong_operation="${operation}"
                 showUsage
                 ;;
 esac
