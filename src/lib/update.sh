@@ -4,38 +4,40 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
+# Variable naming:
+# under_score        - used for global variables which are accessible between functions.
+# _extra_under_score - used for temporary function variables. Should be unset afterwards.
+#          (Note the underscore in the beginning of _extra_under_score!)
+
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:----------      ---default value:-----------   ---declared in:-------------
-# hosts_file_path             /etc/hosts                     bin/config.sh, adsorber.conf
-# hosts_file_backup_path      /etc/hosts.original            bin/config.sh, adsorber.conf
-# ignore_download_error       true                           bin/config.sh, adsorber.conf
-# prefix                      '  ' (two spaces)              bin/colours.sh
-# prefix_fatal                '\033[0;91mE '                 bin/colours.sh
-# prefix_info                 '\033[0;97m  '                 bin/colours.sh
-# prefix_input                '  ' (two spaces)              bin/colours.sh
-# prefix_reset                \033[0m                        bin/colours.sh
-# prefix_title                \033[1;37m                     bin/colours.sh
-# prefix_warning              '- '                           bin/colours.sh
-# primary_list                blacklist                      bin/config.sh, adsorber.conf
-# http_proxy                  Null (not set)                 bin/config.sh, adsorber.conf
-# https_proxy                 Null (not set)                 bin/config.sh, adsorber.conf
-# hosts_file_previous_enable  true                           bin/config.sh, adsorber.conf
-# hosts_file_previous_path    /etc/hosts.previous            bin/config.sh, adsorber.conf
-# reply_to_force_prompt       Null (not set)                 bin/install.sh, adsorber.sh
-# binary_dir_path             script root directory          adsorber.sh
-#   (e.g., /usr/local/bin/adsorber)
-# sourcelist_file_path        config_dir_path/sources.list   adsorber.sh
-#   (e.g., /usr/local/etc/absorber/sources.list)
-# tmp_dir_path                /tmp/adsorber                  adsorber.sh
-# use_partial_matching        true                           bin/config.sh, adsorber.conf
-# version                     0.2.2 or similar               adsorber.sh
+# ---variable:----------      ---default value:-----------   ---declared in:-----------------
+# config_dir_path             ${executable_dir_path}/../..   src/bin/adsorber
+# hosts_file_backup_path      /etc/hosts.original            src/lib/config.sh, adsorber.conf
+# hosts_file_path             /etc/hosts                     src/lib/config.sh, adsorber.conf
+# hosts_file_previous_enable  true                           src/lib/config.sh, adsorber.conf
+# hosts_file_previous_path    /etc/hosts.previous            src/lib/config.sh, adsorber.conf
+# http_proxy                  Null (not set)                 src/lib/config.sh, adsorber.conf
+# https_proxy                 Null (not set)                 src/lib/config.sh, adsorber.conf
+# ignore_download_error       true                           src/lib/config.sh, adsorber.conf
+# prefix                      '  ' (two spaces)              src/lib/colours.sh
+# prefix_fatal                '\033[0;91mE '                 src/lib/colours.sh
+# prefix_info                 '\033[0;97m  '                 src/lib/colours.sh
+# prefix_input                '  ' (two spaces)              src/lib/colours.sh
+# prefix_reset                \033[0m                        src/lib/colours.sh
+# prefix_title                \033[1;37m                     src/lib/colours.sh
+# prefix_warning              '- '                           src/lib/colours.sh
+# primary_list                blacklist                      src/lib/config.sh, adsorber.conf
+# reply_to_force_prompt       Null (not set)                 src/lib/install.sh, src/bin/adsorber
+# tmp_dir_path                /tmp/adsorber                  src/bin/adsorber
+# use_partial_matching        true                           src/lib/config.sh, adsorber.conf
+# version                     0.2.2 or similar               src/bin/adsorber
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
 # ---function:-----     ---function defined in:---
-# remove_CleanUp        /usr/local/lib/adsorber/remove.sh
-# remove_ErrorCleanUp   /usr/local/lib/adsorber/remove.sh
+# remove_CleanUp        src/lib/remove.sh
+# remove_ErrorCleanUp   src/lib/remove.sh
 
 
 update_CheckBackupExist()
@@ -141,8 +143,8 @@ update_ReadBlackList()
 
 update_FetchSources()
 {
-        total_count=0
-        successful_count=0
+        _total_count=0
+        _successful_count=0
 
         if [ -n "${http_proxy}" ]; then
                 echo "${prefix}Using HTTP proxy: ${http_proxy}"
@@ -152,27 +154,28 @@ update_FetchSources()
                 echo "${prefix}Using HTTPS proxy: ${https_proxy}"
         fi
 
-        while read -r domain; do
-                total_count=$((total_count+1))
+        while read -r _domain; do
+                _total_count=$((_total_count+1))
 
-                printf "%bGetting%b: %s\n" "${prefix_info}" "${prefix_reset}" "${domain}"
+                printf "%bGetting%b: %s\n" "${prefix_info}" "${prefix_reset}" "${_domain}"
 
                 # Is wget installed? If yes download the hosts files.
                 if command -v wget 2>/dev/null 1>&2; then
                         printf "%s" "${prefix}"
 
-                        if wget "${domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${tmp_dir_path}/fetched"; then
-                                successful_count=$((successful_count+1))
+                        if wget "${_domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${tmp_dir_path}/fetched"; then
+                                _successful_count=$((_successful_count+1))
                         else
-                                printf "%bwget couldn't fetch: %s\n" "${prefix_warning}" "${domain}" 1>&2
+                                printf "%bwget couldn't fetch: %s\n" "${prefix_warning}" "${_domain}" 1>&2
                         fi
                 # Is curl installed? If yes download the hosts files.
                 elif command -v curl 2>/dev/null 1>&2; then
-                        if curl "${domain}" -sS -L --connect-timeout 30 --fail --retry 1 >> "${tmp_dir_path}/fetched"; then
-                                successful_count=$((successful_count+1))
+                        if curl "${_domain}" -sS -L --connect-timeout 30 --fail --retry 1 >> "${tmp_dir_path}/fetched"; then
+                                _successful_count=$((_successful_count+1))
                         else
-                                printf "%bCurl couldn't fetch %s\n" "${prefix_warning}" "${domain}" 1>&2
+                                printf "%bCurl couldn't fetch: %s\n" "${prefix_warning}" "${_domain}" 1>&2
                         fi
+                # If neither wget nor curl is installed abort and clean up.
                 else
                         printf "%bNeither curl nor wget installed. Can't continue.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                         remove_ErrorCleanUp
@@ -181,21 +184,21 @@ update_FetchSources()
 
         done < "${tmp_dir_path}/sourceslist-filtered"
 
-        if [ "${successful_count}" -eq 0 ]; then
-                printf "%bNothing to apply [%d/%d].\n" "${prefix_warning}" "${successful_count}" "${total_count}" 1>&2
+        if [ "${_successful_count}" -eq 0 ]; then
+                printf "%bNothing to apply [%d/%d].\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
                 echo "Perhaps a proxy server must be set?" 1>&2
                 return 1
-        elif [ "${ignore_download_error}" = "false" ] && [ "${successful_count}" -ne "${total_count}" ]; then
-                printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\n" "${prefix_warning}" "${successful_count}" "${total_count}" 1>&2
-                echo "Perhaps a proxy server must be set?" 1>&2
+        elif [ "${ignore_download_error}" = "false" ] && [ "${_successful_count}" -ne "${_total_count}" ]; then
+                printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
                 remove_ErrorCleanUp
                 exit 1
         else
-                printf "%bSuccessfully fetched %d out of %d hosts sources.%b\n" "${prefix_info}" "${successful_count}" "${total_count}" "${prefix_reset}"
+                printf "%bSuccessfully fetched %d out of %d hosts sources.%b\n" "${prefix_info}" "${_successful_count}" "${_total_count}" "${prefix_reset}"
         fi
 
-        unset total_count
-        unset successful_count
+        # Unset temporary function variables.
+        unset _total_count
+        unset _successful_count
 
         return 0
 }
@@ -203,8 +206,8 @@ update_FetchSources()
 
 update_FilterDomains()
 {
-        input_file="${1}"
-        output_file="${2}"
+        _input_file="${1}"
+        _output_file="${2}"
 
         # - replace OSX '\r' (CR) and MS-DOS '\r\n' (CR,LF) with Unix '\n' (LF) (newline)
         # - replace 127.0.0.1 and 127.0.1.1 with 0.0.0.0
@@ -213,17 +216,17 @@ update_FilterDomains()
         # - replace tabs and multiple spaces with one space
         # - remove domains without a dot (e.g localhost , loopback , ip6-allnodes , etc...)
         # - remove domains that are ending with *.local
-        sed 's/\r/\n/g' "${tmp_dir_path}/${input_file}" \
+        sed 's/\r/\n/g' "${tmp_dir_path}/${_input_file}" \
                 | sed 's/^\s*127\.0\.[01]\.1/0\.0\.0\.0/g' \
                 | sed -n '/^\s*0\.0\.0\.0\s\+.\+/p' \
                 | sed 's/\s\+#.*//g' \
                 | sed 's/[[:blank:]]\+/ /g' \
                 | sed -n '/^0\.0\.0\.0\s.\+\..\+/p' \
                 | sed -n '/\.local\s*$/!p' \
-                > "${tmp_dir_path}/${output_file}"
+                > "${tmp_dir_path}/${_output_file}"
 
-        unset input_file
-        unset output_file
+        unset _input_file
+        unset _output_file
 
         return 0
 }
@@ -231,14 +234,14 @@ update_FilterDomains()
 
 update_SortDomains()
 {
-        input_file="${1}"
-        output_file="${2}"
+        _input_file="${1}"
+        _output_file="${2}"
 
         # Sort the domains by alphabet and also remove duplicates
-        sort "${tmp_dir_path}/${input_file}" -f -u -o "${tmp_dir_path}/${output_file}"
+        sort "${tmp_dir_path}/${_input_file}" -f -u -o "${tmp_dir_path}/${_output_file}"
 
-        unset input_file
-        unset output_file
+        unset _input_file
+        unset _output_file
 
         return 0
 }
@@ -255,14 +258,14 @@ update_ApplyWhiteList()
                 sed -i 's/^0\.0\.0\.0\s\+//g' "${tmp_dir_path}/whitelist-sorted"
                 cp "${tmp_dir_path}/cache" "${tmp_dir_path}/applied-whitelist"
 
-                while read -r domain; do
+                while read -r _domain; do
 
                         if [ "${use_partial_matching}" = "true" ]; then
                                 # Filter out domains from whitelist, also for sub-domains
-                                sed -i "/\.*${domain}$/d" "${tmp_dir_path}/applied-whitelist"
+                                sed -i "/\.*${_domain}$/d" "${tmp_dir_path}/applied-whitelist"
                         else
                                 # Filter out domains from whitelist, ignoring sub-domains
-                                sed -i "/\s\+${domain}$/d" "${tmp_dir_path}/applied-whitelist"
+                                sed -i "/\s\+${_domain}$/d" "${tmp_dir_path}/applied-whitelist"
                         fi
 
                 done < "${tmp_dir_path}/whitelist-sorted"

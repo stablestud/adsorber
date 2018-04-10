@@ -5,9 +5,9 @@
 # License:    MIT, https://opensource.org/licenses/MIT
 
 # Define where the executable 'adsorber' file will be placed.
-readonly executable_dir_path="/usr/local/sbin/"
+readonly executable_dir_path="/usr/local/bin/"
 
-# Define where the other executable will be placed.
+# Define where the other executables will be placed.
 readonly library_dir_path="/usr/local/lib/adsorber/"
 
 # Define the location of adsorbers shareable data (e.g. default config files...).
@@ -30,6 +30,8 @@ fi
 
 echo "Placing executable to ${executable_dir_path}"
 #cp "${source_dir_path}/src/adsorber" "${executable_dir_path}/adsorber"
+
+# Replacing the path to the libraries with the ones defined above.
 sed "s|^readonly library_dir_path=\"\${executable_dir_path}/lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${source_dir_path}/src/adsorber" \
         | sed "s|^readonly shareable_dir_path=\"\${executable_dir_path}/share/\"$|readonly shareable_dir_path=\"${shareable_dir_path}\"|g" \
         | sed "s|^readonly config_dir_path=\"\${executable_dir_path}/\.\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" \
@@ -69,6 +71,7 @@ chown -R root:root "${config_dir_path}"
 
 #echo "Running Adsorber..."
 
+## We don't run Adsorber after installation yet
 #adsorber install --assume-yes --systemd \
 #        || {
 #                printf "\033[0;93mAdsorber was installed on your system, however something went wrong at\n"

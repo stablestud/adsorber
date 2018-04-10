@@ -7,7 +7,7 @@
 
 readonly tmp_dir_path="/tmp/adsorber"
 
-## NOTE: following values will be changed when installed with 'install.sh' ##
+## NOTE: following values will be changed when installed with 'install_to_system.sh' ##
 readonly executable_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 readonly library_dir_path="${executable_dir_path}/../lib"
 readonly shareable_dir_path="${executable_dir_path}/../share"
@@ -27,7 +27,7 @@ readonly options="${*}"
 checkRoot()
 {
         if [ "$(id -g)" -ne 0 ]; then
-                echo "For this Adsorber must be run as root." 1>&2
+                echo "Only root has the power to do this." 1>&2
                 exit 126
         fi
 
@@ -88,7 +88,7 @@ showHelp()
         echo "  version - show version of this shell script"
         echo "  help    - show this help"
         echo ""
-        echo "Options: (not required)"
+        echo "Options: (optional)"
         echo "  -s,  --systemd           - use Systemd ..."
         echo "  -c,  --cron              - use Cronjob as scheduler (use with 'install')"
         echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'install')"
