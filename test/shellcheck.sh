@@ -6,7 +6,7 @@
 readonly source_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
 if ! command -v shellcheck 2>/dev/null 1>&2; then
-        echo "Shellcheck must be installed."
+        echo "Shellcheck is not installed."
 fi
 
 echo "Running shellcheck ..."

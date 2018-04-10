@@ -31,10 +31,11 @@ fi
 adsorber remove -y \
         || {
                 printf "\033[0;93mSometing went wrong at running Adsorber's own removal action. Doing it the hard way...\n\033[0m"
-                
+
         }
-        
-rm -r "${executable_dir_path}/adsorber"     
-rm -r "${library_dir_path}"     
-rm -r "${shareable_dir_path}"     
+
+# Remove placed files from the specified locations
+rm -r "${executable_dir_path}/adsorber"
+rm -r "${library_dir_path}"
+rm -r "${shareable_dir_path}"
 rm -r "${config_dir_path}
