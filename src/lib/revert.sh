@@ -25,6 +25,7 @@
 # remove_CleanUp        src/lib/remove.sh
 # remove_ErrorCleanUp   src/lib/remove.sh
 
+
 revert_HostsFile()
 {
         if [ -f "${hosts_file_previous_path}" ]; then

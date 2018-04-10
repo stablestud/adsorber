@@ -4,7 +4,8 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# Define where the executable 'adsorber' file will be placed.
+# Define where the executable 'adsorber' file will be placed, it must be found
+# when you type 'adsorber' into your console
 readonly executable_dir_path="/usr/local/bin/"
 
 # Define where the other executables will be placed.

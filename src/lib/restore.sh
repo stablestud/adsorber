@@ -29,7 +29,7 @@
 restore_HostsFile()
 {
         if [ -f "${hosts_file_backup_path}" ]; then
-                # Copy /etc/hosts.original to /etc/hosts replacing the current one
+                # Copy /etc/hosts.original to /etc/hosts, replacing the current one
                 cp "${hosts_file_backup_path}" "${hosts_file_path}" \
                         && {
                                 # If the copying failed

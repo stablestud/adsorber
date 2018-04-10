@@ -13,17 +13,17 @@
 # If you run this file independently following variables need to be set:
 # ---variable:-------     ---default value:----   ---defined in:--------------
 # backedup                Null (not set)          src/lib/install.sh
-# crontab_dir_path        /etc/cron.weekly        src/lib/config.sh, adsorber.conf
 # hosts_file_path         /etc/hosts              src/lib/config.sh, adsorber.conf
 # hosts_file_backup_path  /etc/hosts.original     src/lib/config.sh, adsorber.conf
-# installed_scheduler     Null (not set)          src/lib/install.sh
+# installed_scheduler     Null (not set)          src/lib/systemd/systemd.sh, src/lib/cron/cron.sh
 # prefix                  '  ' (two spaces)       src/lib/colours.sh
+# prefix_fatal            '\033[0;91mE '          src/lib/colours.sh
 # prefix_input            '  ' (two spaces)       src/lib/colours.sh
 # prefix_reset            \033[0m                 src/lib/colours.sh
 # prefix_title            \033[1;37m              src/lib/colours.sh
 # prefix_warning          '- '                    src/lib/colours.sh
 # reply_to_prompt         Null (not set)          src/lib/install.sh, src/bin/adsorber
-# systemd_dir_path        /etc/systemd/system     src/lib/config.sh, adsorber.conf
+# tmp_dir_path            /tmp/adsorber           src/bin/adsorber
 
 
 # This function cleans-up all changed files if Adsorber runs into a problem
