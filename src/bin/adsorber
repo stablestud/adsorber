@@ -117,7 +117,7 @@ showSpecificHelp()
 {
         case "${operation}" in
                 install )
-                        printf "%badsorber install [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber install [<options>]%b:\\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "You should run this command first."
                         echo
@@ -136,7 +136,7 @@ showSpecificHelp()
                         echo " -h,  --help               - show this help screen"
                         ;;
                 update )
-                        printf "%badsorber update [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber update [<options>]%b:\\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To keep the hosts file up-to-date."
                         echo
@@ -149,7 +149,7 @@ showSpecificHelp()
                         echo " -h, --help       - show this help screen"
                         ;;
                 restore )
-                        printf "%badsorber restore [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber restore [<options>]%b:\\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To restore the hosts file temporary, without removing the backup."
                         echo
@@ -167,7 +167,7 @@ showSpecificHelp()
                         echo " -h, --help       - show this help screen"
                         ;;
                 revert )
-                        printf "%badsorber revert [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber revert [<options>]%b:\\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To revert to the last hosts file, good use if the"
                         echo "current host file was corrupted."
@@ -181,7 +181,7 @@ showSpecificHelp()
                         echo " -h, --help       - show this help screen"
                         ;;
                 remove )
-                        printf "%badsorber remove [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber remove [<options>]%b:\\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To completely remove changes made by Adsorber."
                         echo
@@ -349,6 +349,6 @@ case "${operation}" in
                 ;;
 esac
 
-printf "%bFinished successfully.%b\n" "${prefix_title}" "${prefix_reset}"
+printf "%bFinished successfully.%b\\n" "${prefix_title}" "${prefix_reset}"
 
 exit 0

@@ -21,11 +21,11 @@
 # https_proxy                 Null (not set)                 src/lib/config.sh, adsorber.conf
 # ignore_download_error       true                           src/lib/config.sh, adsorber.conf
 # prefix                      '  ' (two spaces)              src/lib/colours.sh
-# prefix_fatal                '\033[0;91mE '                 src/lib/colours.sh
-# prefix_info                 '\033[0;97m  '                 src/lib/colours.sh
+# prefix_fatal                '\\033[0;91mE '                 src/lib/colours.sh
+# prefix_info                 '\\033[0;97m  '                 src/lib/colours.sh
 # prefix_input                '  ' (two spaces)              src/lib/colours.sh
-# prefix_reset                \033[0m                        src/lib/colours.sh
-# prefix_title                \033[1;37m                     src/lib/colours.sh
+# prefix_reset                \\033[0m                        src/lib/colours.sh
+# prefix_title                \\033[1;37m                     src/lib/colours.sh
 # prefix_warning              '- '                           src/lib/colours.sh
 # primary_list                blacklist                      src/lib/config.sh, adsorber.conf
 # reply_to_force_prompt       Null (not set)                 src/lib/install.sh, src/bin/adsorber
@@ -49,7 +49,7 @@ update_CheckBackupExist()
                 # hostname association with 127.0.0.1 and localhost will be lost.
                 # The user may interactively decide here wheter to proceed or not.
                 if [ -z "${reply_to_force_prompt}" ]; then
-                        printf "%bBackup of %s does not exist. To backup run '%s install'.%b\n" "${prefix_fatal}" "${hosts_file_path}" "${0}" "${prefix_reset}" 1>&2
+                        printf "%bBackup of %s does not exist. To backup run '%s install'.%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${0}" "${prefix_reset}" 1>&2
                         printf "%bIgnore issue and continue? (May break your system, not recommended) [YES/n]: %b" "${prefix_input}" "${prefix_reset}"
                         read -r reply_to_force_prompt
                 fi
@@ -59,7 +59,7 @@ update_CheckBackupExist()
                                 return 0
                                 ;;
                         * )
-                                printf "%bAborted.\n" "${prefix_warning}" 1>&2
+                                printf "%bAborted.\\n" "${prefix_warning}" 1>&2
                                 remove_ErrorCleanUp
                                 exit 130
                                 ;;
@@ -93,7 +93,7 @@ update_ReadSourceList()
         if [ ! -s "${config_dir_path}/sources.list" ]; then
 
                 if [ ! -s "${config_dir_path}/blacklist" ]; then
-                        printf "%bMissing 'sources.list' and blacklist. To fix run '%s install'.%b\n" "${prefix_fatal}" "${0}" "${prefix_reset}" 1>&2
+                        printf "%bMissing 'sources.list' and blacklist. To fix run '%s install'.%b\\n" "${prefix_fatal}" "${0}" "${prefix_reset}" 1>&2
                         exit 127
                 fi
 
@@ -171,7 +171,7 @@ update_FetchSources()
         while read -r _domain; do
                 _total_count=$((_total_count+1))
 
-                printf "%bGetting%b: %s\n" "${prefix_info}" "${prefix_reset}" "${_domain}"
+                printf "%bGetting%b: %s\\n" "${prefix_info}" "${prefix_reset}" "${_domain}"
 
                 # Is wget installed? If yes download the hosts files.
                 if command -v wget 2>/dev/null 1>&2; then
@@ -180,18 +180,18 @@ update_FetchSources()
                         if wget "${_domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${tmp_dir_path}/fetched"; then
                                 _successful_count=$((_successful_count+1))
                         else
-                                printf "%bwget couldn't fetch: %s\n" "${prefix_warning}" "${_domain}" 1>&2
+                                printf "%bwget couldn't fetch: %s\\n" "${prefix_warning}" "${_domain}" 1>&2
                         fi
                 # Is curl installed? If yes download the hosts files.
                 elif command -v curl 2>/dev/null 1>&2; then
                         if curl "${_domain}" -sS -L --connect-timeout 30 --fail --retry 1 >> "${tmp_dir_path}/fetched"; then
                                 _successful_count=$((_successful_count+1))
                         else
-                                printf "%bCurl couldn't fetch: %s\n" "${prefix_warning}" "${_domain}" 1>&2
+                                printf "%bCurl couldn't fetch: %s\\n" "${prefix_warning}" "${_domain}" 1>&2
                         fi
                 # If neither wget nor curl is installed abort and clean up.
                 else
-                        printf "%bNeither curl nor wget installed. Can't continue.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                        printf "%bNeither curl nor wget installed. Can't continue.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
 
                         remove_ErrorCleanUp
                         exit 2
@@ -202,16 +202,16 @@ update_FetchSources()
 	unset _domain
 
         if [ "${_successful_count}" -eq 0 ]; then
-                printf "%bNothing to apply [%d/%d].\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
+                printf "%bNothing to apply [%d/%d].\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
                 echo "Perhaps a proxy server must be set?" 1>&2
                 return 1
         elif [ "${ignore_download_error}" = "false" ] && [ "${_successful_count}" -ne "${_total_count}" ]; then
-                printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
+                printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
 
                 remove_ErrorCleanUp
                 exit 1
         else
-                printf "%bSuccessfully fetched %d out of %d hosts sources.%b\n" "${prefix_info}" "${_successful_count}" "${_total_count}" "${prefix_reset}"
+                printf "%bSuccessfully fetched %d out of %d hosts sources.%b\\n" "${prefix_info}" "${_successful_count}" "${_total_count}" "${prefix_reset}"
         fi
 
         # Unset temporary function variables.
@@ -280,10 +280,10 @@ update_ApplyWhiteList()
 
                         if [ "${use_partial_matching}" = "true" ]; then
                                 # Filter out domains from whitelist, also for sub-domains
-                                sed -i "/\.*${_domain}$/d" "${tmp_dir_path}/applied-whitelist"
+                                sed -i "/\\.*${_domain}$/d" "${tmp_dir_path}/applied-whitelist"
                         else
                                 # Filter out domains from whitelist, ignoring sub-domains
-                                sed -i "/\s\+${_domain}$/d" "${tmp_dir_path}/applied-whitelist"
+                                sed -i "/\\s\\+${_domain}$/d" "${tmp_dir_path}/applied-whitelist"
                         fi
 
                 done < "${tmp_dir_path}/whitelist-sorted"
@@ -321,7 +321,7 @@ update_MergeBlackList()
 update_IsCacheEmpty()
 {
         if [ ! -s "${tmp_dir_path}/cache" ]; then
-                printf "%bNothing to apply.\n" "${prefix_warning}" 1>&2
+                printf "%bNothing to apply.\\n" "${prefix_warning}" 1>&2
                 remove_ErrorCleanUp
                 exit 1
         fi
@@ -378,7 +378,7 @@ update_PreviousHostsFile()
                  # Copy current hosts file to /etc/hosts.previous before the new hosts file will be applied
                 cp "${hosts_file_path}" "${hosts_file_previous_path}" \
                         || {
-                                printf "%bCouldn't create previous hosts file at %s%b\n" "${prefix_fatal}" "${hosts_file_previous_path}" "${prefix_reset}"
+                                printf "%bCouldn't create previous hosts file at %s%b\\n" "${prefix_fatal}" "${hosts_file_previous_path}" "${prefix_reset}"
                                 remove_ErrorCleanUp
                                 exit 1
                         }
@@ -398,12 +398,12 @@ update_ApplyHostsFile()
         # Replace systems hosts file with the modified version from /tmp/adsorber
         cp "${tmp_dir_path}/hosts" "${hosts_file_path}" \
                 || {
-                        printf "%b" "${prefix_fatal}Couldn't apply hosts file. Aborting.${prefix_reset}\n" 1>&2
+                        printf "%b" "${prefix_fatal}Couldn't apply hosts file. Aborting.${prefix_reset}\\n" 1>&2
                         remove_ErrorCleanUp
                         exit 126
                 }
 
-        printf "%bSuccessfully applied new hosts file with %d blocked domains.%b\n" "${prefix_info}" "$(wc -l < "${tmp_dir_path}/cache")" "${prefix_reset}"
+        printf "%bSuccessfully applied new hosts file with %d blocked domains.%b\\n" "${prefix_info}" "$(wc -l < "${tmp_dir_path}/cache")" "${prefix_reset}"
 
         return 0
 }
@@ -413,7 +413,7 @@ update_ApplyHostsFile()
 # should be run
 update()
 {
-        printf "%bUpdating %s ...%b\n" "${prefix_title}" "${hosts_file_path}" "${prefix_reset}"
+        printf "%bUpdating %s ...%b\\n" "${prefix_title}" "${hosts_file_path}" "${prefix_reset}"
 
         update_CheckBackupExist
         update_CreateTmpDir
@@ -441,7 +441,7 @@ update()
                         update_MergeBlackList
                         ;;
                 * )
-                        printf "%bWrong primary_list set in adsorber.conf. Choose either 'whitelist' or 'blacklist'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                        printf "%bWrong primary_list set in adsorber.conf. Choose either 'whitelist' or 'blacklist'%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                         remove_ErrorCleanUp
                         exit 127
                         ;;

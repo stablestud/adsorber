@@ -15,9 +15,9 @@
 # hosts_file_path          /etc/hosts            src/lib/config.sh, adsorber.conf
 # hosts_file_previous_path /etc/hosts.previous   src/lib/config.sh, adsorber.conf
 # prefix                   '  ' (two spaces)     src/lib/colours.sh
-# prefix_fatal             '\033[0;91mE '        src/lib/colours.sh
-# prefix_reset             \033[0m               src/lib/colours.sh
-# prefix_title             \033[1;37m            src/lib/colours.sh
+# prefix_fatal             '\\033[0;91mE '        src/lib/colours.sh
+# prefix_reset             \\033[0m               src/lib/colours.sh
+# prefix_title             \\033[1;37m            src/lib/colours.sh
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
@@ -40,10 +40,10 @@ revert_HostsFile()
                 # Remove previous host file notice from /etc/hosts.previous in /etc/hosts and also the line before
                 sed -n -i '/^## This was the hosts file/{n; $p; x; d}; x; 1!p; ${x;p;}' "${hosts_file_path}"
 
-                printf "%bSuccessfully reverted %s.\n" "${prefix}" "${hosts_file_path}"
+                printf "%bSuccessfully reverted %s.\\n" "${prefix}" "${hosts_file_path}"
         else
                 # If /etc/hosts.previous was not found, abort and call error clean-up function
-                printf "%bCan't revert hosts file. Previous hosts file does not exist.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bCan't revert hosts file. Previous hosts file does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 remove_ErrorCleanUp
                 exit 1
         fi
@@ -55,7 +55,7 @@ revert_HostsFile()
 # Main function of revert.sh
 revert()
 {
-        printf "%bReverting %s with %s ...%b\n" "${prefix_title}" "${hosts_file_path}" "${hosts_file_previous_path}" "${prefix_reset}"
+        printf "%bReverting %s with %s ...%b\\n" "${prefix_title}" "${hosts_file_path}" "${hosts_file_previous_path}" "${prefix_reset}"
         revert_HostsFile
         remove_CleanUp
 

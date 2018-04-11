@@ -15,8 +15,8 @@
 # hosts_file_backup_path      /etc/hosts.original     src/lib/config.sh, adsorber.conf
 # prefix                      '  ' (two spaces)       src/lib/colours.sh
 # prefix_input                '  ' (two spaces)       src/lib/colours.sh
-# prefix_reset                \033[0m                 src/lib/colours.sh
-# prefix_title                \033[1;37m              src/lib/colours.sh
+# prefix_reset                \\033[0m                 src/lib/colours.sh
+# prefix_title                \\033[1;37m              src/lib/colours.sh
 # prefix_warning              '- '                    src/lib/colours.sh
 # reply_to_prompt             Null (not set)          src/bin/adsorber
 # reply_to_scheduler_prompt   Null (not set)          src/bin/adsorber
@@ -57,7 +57,7 @@ install_Prompt()
                         return 0
                         ;;
                 * )
-                        printf "%bInstallation cancelled.\n" "${prefix_warning}" 1>&2
+                        printf "%bInstallation cancelled.\\n" "${prefix_warning}" 1>&2
                         remove_ErrorCleanUp
                         exit 130
                         ;;
@@ -95,7 +95,7 @@ install_PromptScheduler()
 # Main function when calling installation related tasks
 install()
 {
-        printf "%bInstalling Adsorber ...%b\n" "${prefix_title}" "${prefix_reset}"
+        printf "%bInstalling Adsorber ...%b\\n" "${prefix_title}" "${prefix_reset}"
         install_Prompt
         install_BackupHostsFile
         install_PromptScheduler

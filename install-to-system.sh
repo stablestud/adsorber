@@ -63,9 +63,9 @@ echo "Placing main executable to ${executable_path}"
 mkdir -p "$(dirname ${executable_path})"
 
 # Replacing the path to the libraries with the ones defined above.
-sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\.\./lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${source_dir_path}/src/bin/adsorber" \
-        | sed "s|^readonly shareable_dir_path=\"\${executable_dir_path}/\.\./share/\"$|readonly shareable_dir_path=\"${shareable_dir_path}\"|g" \
-        | sed "s|^readonly config_dir_path=\"\${executable_dir_path}/\.\./\.\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" \
+sed "s|^readonly library_dir_path=\\"\\${executable_dir_path}/\\.\\./lib/\\"$|readonly library_dir_path=\\"${library_dir_path}\\"|g" "${source_dir_path}/src/bin/adsorber" \
+        | sed "s|^readonly shareable_dir_path=\\"\\${executable_dir_path}/\\.\\./share/\\"$|readonly shareable_dir_path=\\"${shareable_dir_path}\\"|g" \
+        | sed "s|^readonly config_dir_path=\\"\\${executable_dir_path}/\\.\\./\\.\\./\\"$|readonly config_dir_path=\\"${config_dir_path}\\"|g" \
         > "${executable_path}"
 
 chmod u=rwx,g=rx,o=rx "${executable_path}"
@@ -117,10 +117,10 @@ echo ""
 ## We don't run Adsorber after installation yet
 #adsorber install \
 #        || {
-#                printf "\033[0;93mAdsorber was installed on your system, however something went wrong at\n"
-#                printf "running it.\n"
-#                printf "If a proxy server is in use, please change the config file\n"
-#                printf "(${config_dir_path}/adsorber.conf) to the appropriate proxy server.\n\033[0m"
+#                printf "\\033[0;93mAdsorber was installed on your system, however something went wrong at\\n"
+#                printf "running it.\\n"
+#                printf "If a proxy server is in use, please change the config file\\n"
+#                printf "(${config_dir_path}/adsorber.conf) to the appropriate proxy server.\\n\\033[0m"
 #                echo "Run 'adsorber install' to try again."
 #        }
 

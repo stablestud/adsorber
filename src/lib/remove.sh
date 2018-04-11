@@ -17,10 +17,10 @@
 # hosts_file_backup_path  /etc/hosts.original   src/lib/config.sh, adsorber.conf
 # installed_scheduler     Null (not set)        src/lib/systemd/systemd.sh, src/lib/cron/cron.sh
 # prefix                  '  ' (two spaces)     src/lib/colours.sh
-# prefix_fatal            '\033[0;91mE '        src/lib/colours.sh
+# prefix_fatal            '\\033[0;91mE '        src/lib/colours.sh
 # prefix_input            '  ' (two spaces)     src/lib/colours.sh
-# prefix_reset            \033[0m               src/lib/colours.sh
-# prefix_title            \033[1;37m            src/lib/colours.sh
+# prefix_reset            \\033[0m               src/lib/colours.sh
+# prefix_title            \\033[1;37m            src/lib/colours.sh
 # prefix_warning          '- '                  src/lib/colours.sh
 # reply_to_prompt         Null (not set)        src/bin/adsorber
 # tmp_dir_path            /tmp/adsorber         src/bin/adsorber
@@ -35,7 +35,7 @@
 # This function cleans-up all changed files if Adsorber runs into a problem
 remove_ErrorCleanUp()
 {
-        printf "%bCleaning up ...\n" "${prefix_warning}"
+        printf "%bCleaning up ...\\n" "${prefix_warning}"
 
         # Remove scheduler if it was installed in the same run
         case "${installed_scheduler}" in
@@ -87,7 +87,7 @@ remove_Prompt()
                         ;;
                 * )
                         # If other input then Yes, abort and call error clean-up function
-                        printf "%bRemoval cancelled.\n" "${prefix_warning}" 1>&2
+                        printf "%bRemoval cancelled.\\n" "${prefix_warning}" 1>&2
                         remove_ErrorCleanUp
                         exit 130
                         ;;
@@ -106,7 +106,7 @@ remove_HostsFile()
                         && echo "${prefix}Successfully restored ${hosts_file_path}"
         else
                 # If /etc/hosts.original was not found, abort and call the error clean-up function
-                printf "%bCan not restore hosts file. Original hosts file does not exist.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bCan not restore hosts file. Original hosts file does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 echo "${prefix}Maybe already removed?" 1>&2
                 remove_ErrorCleanUp
                 exit 1
@@ -133,7 +133,7 @@ remove_PreviousHostsFile()
 # Main function of remove.sh
 remove()
 {
-        printf "%bRemoving Adsorber ...%b\n"  "${prefix_title}" "${prefix_reset}"
+        printf "%bRemoving Adsorber ...%b\\n"  "${prefix_title}" "${prefix_reset}"
         remove_Prompt
         systemdRemove
         crontabRemove

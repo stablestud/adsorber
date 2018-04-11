@@ -17,8 +17,8 @@
 # options                every parameter but first         src/bin/adsorber
 # operations             the first parameter               src/bin/adsorber
 # prefix                 '  ' (two spaces)                 src/lib/colours.sh
-# prefix_reset           \033[0m                           src/lib/colours.sh
-# prefix_title           \033[1;37m                        src/lib/colours.sh
+# prefix_reset           \\033[0m                           src/lib/colours.sh
+# prefix_title           \\033[1;37m                        src/lib/colours.sh
 # prefix_warning         '- '                              src/lib/colours.sh
 # shareable_dir_path     ${executable_dir_path}/../share/  src/bin/adsorber
 # tmp_dir_path           /tmp/adsorber                     src/bin/adsorber
@@ -95,7 +95,7 @@ config_CopyConfig()
 {
         # Can't proceed without a config file. Creating a new one if not found
         if [ ! -s "${config_dir_path}/adsorber.conf" ] || [ ! -f "${config_dir_path}/adsorber.conf" ]; then
-                printf "%bNo config file found. Creating default.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bNo config file found. Creating default.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 echo "${prefix_warning}Please re-run the command to continue."
                 sed "s|@.*|# Config file for Adsorber v${version}|g" "${shareable_dir_path}/default/default-adsorber.conf" > "${config_dir_path}/adsorber.conf"
 
@@ -113,7 +113,7 @@ config_FilterConfig()
         # Remove comments, etc., to be able to read the config file
         cp "${config_dir_path}/adsorber.conf" "${tmp_dir_path}/config" \
                 || {
-                        printf "%bCouldn't process config file.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                        printf "%bCouldn't process config file.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                         remove_ErrorCleanUp
                         exit 126
                 }
@@ -244,8 +244,8 @@ config_IsVariableSet()
         # Check if essential configurations were set in the config file
         # if not abort, and call error clean-up function
         if [ -z "${hosts_file_path}" ] || [ -z "${hosts_file_backup_path}" ] || [ -z "${crontab_dir_path}" ] || [ -z "${systemd_dir_path}" ] || [ -z "${hosts_file_previous_path}" ] || [ -z "${hosts_file_previous_enable}" ]; then
-                printf "%bMissing setting(s) in adsorber.conf.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                printf "%bPlease delete adsorber.conf in %s and run '%s install' to create a new config file.%b\n" "${prefix_fatal}" "${config_dir_path}" "${0}" "${prefix_reset}" 1>&2
+                printf "%bMissing setting(s) in adsorber.conf.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bPlease delete adsorber.conf in %s and run '%s install' to create a new config file.%b\\n" "${prefix_fatal}" "${config_dir_path}" "${0}" "${prefix_reset}" 1>&2
                 remove_ErrorCleanUp
                 exit 127
         fi
@@ -253,17 +253,17 @@ config_IsVariableSet()
         # These configurations are not mandatory needed by Adsorber, thus
         # if any of them were not defined, Adsorber will use the default value
         if [ -z "${primary_list}" ]; then
-                printf "%bprimary_list not set in adsorber.conf. Using default value: blacklist\n" "${prefix_warning}" 1>&2
+                printf "%bprimary_list not set in adsorber.conf. Using default value: blacklist\\n" "${prefix_warning}" 1>&2
                 readonly primary_list="blacklist"
         fi
 
         if [ -z "${use_partial_matching}" ]; then
-                printf "%buse_partial_matching not set in adsorber.conf. Using default value: true\n" "${prefix_warning}" 1>&2
+                printf "%buse_partial_matching not set in adsorber.conf. Using default value: true\\n" "${prefix_warning}" 1>&2
                 readonly use_partial_matching="true"
         fi
 
         if [ -z "${ignore_download_error}" ]; then
-                printf "%bignore_download_error not set in adsorber.conf. Using default value: false\n" "${prefix_warning}" 1>&2
+                printf "%bignore_download_error not set in adsorber.conf. Using default value: false\\n" "${prefix_warning}" 1>&2
                 readonly ignore_download_error="false"
         fi
 
@@ -278,42 +278,42 @@ config_IsVariableValid()
         # and abort with the error clean-up function
 
         if [ "${primary_list}" != "blacklist" ] && [ "${primary_list}" != "whitelist" ]; then
-                printf "%bWrong 'primary_list' set in adsorber.conf. Choose either 'blacklist' or 'whitelist'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bWrong 'primary_list' set in adsorber.conf. Choose either 'blacklist' or 'whitelist'%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 wrongVariable="true"
         fi
 
         if [ "${use_partial_matching}" != "true" ] && [ "${use_partial_matching}" != "false" ]; then
-                printf "%bWrong 'use_partial_matching' set in adsorber.conf. Possible option: 'true' or 'false'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bWrong 'use_partial_matching' set in adsorber.conf. Possible option: 'true' or 'false'%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 wrongVariable="true"
         fi
 
         if [ "${ignore_download_error}" != "true" ] && [ "${ignore_download_error}" != "false" ]; then
-                printf "%bWrong 'ignore_download_error' set in adsorber.conf. Possible option: 'true' or 'false'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bWrong 'ignore_download_error' set in adsorber.conf. Possible option: 'true' or 'false'%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 wrongVariable="true"
         fi
 
         if [ ! -f "${hosts_file_path}" ]; then
-                printf "%bWrong 'hosts_file_path' set in adsorber.conf. Can't access: %s%b\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
+                printf "%bWrong 'hosts_file_path' set in adsorber.conf. Can't access: %s%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
                 wrongVariable="true"
         fi
 
         if [ ! -d "$(dirname "${hosts_file_backup_path}")" ]; then
-                printf "%bWrong 'hosts_file_backup_path' set in adsorber.conf. Can't access: %s%b\n" "${prefix_fatal}" "$(dirname "${hosts_file_backup_path}")" "${prefix_reset}" 1>&2
+                printf "%bWrong 'hosts_file_backup_path' set in adsorber.conf. Can't access: %s%b\\n" "${prefix_fatal}" "$(dirname "${hosts_file_backup_path}")" "${prefix_reset}" 1>&2
                 wrongVariable="true"
         fi
 
         if [ "${hosts_file_previous_enable}" != "true" ] && [ "${hosts_file_previous_enable}" != "false" ]; then
-                printf "%bWrong 'hosts_file_previous_enable' set in adsorber.conf. Possible options: 'true' or 'false'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bWrong 'hosts_file_previous_enable' set in adsorber.conf. Possible options: 'true' or 'false'%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 wrongVariable="true"
         fi
 
         if [ ! -d "$(dirname "${hosts_file_previous_path}")" ]; then
-                printf "%bWrong 'hosts_file_previous_path' set in adsorber.conf. Can't access: %s%b\n" "${prefix_fatal}" "$(dirname "${hosts_file_previous_path}")" "${prefix_reset}" 1>&2
+                printf "%bWrong 'hosts_file_previous_path' set in adsorber.conf. Can't access: %s%b\\n" "${prefix_fatal}" "$(dirname "${hosts_file_previous_path}")" "${prefix_reset}" 1>&2
                 wrongVariable="true"
         fi
 
         if [ ! -d "$(dirname "${tmp_dir_path}")" ]; then
-                printf "%bWrong 'tmp_dir_path' set in adsorber.conf. Can't access: %s%b\n" "${prefix_fatal}" "$(dirname "${tmp_dir_path}")" "${prefix_reset}" 1>&2
+                printf "%bWrong 'tmp_dir_path' set in adsorber.conf. Can't access: %s%b\\n" "${prefix_fatal}" "$(dirname "${tmp_dir_path}")" "${prefix_reset}" 1>&2
                 wrongVariable="true"
         fi
 
@@ -357,7 +357,7 @@ config_PrintVariables()
 # Main function for calling config related tasks
 config()
 {
-        printf "%b" "${prefix_title}Reading configuration ... ${prefix_reset}\n"
+        printf "%b" "${prefix_title}Reading configuration ... ${prefix_reset}\\n"
         config_CreateTmpDir
         config_CopySourceList
         config_CopyWhiteList

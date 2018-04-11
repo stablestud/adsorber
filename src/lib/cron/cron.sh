@@ -16,8 +16,8 @@
 # executable_dir_path   the root dir of the script      src/bin/adsorber
 # library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber
 # prefix                '  ' (two spaces)               src/lib/colours.sh
-# prefix_fatal          '\033[0;91mE '                  src/lib/colours.sh
-# prefix_reset          \033[0m                         src/lib/colours.sh
+# prefix_fatal          '\\033[0;91mE '                  src/lib/colours.sh
+# prefix_reset          \\033[0m                         src/lib/colours.sh
 # prefix_warning        '- '                            src/lib/colours.sh
 
 # The following functions are defined in different files.
@@ -32,7 +32,7 @@ crontabInstall()
 
         # Check if crontabs directory variable is correctly set, if not abort and call the error clean-up function
         if [ ! -d "${crontab_dir_path}" ]; then
-                printf "%bWrong crontab_dir_path set. Can't access: %s.%b\n" "${prefix_fatal}" "${crontab_dir_path}" "${prefix_reset}" 1>&2
+                printf "%bWrong crontab_dir_path set. Can't access: %s.%b\\n" "${prefix_fatal}" "${crontab_dir_path}" "${prefix_reset}" 1>&2
                 echo "${prefix}Is a cron service installed? If not use systemd if possible."
                 remove_ErrorCleanUp
                 exit 126
@@ -41,7 +41,7 @@ crontabInstall()
         # Replace the @ place holder line with the location of adsorber
         # and copy and manipulate the content to crontabs directory
         sed "s|#@version@#|${version}|g" "${library_dir_path}/cron/80adsorber" \
-                | sed "s|^#@\/some\/path\/adsorber update@#$|${executable_dir_path}\/adsorber update|g" \
+                | sed "s|^#@\\/some\\/path\\/adsorber update@#$|${executable_dir_path}\\/adsorber update|g" \
                 > "${crontab_dir_path}/80adsorber"
 
         chmod u=rwx,g=rx,o=rx "${crontab_dir_path}/80adsorber"
@@ -61,7 +61,7 @@ crontabRemove()
                 # Remove the crontab from /etc/cron.weekly
                 rm "${crontab_dir_path}/80adsorber" \
                         || {
-                                printf "%bCouldn't remove crontab %s\n." "${prefix_warning}" "${crontab_dir_path}" 1>&2
+                                printf "%bCouldn't remove crontab %s\\n." "${prefix_warning}" "${crontab_dir_path}" 1>&2
                                 return 1
                         }
 

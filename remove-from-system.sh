@@ -67,7 +67,7 @@ echo ""
 (adsorber remove -y) \
         || {
                 echo ""
-                printf "\033[0;93mSomething went wrong at running Adsorber's own removal action. Doing it the hard way...\n\033[0m"
+                printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action. Doing it the hard way...\\n\\033[0m"
                 echo "Maybe Adsorber has been already removed?"
 
                 # Doing it the hard way .., removing everything manually

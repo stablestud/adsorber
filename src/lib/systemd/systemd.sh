@@ -15,8 +15,8 @@
 # executable_dir_path   the root dir of the script      src/bin/adsorber
 # library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber
 # prefix                '  ' (two spaces)               src/lib/colours.sh
-# prefix_fatal          '\033[0;91mE '                  src/lib/colours.sh
-# prefix_reset          \033[0m                         src/lib/colours.sh
+# prefix_fatal          '\\033[0;91mE '                  src/lib/colours.sh
+# prefix_reset          \\033[0m                         src/lib/colours.sh
 # prefix_warning        '- '                            src/lib/colours.sh
 # systemd_dir_path      /etc/systemd/system             src/lib/config.sh, adsorber.conf
 
@@ -30,7 +30,7 @@ systemdInstall()
 {
         # Check if the variable systemd_dir_path is valid, if not abort and call error clean-up function
         if [ ! -d "${systemd_dir_path}" ]; then
-                printf "%bWrong systemd_dir_path set. Can't access: %s.%b\n" "${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
+                printf "%bWrong systemd_dir_path set. Can't access: %s.%b\\n" "${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
                 echo "${prefix}Is Systemd installed? If not use cron instead."
                 remove_ErrorCleanUp
                 exit 126
@@ -46,7 +46,7 @@ systemdInstall()
 
         # Replace the @ place holder line with the location of adsorber and copy
         # the service to the systemd directory ( /etc/sytemd/system/adsorber.service )
-        sed "s|^#@ExecStart=\/some\/path\/adsorber update@#$|ExecStart=${executable_dir_path}\/adsorber update|g" "${library_dir_path}/systemd/adsorber.service" \
+        sed "s|^#@ExecStart=\\/some\\/path\\/adsorber update@#$|ExecStart=${executable_dir_path}\\/adsorber update|g" "${library_dir_path}/systemd/adsorber.service" \
                 > "${systemd_dir_path}/adsorber.service"
         # Copy the systemd timer to /etc/systemd/system/adsorber.timer, timer is the clock that triggers adsorber.service
         cp "${library_dir_path}/systemd/adsorber.timer" "${systemd_dir_path}/adsorber.timer"
@@ -56,16 +56,16 @@ systemdInstall()
 
         # Enable the systemd service and enable it to start at boot-up
         systemctl daemon-reload 2>/dev/null \
-                && systemctl enable adsorber.timer 2>/dev/null \
-                && systemctl start adsorber.timer 2>/dev/null \
-                        || {
-                                # Systemd couldn't be run, probably it's a systemd-less system like Gentoo
-                                printf "%bCouldn't start systemd service.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                                echo "${prefix}Is Systemd installed? If not use cron instead."
-                                systemdRemove
-                                remove_ErrorCleanUp
-                                exit 126
-                        }
+                && systemctl enable adsorber.timer 2>/dev/null
+
+                if ! systemctl start adsorber.timer 2>/dev/null; then
+                        # Systemd couldn't be run, probably it's a systemd-less system like Gentoo
+                        printf "%bCouldn't start systemd service.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                        echo "${prefix}Is Systemd installed? If not use cron instead."
+                        systemdRemove
+                        remove_ErrorCleanUp
+                        exit 126
+                fi
 
         # Make known that we have installed the systemd service in this run,
         # if we fail now, systemd will be also removed (see remove_ErrorCleanUp)
@@ -92,7 +92,7 @@ systemdRemove()
                 # Remove leftover service files.
                 rm "${systemd_dir_path}/adsorber.timer" "${systemd_dir_path}/adsorber.service" \
                         || {
-                                printf "%bCouldn't remove systemd service files at %s%b\n." "${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
+                                printf "%bCouldn't remove systemd service files at %s%b\\n." "${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
                                 return 1
                         }
 
