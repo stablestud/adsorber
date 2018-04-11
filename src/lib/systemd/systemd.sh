@@ -11,7 +11,7 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:-------   ---default value:--             ---declared in:-------------
+# ---variable:-------   ---default value:--             ---declared in:---------
 # executable_dir_path   the root dir of the script      src/bin/adsorber
 # library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber
 # prefix                '  ' (two spaces)               src/lib/colours.sh
@@ -26,7 +26,7 @@
 # remove_ErrorCleanUp   src/lib/remove.sh
 
 
-Systemd_install()
+systemdInstall()
 {
         # Check if the variable systemd_dir_path is valid, if not abort and call error clean-up function
         if [ ! -d "${systemd_dir_path}" ]; then
@@ -39,7 +39,7 @@ Systemd_install()
         # Remove systemd service if already installed
         if [ -f "${systemd_dir_path}/adsorber.service" ] || [ -f "${systemd_dir_path}/adsorber.timer" ]; then
                 echo "${prefix}Removing previously installed systemd services ..."
-                Systemd_remove
+                systemdRemove
         fi
 
         echo "${prefix}Installing systemd service ..."
@@ -62,7 +62,7 @@ Systemd_install()
                                 # Systemd couldn't be run, probably it's a systemd-less system like Gentoo
                                 printf "%bCouldn't start systemd service.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                                 echo "${prefix}Is Systemd installed? If not use cron instead."
-                                Systemd_remove
+                                systemdRemove
                                 remove_ErrorCleanUp
                                 exit 126
                         }
@@ -77,7 +77,7 @@ Systemd_install()
 }
 
 
-Systemd_remove()
+systemdRemove()
 {
         if [ -f "${systemd_dir_path}/adsorber.service" ] || [ -f "${systemd_dir_path}/adsorber.timer" ]; then
 

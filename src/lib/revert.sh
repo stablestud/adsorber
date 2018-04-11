@@ -11,7 +11,7 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:----------   ---default value:--   ---declared in:-------------
+# ---variable:----------   ---default value:--   ---declared in:----------------
 # hosts_file_path          /etc/hosts            src/lib/config.sh, adsorber.conf
 # hosts_file_previous_path /etc/hosts.previous   src/lib/config.sh, adsorber.conf
 # prefix                   '  ' (two spaces)     src/lib/colours.sh

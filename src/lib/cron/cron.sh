@@ -11,7 +11,7 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:-------   ---default value:--             ---declared in:-------------
+# ---variable:-------   ---default value:--             ---declared in:---------
 # crontab_dir_path      /etc/cron.weekly                src/lib/config.sh, adsorber.conf
 # executable_dir_path   the root dir of the script      src/bin/adsorber
 # library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber
@@ -26,7 +26,7 @@
 # remove_ErrorCleanUp   src/lib/remove.sh
 
 
-Cronjob_install()
+crontabInstall()
 {
         echo "${prefix}Installing cronjob ..."
 
@@ -55,7 +55,7 @@ Cronjob_install()
 }
 
 
-Cronjob_remove()
+crontabRemove()
 {
         if [ -f "${crontab_dir_path}/80adsorber" ]; then
                 # Remove the crontab from /etc/cron.weekly

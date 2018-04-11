@@ -1,12 +1,15 @@
 #!/bin/sh
 
+# TODO: Maybe rename install to init (initialize) because there's already an
+# installation into the system (install-to-system.sh) however with a different goal
+
 # Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:-------------   ---default value:----   ---defined in:--------------
+# ---variable:-------------   ---default value:----   ---defined in:------------
 # crontab_dir_path            /etc/cron.weekly        src/lib/config.sh, adsorber.conf
 # hosts_file_path             /etc/hosts              src/lib/config.sh, adsorber.conf
 # hosts_file_backup_path      /etc/hosts.original     src/lib/config.sh, adsorber.conf
@@ -21,13 +24,14 @@
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
 # ---function:-----     ---function defined in:---
-# Cronjob_install       src/lib/cron/cron.sh
+# crontabInstall       src/lib/cron/cron.sh
 # remove_ErrorCleanUp   src/lib/remove.sh
-# Systemd_install       src/lib/systemd/systemd.sh
+# systemdInstall       src/lib/systemd/systemd.sh
 
 
 install_BackupHostsFile()
 {
+        # Create a backup, to be able to restore to it later if neccessary
         if [ ! -f "${hosts_file_backup_path}" ]; then
                 cp "${hosts_file_path}" "${hosts_file_backup_path}" \
                         && echo "${prefix}Successfully created backup of ${hosts_file_path} to ${hosts_file_backup_path}."
@@ -42,6 +46,7 @@ install_BackupHostsFile()
 
 install_Prompt()
 {
+        # Ask the user if he/she is sure about to install Adsorber
         if [ -z "${reply_to_prompt}" ]; then
                 printf "%bDo you really want to install Adsorber? [Y/n]: %b" "${prefix_input}" "${prefix_reset}"
                 read -r reply_to_prompt
@@ -64,6 +69,8 @@ install_Prompt()
 
 install_PromptScheduler()
 {
+        # The user enters interactively what scheduler (Systemd, Cron or none)
+        # should be used to update the hosts file periodically
         if [ -z "${reply_to_scheduler_prompt}" ]; then
                 printf "%bWhat scheduler should be used to update the host file automatically? [(S)ystemd/(C)ron/(N)one]: %b" "${prefix_input}" "${prefix_reset}"
                 read -r reply_to_scheduler_prompt
@@ -71,10 +78,10 @@ install_PromptScheduler()
 
         case "${reply_to_scheduler_prompt}" in
                 [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
-                        Systemd_install
+                        systemdInstall
                         ;;
                 [Cc] | [Cc]ron | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab )
-                        Cronjob_install
+                        crontabInstall
                         ;;
                 * )
                         echo "${prefix}Skipping scheduler creation ..."

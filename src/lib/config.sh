@@ -11,7 +11,7 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:--------   ---default value:------------     ----declared in:------------
+# ---variable:--------   ---default value:------------     ----declared in:-----
 # config_dir_path        ${executable_dir_path}/../../     src/bin/adsorber
 # debug                  false                             src/bin/adsorber
 # options                every parameter but first         src/bin/adsorber
@@ -32,8 +32,8 @@
 
 config_CreateTmpDir()
 {
-        # Create a temporary folder in which I can manipulate files without
-        # distracting the environment
+        # Create a temporary folder in which Adsorber can manipulate files
+        # without distracting the environment
         if [ ! -d "${tmp_dir_path}" ]; then
                 mkdir "${tmp_dir_path}"
         else
@@ -48,7 +48,7 @@ config_CreateTmpDir()
 
 config_CopySourceList()
 {
-        # Create sources.list if not found. I need sources.list to know from where to fetch hosts domains from
+        # Create sources.list if not found. Adsorber need sources.list to know from where to fetch hosts domains from
         if [ ! -f "${config_dir_path}/sources.list" ] || [ ! -s "${config_dir_path}/sources.list" ]; then
                 cp "${shareable_dir_path}/default/default-sources.list" "${config_dir_path}/sources.list" \
                         && echo "${prefix_warning}Created sources.list: to add new host sources edit this file."
@@ -93,7 +93,7 @@ config_CopyBlackList()
 
 config_CopyConfig()
 {
-        # Can't proceed without having a configuration. Creating a new one if not found
+        # Can't proceed without a config file. Creating a new one if not found
         if [ ! -s "${config_dir_path}/adsorber.conf" ] || [ ! -f "${config_dir_path}/adsorber.conf" ]; then
                 printf "%bNo config file found. Creating default.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 echo "${prefix_warning}Please re-run the command to continue."
@@ -110,7 +110,7 @@ config_CopyConfig()
 
 config_FilterConfig()
 {
-        # Remove comments, etc to be able to read the config file
+        # Remove comments, etc., to be able to read the config file
         cp "${config_dir_path}/adsorber.conf" "${tmp_dir_path}/config" \
                 || {
                         printf "%bCouldn't process config file.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
@@ -222,9 +222,9 @@ config_ReadConfig()
                                 fi
                                 ;;
                         * )
-                                # We should never reach this, as the config file
-                                # was filtered by config_FilterConfig and should
-                                # not contain any unknown lines
+                                # This should never be reached, as the config
+                                # file was filtered by config_FilterConfig and
+                                # should not contain any unknown lines
                                 printf "%bThis is scary: I extracted %s from the config file, however I shouldn't be able to.%b" "${prefix_fatal}" "${_line}" "${prefix_reset}"
                                 echo "Please report this error with your config file to https://github.com/stablestud/adsorber"
                                 remove_ErrorCleanUp
@@ -251,7 +251,7 @@ config_IsVariableSet()
         fi
 
         # These configurations are not mandatory needed by Adsorber, thus
-        # if any of them were not defined we'll use the default value
+        # if any of them were not defined, Adsorber will use the default value
         if [ -z "${primary_list}" ]; then
                 printf "%bprimary_list not set in adsorber.conf. Using default value: blacklist\n" "${prefix_warning}" 1>&2
                 readonly primary_list="blacklist"
@@ -317,7 +317,7 @@ config_IsVariableValid()
                 wrongVariable="true"
         fi
 
-        # TODO: Check if proxy is valid ( with ping )
+        # TODO: Check if proxy is valid ( with ping or similar )
 
         # If one or more values were invalid exit with error message
         if [ "${wrongVariable}" = "true" ]; then

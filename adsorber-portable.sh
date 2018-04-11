@@ -2,7 +2,7 @@
 
 parameters="${@}"
 
-printf "Running Adsorber in systemless-mode"
+printf "Running Adsorber in portable-mode"
 if [ ! "${parameters}" = "" ]; then
         printf " with %s parameter(s): '%s'" "${#}" "${parameters}"
 fi
@@ -18,7 +18,7 @@ echo ""
         && {
                 exit_code=$?
                 echo ""
-                echo "Adsorber in systemless-mode exited with code ${exit_code}."
+                echo "Adsorber in portable-mode exited with code ${exit_code}."
         } || {
                 exit_code=$?
 
@@ -28,5 +28,5 @@ echo ""
                         echo "You've supplied no or wrong parameters."
                 fi
 
-                echo "Adsorber in systemless-mode exited with code ${exit_code}. Thats an error."
+                echo "Adsorber in portable-mode exited with code ${exit_code}. Thats an error."
         }

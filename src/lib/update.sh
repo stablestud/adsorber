@@ -11,27 +11,27 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:----------      ---default value:------------   ---declared in:-----------------
-# config_dir_path             ${executable_dir_path}/../../   src/bin/adsorber
-# hosts_file_backup_path      /etc/hosts.original             src/lib/config.sh, adsorber.conf
-# hosts_file_path             /etc/hosts                      src/lib/config.sh, adsorber.conf
-# hosts_file_previous_enable  true                            src/lib/config.sh, adsorber.conf
-# hosts_file_previous_path    /etc/hosts.previous             src/lib/config.sh, adsorber.conf
-# http_proxy                  Null (not set)                  src/lib/config.sh, adsorber.conf
-# https_proxy                 Null (not set)                  src/lib/config.sh, adsorber.conf
-# ignore_download_error       true                            src/lib/config.sh, adsorber.conf
-# prefix                      '  ' (two spaces)               src/lib/colours.sh
-# prefix_fatal                '\033[0;91mE '                  src/lib/colours.sh
-# prefix_info                 '\033[0;97m  '                  src/lib/colours.sh
-# prefix_input                '  ' (two spaces)               src/lib/colours.sh
-# prefix_reset                \033[0m                         src/lib/colours.sh
-# prefix_title                \033[1;37m                      src/lib/colours.sh
-# prefix_warning              '- '                            src/lib/colours.sh
-# primary_list                blacklist                       src/lib/config.sh, adsorber.conf
-# reply_to_force_prompt       Null (not set)                  src/lib/install.sh, src/bin/adsorber
-# tmp_dir_path                /tmp/adsorber                   src/bin/adsorber
-# use_partial_matching        true                            src/lib/config.sh, adsorber.conf
-# version                     0.2.2 or similar                src/bin/adsorber
+# ---variable:----------      ---default value:------------  ---declared in:----
+# config_dir_path             ${executable_dir_path}/../../  src/bin/adsorber
+# hosts_file_backup_path      /etc/hosts.original            src/lib/config.sh, adsorber.conf
+# hosts_file_path             /etc/hosts                     src/lib/config.sh, adsorber.conf
+# hosts_file_previous_enable  true                           src/lib/config.sh, adsorber.conf
+# hosts_file_previous_path    /etc/hosts.previous            src/lib/config.sh, adsorber.conf
+# http_proxy                  Null (not set)                 src/lib/config.sh, adsorber.conf
+# https_proxy                 Null (not set)                 src/lib/config.sh, adsorber.conf
+# ignore_download_error       true                           src/lib/config.sh, adsorber.conf
+# prefix                      '  ' (two spaces)              src/lib/colours.sh
+# prefix_fatal                '\033[0;91mE '                 src/lib/colours.sh
+# prefix_info                 '\033[0;97m  '                 src/lib/colours.sh
+# prefix_input                '  ' (two spaces)              src/lib/colours.sh
+# prefix_reset                \033[0m                        src/lib/colours.sh
+# prefix_title                \033[1;37m                     src/lib/colours.sh
+# prefix_warning              '- '                           src/lib/colours.sh
+# primary_list                blacklist                      src/lib/config.sh, adsorber.conf
+# reply_to_force_prompt       Null (not set)                 src/lib/install.sh, src/bin/adsorber
+# tmp_dir_path                /tmp/adsorber                  src/bin/adsorber
+# use_partial_matching        true                           src/lib/config.sh, adsorber.conf
+# version                     0.2.2 or similar               src/bin/adsorber
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
@@ -44,6 +44,10 @@ update_CheckBackupExist()
 {
         if [ ! -f "${hosts_file_backup_path}" ]; then
 
+                # The user may proceed without having a backup of the original
+                # hosts file, however it's not recommended to proceed as the
+                # hostname association with 127.0.0.1 and localhost will be lost.
+                # The user may interactively decide here wheter to proceed or not.
                 if [ -z "${reply_to_force_prompt}" ]; then
                         printf "%bBackup of %s does not exist. To backup run '%s install'.%b\n" "${prefix_fatal}" "${hosts_file_path}" "${0}" "${prefix_reset}" 1>&2
                         printf "%bIgnore issue and continue? (May break your system, not recommended) [YES/n]: %b" "${prefix_input}" "${prefix_reset}"
@@ -68,6 +72,8 @@ update_CheckBackupExist()
 
 update_CreateTmpDir()
 {
+        # Create a temporary folder in which Adsorber can manipulate files
+        # without distracting the environment
         if [ ! -d "${tmp_dir_path}" ]; then
                 mkdir "${tmp_dir_path}"
         elif [ ! -s "${tmp_dir_path}/config-filtered" ]; then
@@ -82,6 +88,8 @@ update_CreateTmpDir()
 
 update_ReadSourceList()
 {
+        # Read the sources.list (by default located at /usr/local/etc/adsorber)
+        # which holds the URLs to the remote hosts files
         if [ ! -s "${config_dir_path}/sources.list" ]; then
 
                 if [ ! -s "${config_dir_path}/blacklist" ]; then
@@ -111,12 +119,15 @@ update_ReadSourceList()
 
 update_ReadWhiteList()
 {
+        # Read whitelist to get the domains which should not be blocked
         if [ ! -f "${config_dir_path}/whitelist" ]; then
                 echo "${prefix}Whitelist does not exist, ignoring ..." 1>&2
                 return 1
         else
                 cp "${config_dir_path}/whitelist" "${tmp_dir_path}/whitelist"
 
+                # Filter and sort the whitelist and place the result into the
+                # temporary folder (by default /tmp/adsorber)
                 update_FilterDomains "whitelist" "whitelist-filtered"
                 update_SortDomains "whitelist-filtered" "whitelist-sorted"
         fi
@@ -127,12 +138,15 @@ update_ReadWhiteList()
 
 update_ReadBlackList()
 {
+        # Read blacklist to get the domains which should be blocked explicitly
         if [ ! -f "${config_dir_path}/blacklist" ]; then
                 echo "${prefix}Blacklist does not exist, ignoring ..." 1>&2
                 return 1
         else
                 cp "${config_dir_path}/blacklist" "${tmp_dir_path}/blacklist"
 
+                # Filter and sort the blacklist and place the result into the
+                # temporary folder (by default /tmp/adsorber)
                 update_FilterDomains "blacklist" "blacklist-filtered"
                 update_SortDomains "blacklist-filtered" "blacklist-sorted"
         fi
@@ -357,7 +371,8 @@ update_BuildHostsFile()
 
 update_PreviousHostsFile()
 {
-        if [ "${hosts_file_previous_enable}" = "true" ]; then           # Check if we should backup the previous hosts file
+        # Check if we should backup the previous hosts file
+        if [ "${hosts_file_previous_enable}" = "true" ]; then
                 echo "${prefix}Creating previous hosts file ..."
 
                  # Copy current hosts file to /etc/hosts.previous before the new hosts file will be applied
@@ -380,7 +395,7 @@ update_ApplyHostsFile()
 {
         echo "${prefix}Applying new hosts file ..."
 
-        # Replace systems hosts file with the modified version
+        # Replace systems hosts file with the modified version from /tmp/adsorber
         cp "${tmp_dir_path}/hosts" "${hosts_file_path}" \
                 || {
                         printf "%b" "${prefix_fatal}Couldn't apply hosts file. Aborting.${prefix_reset}\n" 1>&2
@@ -394,6 +409,8 @@ update_ApplyHostsFile()
 }
 
 
+# Main function of update.sh. This is like an index in what order the functions
+# should be run
 update()
 {
         printf "%bUpdating %s ...%b\n" "${prefix_title}" "${hosts_file_path}" "${prefix_reset}"
