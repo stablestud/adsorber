@@ -134,25 +134,88 @@ config_ReadConfig()
 {
         while read -r _line; do
                 case "${_line}" in      # TODO FIXME
-                        http_proxy* )
-                                # set_
-                                readonly "set_${_line}"
-                                if [ -n "$set_http_proxy" ]; then
-                                        export "${_line}"
+                        primary_list=* )
+                                if [ -z "${primary_list}" ]; then
+                                        readonly "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${primary_list}"
                                 fi
                                 ;;
-                        https_proxy* )
-                                readonly "set_${_line}"
-                                if [ -n "$set_https_proxy" ]; then
+                        use_partial_matching=* )
+                                if [ -z "${use_partial_matching}" ]; then
+                                        readonly "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'use_partial_matching', keeping the first value: ${use_partial_matching}"
+                                fi
+                                ;;
+                        ignore_download_error=* )
+                                if [ -z "${ignore_download_error}" ]; then
+                                        readonly "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${ignore_download_error}"
+                                fi
+                                ;;
+                        http_proxy=* )
+                                if [ -z "${http_proxy}" ]; then
                                         export "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'http_proxy', keeping the first value: ${http_proxy}"
+                                fi
+                                ;;
+                        https_proxy=* )
+                                if [ -z "${https_proxy}" ]; then
+                                        export "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'https_proxy', keeping the first value: ${https_proxy}"
+                                fi
+                                ;;
+                        hosts_file_path=* )
+                                if [ -z "${hosts_file_path}" ]; then
+                                        readonly "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${hosts_file_path}"
+                                fi
+                                ;;
+                        hosts_file_backup_path=* )
+                                if [ -z "${hosts_file_backup_path}" ]; then
+                                        readonly "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${hosts_file_backup_path}"
+                                fi
+                                ;;
+                        hosts_file_previous_enable=* )
+                                if [ -z "${hosts_file_previous_enable}" ]; then
+                                        readonly "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${hosts_file_previous_enable}"
+                                fi
+                                ;;
+                        hosts_file_previous_path=* )
+                                if [ -z "${hosts_file_previous_path}" ]; then
+                                        readonly "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${hosts_file_previous_path}"
+                                fi
+                                ;;
+                        crontab_dir_path=* )
+                                if [ -z "${crontab_dir_path}" ]; then
+                                        readonly "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${crontab_dir_path}"
+                                fi
+                                ;;
+                        systemd_dir_path=* )
+                                if [ -z "${systemd_dir_path}" ]; then
+                                        readonly "${_line}"
+                                else
+                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${systemd_dir_path}"
                                 fi
                                 ;;
                         * )
-                                #if [ -n- "${_line}" ]; then
-                                        readonly "${_line}"
-                                #else
-                                #        printf "%b%s is defined in " "${prefix_warning}" "${_line}"
-                                #if
+                                printf "%bThis is scary: I extracted %s from the config file, however I shouldn't be able to.%b" "${prefix_fatal}" "${_line}" "${prefix_reset}"
+                                echo "Please report this error with your config file to https://github.com/stablestud/adsorber"
+                                remove_ErrorCleanUp
+                                exit 1
                                 ;;
                 esac
         done < "${tmp_dir_path}/config-filtered"
@@ -167,7 +230,7 @@ config_IsVariableSet()
 {
         if [ -z "${hosts_file_path}" ] || [ -z "${hosts_file_backup_path}" ] || [ -z "${crontab_dir_path}" ] || [ -z "${systemd_dir_path}" ] || [ -z "${hosts_file_previous_path}" ] || [ -z "${hosts_file_previous_enable}" ]; then
                 printf "%bMissing setting(s) in adsorber.conf.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                printf "%bPlease delete adsorber.conf and run '%s install' to create a new config file.%b\n" "${prefix_fatal}" "${0}" "${prefix_reset}" 1>&2
+                printf "%bPlease delete adsorber.conf in %s and run '%s install' to create a new config file.%b\n" "${prefix_fatal}" "${config_dir_path}" "${0}" "${prefix_reset}" 1>&2
                 remove_ErrorCleanUp
                 exit 127
         fi
@@ -235,7 +298,7 @@ config_IsVariableValid()
                 wrongVariable="true"
         fi
 
-        if [ -n "${wrongVariable}" ]; then      # When wrongVariable is set then ...
+        if [ "${wrongVariable}" = "true" ]; then      # When wrongVariable is set then ...
                 remove_ErrorCleanUp
                 exit 126
         fi

@@ -23,6 +23,14 @@ readonly config_dir_path="/usr/local/etc/adsorber/"
 # Resolve source directory.
 readonly source_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
+echo "Scripts root current location: ${source_dir_path}"
+
+echo "Going to place files to:"
+echo " - main exectuable:   ${executable_dir_path}"
+echo " - other executables: ${library_dir_path}"
+echo " - configuration:     ${config_dir_path}"
+echo " - miscellaneous:     ${shareable_dir_path}"
+
 # Check if user is root, if not exit.
 if [ "$(id -g)" -ne 0 ]; then
         echo "You need to be root to install Adsorber." 1>&2
@@ -70,17 +78,20 @@ cp "${source_dir_path}/src/share/default/default-sources.list" "${config_dir_pat
 chmod -R u=rwx,g=rx,o=rx "${config_dir_path}"
 chown -R root:root "${config_dir_path}"
 
+#echo "Installation into the system completed."
 #echo "Running Adsorber..."
+#echo ""
+#echo ""
 
 ## We don't run Adsorber after installation yet
-#adsorber install --assume-yes --systemd \
+#adsorber install \
 #        || {
 #                printf "\033[0;93mAdsorber was installed on your system, however something went wrong at\n"
-#                printf "running Adsorber.\n"
+#                printf "running it.\n"
 #                printf "If a proxy server is in use, please change the config file\n"
-#                printf "to the appropriate proxy server.\n\033[0m"
+#                printf "(${config_dir_path}/adsorber.conf) to the appropriate proxy server.\n\033[0m"
 #                echo "Run 'adsorber install' to try again."
 #        }
 
-echo "Installation completed."
+echo "________________________________________________________________________________"
 echo "You can now delete this folder."

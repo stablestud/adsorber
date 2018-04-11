@@ -201,7 +201,6 @@ update_FetchSources()
         fi
 
         # Unset temporary function variables.
-
         unset _total_count
         unset _successful_count
 
@@ -274,7 +273,7 @@ update_ApplyWhiteList()
                         fi
 
                 done < "${tmp_dir_path}/whitelist-sorted"
-		
+
 		unset _domain
 
                 cp "${tmp_dir_path}/applied-whitelist" "${tmp_dir_path}/cache"
