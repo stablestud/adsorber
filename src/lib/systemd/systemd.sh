@@ -15,15 +15,15 @@
 # executable_dir_path   the root dir of the script      src/bin/adsorber
 # library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber
 # prefix                '  ' (two spaces)               src/lib/colours.sh
-# prefix_fatal          '\\033[0;91mE '                  src/lib/colours.sh
-# prefix_reset          \\033[0m                         src/lib/colours.sh
+# prefix_fatal          '\033[0;91mE '                  src/lib/colours.sh
+# prefix_reset          \033[0m                         src/lib/colours.sh
 # prefix_warning        '- '                            src/lib/colours.sh
 # systemd_dir_path      /etc/systemd/system             src/lib/config.sh, adsorber.conf
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----     ---function defined in:---
-# remove_ErrorCleanUp   src/lib/remove.sh
+# ---function:-----    ---function defined in:---
+# remove_ErrorCleanUp  src/lib/remove.sh
 
 
 systemdInstall()

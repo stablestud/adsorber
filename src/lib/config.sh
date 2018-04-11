@@ -17,8 +17,8 @@
 # options                every parameter but first         src/bin/adsorber
 # operations             the first parameter               src/bin/adsorber
 # prefix                 '  ' (two spaces)                 src/lib/colours.sh
-# prefix_reset           \\033[0m                           src/lib/colours.sh
-# prefix_title           \\033[1;37m                        src/lib/colours.sh
+# prefix_reset           \033[0m                           src/lib/colours.sh
+# prefix_title           \033[1;37m                        src/lib/colours.sh
 # prefix_warning         '- '                              src/lib/colours.sh
 # shareable_dir_path     ${executable_dir_path}/../share/  src/bin/adsorber
 # tmp_dir_path           /tmp/adsorber                     src/bin/adsorber

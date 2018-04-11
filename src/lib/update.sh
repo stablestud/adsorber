@@ -21,11 +21,11 @@
 # https_proxy                 Null (not set)                 src/lib/config.sh, adsorber.conf
 # ignore_download_error       true                           src/lib/config.sh, adsorber.conf
 # prefix                      '  ' (two spaces)              src/lib/colours.sh
-# prefix_fatal                '\\033[0;91mE '                 src/lib/colours.sh
-# prefix_info                 '\\033[0;97m  '                 src/lib/colours.sh
+# prefix_fatal                '\033[0;91mE '                 src/lib/colours.sh
+# prefix_info                 '\033[0;97m  '                 src/lib/colours.sh
 # prefix_input                '  ' (two spaces)              src/lib/colours.sh
-# prefix_reset                \\033[0m                        src/lib/colours.sh
-# prefix_title                \\033[1;37m                     src/lib/colours.sh
+# prefix_reset                \033[0m                        src/lib/colours.sh
+# prefix_title                \033[1;37m                     src/lib/colours.sh
 # prefix_warning              '- '                           src/lib/colours.sh
 # primary_list                blacklist                      src/lib/config.sh, adsorber.conf
 # reply_to_force_prompt       Null (not set)                 src/lib/install.sh, src/bin/adsorber
@@ -35,9 +35,9 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----     ---function defined in:---
-# remove_CleanUp        src/lib/remove.sh
-# remove_ErrorCleanUp   src/lib/remove.sh
+# ---function:-----    ---function defined in:---
+# remove_CleanUp       src/lib/remove.sh
+# remove_ErrorCleanUp  src/lib/remove.sh
 
 
 update_CheckBackupExist()

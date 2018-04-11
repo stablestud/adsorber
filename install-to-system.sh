@@ -117,10 +117,10 @@ echo ""
 ## We don't run Adsorber after installation yet
 #adsorber install \
 #        || {
-#                printf "\\033[0;93mAdsorber was installed on your system, however something went wrong at\\n"
+#                printf "\033[0;93mAdsorber was installed on your system, however something went wrong at\\n"
 #                printf "running it.\\n"
 #                printf "If a proxy server is in use, please change the config file\\n"
-#                printf "(${config_dir_path}/adsorber.conf) to the appropriate proxy server.\\n\\033[0m"
+#                printf "(${config_dir_path}/adsorber.conf) to the appropriate proxy server.\\n\033[0m"
 #                echo "Run 'adsorber install' to try again."
 #        }
 

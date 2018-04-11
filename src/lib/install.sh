@@ -15,17 +15,17 @@
 # hosts_file_backup_path      /etc/hosts.original     src/lib/config.sh, adsorber.conf
 # prefix                      '  ' (two spaces)       src/lib/colours.sh
 # prefix_input                '  ' (two spaces)       src/lib/colours.sh
-# prefix_reset                \\033[0m                 src/lib/colours.sh
-# prefix_title                \\033[1;37m              src/lib/colours.sh
+# prefix_reset                \033[0m                 src/lib/colours.sh
+# prefix_title                \033[1;37m              src/lib/colours.sh
 # prefix_warning              '- '                    src/lib/colours.sh
 # reply_to_prompt             Null (not set)          src/bin/adsorber
 # reply_to_scheduler_prompt   Null (not set)          src/bin/adsorber
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----     ---function defined in:---
+# ---function:-----    ---function defined in:---
 # crontabInstall       src/lib/cron/cron.sh
-# remove_ErrorCleanUp   src/lib/remove.sh
+# remove_ErrorCleanUp  src/lib/remove.sh
 # systemdInstall       src/lib/systemd/systemd.sh
 
 

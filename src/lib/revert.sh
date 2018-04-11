@@ -15,15 +15,15 @@
 # hosts_file_path          /etc/hosts            src/lib/config.sh, adsorber.conf
 # hosts_file_previous_path /etc/hosts.previous   src/lib/config.sh, adsorber.conf
 # prefix                   '  ' (two spaces)     src/lib/colours.sh
-# prefix_fatal             '\\033[0;91mE '        src/lib/colours.sh
-# prefix_reset             \\033[0m               src/lib/colours.sh
-# prefix_title             \\033[1;37m            src/lib/colours.sh
+# prefix_fatal             '\033[0;91mE '        src/lib/colours.sh
+# prefix_reset             \033[0m               src/lib/colours.sh
+# prefix_title             \033[1;37m            src/lib/colours.sh
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----     ---function defined in:---
-# remove_CleanUp        src/lib/remove.sh
-# remove_ErrorCleanUp   src/lib/remove.sh
+# ---function:-----    ---function defined in:---
+# remove_CleanUp       src/lib/remove.sh
+# remove_ErrorCleanUp  src/lib/remove.sh
 
 
 revert_HostsFile()
