@@ -4,10 +4,10 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# Define where the executable 'adsorber' file will be placed.
-readonly executable_dir_path="/usr/local/sbin/"
+# Define where the executable 'adsorber' is.
+readonly executable_path="/usr/local/bin/adsorber"
 
-# Define where the other executable will be placed.
+# Define where the other executable are.
 readonly library_dir_path="/usr/local/lib/adsorber/"
 
 # Define the location of adsorbers shareable data (e.g. default config files...).
@@ -32,45 +32,60 @@ readonly tmp_dir_path="/tmp/adsorber"
 
 echo "Current script location: ${source_dir_path}"
 
-echo "Going to check files at:"
-echo " - main exectuable:   ${executable_dir_path}"
+echo "Going to remove files from:"
+echo " - main exectuable:   ${executable_path}"
 echo " - other executables: ${library_dir_path}"
 echo " - configuration:     ${config_dir_path}"
 echo " - miscellaneous:     ${shareable_dir_path}"
 
+_prompt="${1}"
+
 # Prompt user if sure about to remove Adsorber from the system
-printf "Are you sure you want to remove Adsorber from the system? [(Y)es/(N)o]: "
-read -r _prompt
+if [ -z "${_prompt}" ]; then
+        printf "Are you sure you want to remove Adsorber from the system? [(Y)es/(N)o]: "
+        read -r _prompt
+fi
 
 case "${_prompt}" in
-        [Yy] | [Yy][Ee][Ss] )
+        -[Yy] | --[Yy][Ee][Ss] | [Yy] | [Yy][Ee][Ss] )
                 :
                 ;;
         * )
-                echo "Removal from system cancelled."
+                echo "Removal from the system has been cancelled."
                 exit 1
                 ;;
 esac
 
 # Check if user is root, if not exit.
 if [ "$(id -g)" -ne 0 ]; then
-        echo "You need to be root to remove Adsorber." 1>&2
+        echo "You need to be root to remove Adsorber from the system." 1>&2
         exit 126
 fi
 
-adsorber remove -y \
+echo ""
+
+(adsorber remove -y) \
         || {
-                printf "\033[0;93mSometing went wrong at running Adsorber's own removal action. Doing it the hard way...\n\033[0m"
+                echo ""
+                printf "\033[0;93mSomething went wrong at running Adsorber's own removal action. Doing it the hard way...\n\033[0m"
+                echo "Maybe Adsorber has been already removed?"
+
                 # Doing it the hard way .., removing everything manually
-                rm "${systemd_timer_path}"
-                rm "${systemd_service_path}"
-                rm "${crontab_path}"
-                rm -r "${tmp_dir_path}"
+                rm "${systemd_timer_path}" 2>/dev/null && echo "Removed ${systemd_timer_path}"
+                rm "${systemd_service_path}" 2>/dev/null && echo "Removed ${systemd_service_path}"
+                rm "${crontab_path}" 2>/dev/null && echo "Removed ${crontab_path}"
+                rm -r "${tmp_dir_path}" 2>/dev/null && echo "Removed ${tmp_dir_path}"
                 # TODO restore hosts file
         }
 
+echo ""
+
 # Remove placed files from the specified locations
-rm -r "${executable_dir_path}/adsorber"
-rm -r "${library_dir_path}"
-rm -r "${shareable_dir_path}"
-rm -r "${config_dir_path}
+rm -r "${executable_path}" 2>/dev/null && echo "Removed ${executable_path}"
+rm -r "${library_dir_path}" 2>/dev/null && echo "Removed ${library_dir_path}"
+rm -r "${shareable_dir_path}" 2>/dev/null && echo "Removed ${shareable_dir_path}"
+rm -r "${config_dir_path}" 2>/dev/null && echo "Removed ${config_dir_path}"
+
+echo ""
+
+echo "Done. Adsorber has been removed from the system."
