@@ -148,11 +148,11 @@ config_ReadConfig()
                                 fi
                                 ;;
                         * )
-                                if [ -n- "${_line}" ]; then
+                                #if [ -n- "${_line}" ]; then
                                         readonly "${_line}"
-                                else
-                                        printf "%b%s is defined in " "${prefix_warning}" "${_line}"
-                                if
+                                #else
+                                #        printf "%b%s is defined in " "${prefix_warning}" "${_line}"
+                                #if
                                 ;;
                 esac
         done < "${tmp_dir_path}/config-filtered"

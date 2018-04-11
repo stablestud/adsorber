@@ -32,11 +32,7 @@ readonly options="${*}"
 checkRoot()
 {
         if [ "$(id -g)" -ne 0 ]; then
-                if command -v whoami 2>/dev/null 1>&2; then
-                        echo "$(whoami), I require way more more power then this! How about... root ..? ;)" 1>&2
-                else
-                        echo "I require way more power then this! Maybe ... root ..? ;)" 1>&2
-                fi
+        	echo "$(id -un), I require way more more power then this! How about... root ..? ;)" 1>&2
                 exit 126
         fi
 
@@ -71,7 +67,7 @@ showUsage()
         echo "Usage: adsorber <install|update|restore|revert|remove> [<options>]"
         echo "Try --help for more information."
 
-        exit 127
+        exit 80
 }
 
 
@@ -229,7 +225,7 @@ duplicateOption()
                 showUsage
         fi
 
-        exit 127
+        exit 80
 }
 
 
@@ -244,6 +240,7 @@ sourceFiles()
         . "${library_dir_path}/colours.sh"
         . "${library_dir_path}/cron/cron.sh"
         . "${library_dir_path}/systemd/systemd.sh"
+
         return 0
 }
 

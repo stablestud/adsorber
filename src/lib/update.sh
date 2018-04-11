@@ -178,11 +178,14 @@ update_FetchSources()
                 # If neither wget nor curl is installed abort and clean up.
                 else
                         printf "%bNeither curl nor wget installed. Can't continue.%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+
                         remove_ErrorCleanUp
                         exit 2
                 fi
 
         done < "${tmp_dir_path}/sourceslist-filtered"
+
+	unset _domain
 
         if [ "${_successful_count}" -eq 0 ]; then
                 printf "%bNothing to apply [%d/%d].\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
@@ -190,6 +193,7 @@ update_FetchSources()
                 return 1
         elif [ "${ignore_download_error}" = "false" ] && [ "${_successful_count}" -ne "${_total_count}" ]; then
                 printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
+
                 remove_ErrorCleanUp
                 exit 1
         else
@@ -197,6 +201,7 @@ update_FetchSources()
         fi
 
         # Unset temporary function variables.
+
         unset _total_count
         unset _successful_count
 
@@ -269,9 +274,12 @@ update_ApplyWhiteList()
                         fi
 
                 done < "${tmp_dir_path}/whitelist-sorted"
+		
+		unset _domain
 
                 cp "${tmp_dir_path}/applied-whitelist" "${tmp_dir_path}/cache"
         fi
+
 
         return 0
 }
