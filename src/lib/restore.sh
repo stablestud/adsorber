@@ -32,7 +32,7 @@ restore_HostsFile()
                 # Copy /etc/hosts.original to /etc/hosts, replacing the current one
                 cp "${hosts_file_backup_path}" "${hosts_file_path}" \
                         && {
-                                # If the copying failed
+                                # If the copying was successful print these messages
                                 printf "%bSuccessfully restored %s.\n" "${prefix}" "${hosts_file_path}"
                                 printf "%bTo reapply please run './adsorber.sh update'.\n" "${prefix}"
                         }
