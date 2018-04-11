@@ -23,7 +23,7 @@ readonly config_dir_path="/usr/local/etc/adsorber/"
 # Resolve source directory.
 readonly source_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
-echo "Scripts root current location: ${source_dir_path}"
+echo "Current script location: ${source_dir_path}"
 
 echo "Going to place files to:"
 echo " - main exectuable:   ${executable_dir_path}"
@@ -31,12 +31,26 @@ echo " - other executables: ${library_dir_path}"
 echo " - configuration:     ${config_dir_path}"
 echo " - miscellaneous:     ${shareable_dir_path}"
 
+printf "Are you sure you want to install Adsorber into the system? [(Y)es/(N)o]: "
+read -r _prompt
+
+case "${_prompt}" in
+        [Yy] | [Yy][Ee][Ss] )
+                :
+                ;;
+        * )
+                echo "Installation to the system cancelled."
+                exit 1
+                ;;
+esac
+
 # Check if user is root, if not exit.
 if [ "$(id -g)" -ne 0 ]; then
         echo "You need to be root to install Adsorber." 1>&2
         exit 126
 fi
 
+# Main exectuable
 echo "Placing executable to ${executable_dir_path}"
 #cp "${source_dir_path}/src/adsorber" "${executable_dir_path}/adsorber"
 
@@ -49,8 +63,11 @@ sed "s|^readonly library_dir_path=\"\${executable_dir_path}/lib/\"$|readonly lib
 chmod u=rwx,g=rx,o=rx "${executable_dir_path}/adsorber"
 chown root:root "${executable_dir_path}/adsorber"
 
+# Libaries
 echo "Placing libraries to ${library_dir_path}"
+
 mkdir "${library_dir_path}" 2>/dev/null
+
 cp -r "${source_dir_path}/src/lib/cron/" \
         "${source_dir_path}/src/lib/colours.sh" \
         "${source_dir_path}/src/lib/config.sh" \
@@ -60,21 +77,30 @@ cp -r "${source_dir_path}/src/lib/cron/" \
         "${source_dir_path}/src/lib/revert.sh" \
         "${source_dir_path}/src/lib/update.sh" \
         "${source_dir_path}/src/lib/systemd/" "${library_dir_path}"
+
 chmod -R u=rwx,g=rx,o=rx "${library_dir_path}"
 chown -R root:root "${library_dir_path}"
 
+# Shareables
 echo "Placing shareables to ${shareable_dir_path}"
+
 mkdir "${shareable_dir_path}" 2>/dev/null
+
 cp -r "${source_dir_path}/src/share/components" "${source_dir_path}/src/share/default" "${shareable_dir_path}"
+
 chmod -R u=rwx,g=rx,o=rx "${shareable_dir_path}"
 chown -R root:root "${shareable_dir_path}"
 
+# Config files
 echo "Placing config files to ${config_dir_path}"
+
 mkdir "${config_dir_path}" 2>/dev/null
+
 cp "${source_dir_path}/src/share/default/default-adsorber.conf" "${config_dir_path}/adsorber.conf"
 cp "${source_dir_path}/src/share/default/default-blacklist" "${config_dir_path}/blacklist"
 cp "${source_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/whitelist"
 cp "${source_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"
+
 chmod -R u=rwx,g=rx,o=rx "${config_dir_path}"
 chown -R root:root "${config_dir_path}"
 

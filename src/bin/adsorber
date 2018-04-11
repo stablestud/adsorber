@@ -12,15 +12,17 @@
 readonly tmp_dir_path="/tmp/adsorber"
 readonly debug="true"
 
-# NOTE: following values will be changed when installed with 'install_to_system.sh' #
+
+# NOTE: following values will be changed when installed with
+# 'install-to-system.sh', if you want to change them, change them there
 readonly executable_dir_path="$(cd "$(dirname "${0}")" && pwd)"
-readonly library_dir_path="${executable_dir_path}/../lib"
-readonly shareable_dir_path="${executable_dir_path}/../share"
-readonly config_dir_path="${executable_dir_path}/../.."
-################################################################################
+readonly library_dir_path="${executable_dir_path}/../lib/"
+readonly shareable_dir_path="${executable_dir_path}/../share/"
+readonly config_dir_path="${executable_dir_path}/../../"
+
+############[ end of configuration, script begins now ]#########################
 
 readonly version="0.4.0"
-
 readonly operation="${1}"
 
 if [ "${#}" -ne 0 ]; then
@@ -31,8 +33,9 @@ readonly options="${*}"
 
 checkRoot()
 {
+        # Changing the hosts file requires root rights!
         if [ "$(id -g)" -ne 0 ]; then
-        	echo "$(id -un), I require way more more power then this! How about... root ..? ;)" 1>&2
+        	echo "$(id -un), I require way more more power then this! How about.. root ..? ;)" 1>&2
                 exit 126
         fi
 

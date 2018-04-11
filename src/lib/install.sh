@@ -7,27 +7,23 @@
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:-------------   ---default value:----   ---defined in:--------------
-# crontab_dir_path            /etc/cron.weekly        bin/config.sh, adsorber.conf
-# hosts_file_path             /etc/hosts              bin/config.sh, adsorber.conf
-# hosts_file_backup_path      /etc/hosts.original     bin/config.sh, adsorber.conf
-# prefix                      '  ' (two spaces)       bin/colours.sh
-# prefix_input                '  ' (two spaces)       bin/colours.sh
-# prefix_fatal                '\033[0;91mE '          bin/colours.sh
-# prefix_reset                \033[0m                 bin/colours.sh
-# prefix_title                \033[1;37m              bin/colours.sh
-# prefix_warning              '- '                    bin/colours.sh
-# reply_to_prompt             Null (not set)          bin/install.sh, adsorber.sh
-# reply_to_scheduler_prompt   Null (not set)          bin/install.sh, adsorber.sh
-# binary_dir_path             script root directory   adsorber.sh
-#   (e.g., /home/user/Downloads/adsorber)
-# systemd_dir_path            /etc/systemd/system     bin/config.sh, adsorber.conf
-# version                     0.2.2 or similar        adsorber.sh
+# crontab_dir_path            /etc/cron.weekly        src/lib/config.sh, adsorber.conf
+# hosts_file_path             /etc/hosts              src/lib/config.sh, adsorber.conf
+# hosts_file_backup_path      /etc/hosts.original     src/lib/config.sh, adsorber.conf
+# prefix                      '  ' (two spaces)       src/lib/colours.sh
+# prefix_input                '  ' (two spaces)       src/lib/colours.sh
+# prefix_reset                \033[0m                 src/lib/colours.sh
+# prefix_title                \033[1;37m              src/lib/colours.sh
+# prefix_warning              '- '                    src/lib/colours.sh
+# reply_to_prompt             Null (not set)          src/bin/adsorber
+# reply_to_scheduler_prompt   Null (not set)          src/bin/adsorber
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
 # ---function:-----     ---function defined in:---
-# remove_ErrorCleanUp  bin/remove.sh
-# Systemd_remove       bin/remove.sh
+# Cronjob_install       src/lib/cron/cron.sh
+# remove_ErrorCleanUp   src/lib/remove.sh
+# Systemd_install       src/lib/systemd/systemd.sh
 
 
 install_BackupHostsFile()
@@ -89,6 +85,7 @@ install_PromptScheduler()
 }
 
 
+# Main function when calling installation related tasks
 install()
 {
         printf "%bInstalling Adsorber ...%b\n" "${prefix_title}" "${prefix_reset}"

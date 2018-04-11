@@ -11,27 +11,27 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:----------      ---default value:-----------   ---declared in:-----------------
-# config_dir_path             ${executable_dir_path}/../..   src/bin/adsorber
-# hosts_file_backup_path      /etc/hosts.original            src/lib/config.sh, adsorber.conf
-# hosts_file_path             /etc/hosts                     src/lib/config.sh, adsorber.conf
-# hosts_file_previous_enable  true                           src/lib/config.sh, adsorber.conf
-# hosts_file_previous_path    /etc/hosts.previous            src/lib/config.sh, adsorber.conf
-# http_proxy                  Null (not set)                 src/lib/config.sh, adsorber.conf
-# https_proxy                 Null (not set)                 src/lib/config.sh, adsorber.conf
-# ignore_download_error       true                           src/lib/config.sh, adsorber.conf
-# prefix                      '  ' (two spaces)              src/lib/colours.sh
-# prefix_fatal                '\033[0;91mE '                 src/lib/colours.sh
-# prefix_info                 '\033[0;97m  '                 src/lib/colours.sh
-# prefix_input                '  ' (two spaces)              src/lib/colours.sh
-# prefix_reset                \033[0m                        src/lib/colours.sh
-# prefix_title                \033[1;37m                     src/lib/colours.sh
-# prefix_warning              '- '                           src/lib/colours.sh
-# primary_list                blacklist                      src/lib/config.sh, adsorber.conf
-# reply_to_force_prompt       Null (not set)                 src/lib/install.sh, src/bin/adsorber
-# tmp_dir_path                /tmp/adsorber                  src/bin/adsorber
-# use_partial_matching        true                           src/lib/config.sh, adsorber.conf
-# version                     0.2.2 or similar               src/bin/adsorber
+# ---variable:----------      ---default value:------------   ---declared in:-----------------
+# config_dir_path             ${executable_dir_path}/../../   src/bin/adsorber
+# hosts_file_backup_path      /etc/hosts.original             src/lib/config.sh, adsorber.conf
+# hosts_file_path             /etc/hosts                      src/lib/config.sh, adsorber.conf
+# hosts_file_previous_enable  true                            src/lib/config.sh, adsorber.conf
+# hosts_file_previous_path    /etc/hosts.previous             src/lib/config.sh, adsorber.conf
+# http_proxy                  Null (not set)                  src/lib/config.sh, adsorber.conf
+# https_proxy                 Null (not set)                  src/lib/config.sh, adsorber.conf
+# ignore_download_error       true                            src/lib/config.sh, adsorber.conf
+# prefix                      '  ' (two spaces)               src/lib/colours.sh
+# prefix_fatal                '\033[0;91mE '                  src/lib/colours.sh
+# prefix_info                 '\033[0;97m  '                  src/lib/colours.sh
+# prefix_input                '  ' (two spaces)               src/lib/colours.sh
+# prefix_reset                \033[0m                         src/lib/colours.sh
+# prefix_title                \033[1;37m                      src/lib/colours.sh
+# prefix_warning              '- '                            src/lib/colours.sh
+# primary_list                blacklist                       src/lib/config.sh, adsorber.conf
+# reply_to_force_prompt       Null (not set)                  src/lib/install.sh, src/bin/adsorber
+# tmp_dir_path                /tmp/adsorber                   src/bin/adsorber
+# use_partial_matching        true                            src/lib/config.sh, adsorber.conf
+# version                     0.2.2 or similar                src/bin/adsorber
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:

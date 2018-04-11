@@ -22,6 +22,27 @@ readonly config_dir_path="/usr/local/etc/adsorber/"
 # Resolve source directory.
 readonly source_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
+echo "Current script location: ${source_dir_path}"
+
+echo "Going to check files at:"
+echo " - main exectuable:   ${executable_dir_path}"
+echo " - other executables: ${library_dir_path}"
+echo " - configuration:     ${config_dir_path}"
+echo " - miscellaneous:     ${shareable_dir_path}"
+
+printf "Are you sure you want to remove Adsorber from the system? [(Y)es/(N)o]: "
+read -r _prompt
+
+case "${_prompt}" in
+        [Yy] | [Yy][Ee][Ss] )
+                :
+                ;;
+        * )
+                echo "Removal from system cancelled."
+                exit 1
+                ;;
+esac
+
 # Check if user is root, if not exit.
 if [ "$(id -g)" -ne 0 ]; then
         echo "You need to be root to remove Adsorber." 1>&2
@@ -31,7 +52,7 @@ fi
 adsorber remove -y \
         || {
                 printf "\033[0;93mSometing went wrong at running Adsorber's own removal action. Doing it the hard way...\n\033[0m"
-
+                # Doing it the hard way ...
         }
 
 # Remove placed files from the specified locations
