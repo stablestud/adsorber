@@ -53,6 +53,7 @@ config_CopySourceList()
         if [ ! -f "${config_dir_path}/sources.list" ] || [ ! -s "${config_dir_path}/sources.list" ]; then
                 cp "${shareable_dir_path}/default/default-sources.list" "${config_dir_path}/sources.list" \
                         && echo "${prefix_warning}Created sources.list: to add new host sources edit this file."
+
                 chown root:root -R "${config_dir_path}/sources.list"
                 chmod u=rwx,g=rx,o=r -R "${config_dir_path}/sources.list"
         fi
@@ -66,6 +67,7 @@ config_CopyWhiteList()
         if [ ! -f "${config_dir_path}/whitelist" ] || [ ! -s "${config_dir_path}/whitelist" ]; then
                 cp "${shareable_dir_path}/default/default-whitelist" "${config_dir_path}/whitelist" \
                         && echo "${prefix_warning}Created whitelist: to allow specific domains edit this file."
+
                 chown root:root -R "${config_dir_path}/whitelist"
                 chmod u=rwx,g=rx,o=r -R "${config_dir_path}/whitelist"
         fi
@@ -79,6 +81,7 @@ config_CopyBlackList()
         if [ ! -f "${config_dir_path}/blacklist" ] || [ ! -s "${config_dir_path}/blacklist" ]; then
                 cp "${shareable_dir_path}/default/default-blacklist" "${config_dir_path}/blacklist" \
                         && echo "${prefix_warning}Created blacklist: to block additional domains edit this file."
+
                 chown root:root -R "${config_dir_path}/blacklist"
                 chmod u=rwx,g=rx,o=r -R "${config_dir_path}/blacklist"
         fi
@@ -152,7 +155,7 @@ config_ReadConfig()
                                 if [ -z "${ignore_download_error}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${ignore_download_error}"
+                                        echo "${prefix_warning}Duplicate configuration for 'ignore_download_error', keeping the first value: ${ignore_download_error}"
                                 fi
                                 ;;
                         http_proxy=* )
@@ -173,42 +176,42 @@ config_ReadConfig()
                                 if [ -z "${hosts_file_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${hosts_file_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_path', keeping the first value: ${hosts_file_path}"
                                 fi
                                 ;;
                         hosts_file_backup_path=* )
                                 if [ -z "${hosts_file_backup_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${hosts_file_backup_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_backup_path', keeping the first value: ${hosts_file_backup_path}"
                                 fi
                                 ;;
                         hosts_file_previous_enable=* )
                                 if [ -z "${hosts_file_previous_enable}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${hosts_file_previous_enable}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_enable', keeping the first value: ${hosts_file_previous_enable}"
                                 fi
                                 ;;
                         hosts_file_previous_path=* )
                                 if [ -z "${hosts_file_previous_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${hosts_file_previous_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_path', keeping the first value: ${hosts_file_previous_path}"
                                 fi
                                 ;;
                         crontab_dir_path=* )
                                 if [ -z "${crontab_dir_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${crontab_dir_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'crontab_dir_path', keeping the first value: ${crontab_dir_path}"
                                 fi
                                 ;;
                         systemd_dir_path=* )
                                 if [ -z "${systemd_dir_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${systemd_dir_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'systemd_dir_path', keeping the first value: ${systemd_dir_path}"
                                 fi
                                 ;;
                         * )
@@ -264,12 +267,12 @@ config_IsVariableValid()
         fi
 
         if [ "${use_partial_matching}" != "true" ] && [ "${use_partial_matching}" != "false" ]; then
-                printf "%bWrong 'use_partial_matching' set in adsorber.conf. Possible options: 'true' or 'false'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bWrong 'use_partial_matching' set in adsorber.conf. Possible option: 'true' or 'false'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 wrongVariable="true"
         fi
 
         if [ "${ignore_download_error}" != "true" ] && [ "${ignore_download_error}" != "false" ]; then
-                printf "%bWrong 'ignore_download_error' set in adsorber.conf. Possible options: 'true' or 'false'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bWrong 'ignore_download_error' set in adsorber.conf. Possible option: 'true' or 'false'%b\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 wrongVariable="true"
         fi
 
