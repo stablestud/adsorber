@@ -169,14 +169,14 @@ config_ReadConfig()
                                 if [ -z "${http_proxy}" ]; then
                                         export "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'http_proxy', keeping the first value: ${http_proxy}"
+                                        echo "${prefix_warning}'http_proxy' already defined, using: ${http_proxy}"
                                 fi
                                 ;;
                         https_proxy=* )
                                 if [ -z "${https_proxy}" ]; then
                                         export "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'https_proxy', keeping the first value: ${https_proxy}"
+                                        echo "${prefix_warning}'https_proxy' already defined, using: ${https_proxy}"
                                 fi
                                 ;;
                         hosts_file_path=* )
