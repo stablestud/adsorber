@@ -54,7 +54,7 @@ config_CopySourceList()
                         && echo "${prefix_warning}Created sources.list: to add new host sources edit this file."
 
                 chown root:root -R "${config_dir_path}/sources.list" 2>/dev/null
-                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/sources.list" 2>/dev/null
+                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/sources.list" 2>/dev/null # TODO Add proper error message for this
         fi
 
         return 0

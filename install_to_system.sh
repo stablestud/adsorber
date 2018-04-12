@@ -63,13 +63,13 @@ echo "Placing main executable to ${executable_path}"
 mkdir -p "$(dirname ${executable_path})"
 
 # Replacing the path to the libraries with the ones defined above.
-sed "s|^readonly library_dir_path=\\"\\${executable_dir_path}/\\.\\./lib/\\"$|readonly library_dir_path=\\"${library_dir_path}\\"|g" "${source_dir_path}/src/bin/adsorber" \
-        | sed "s|^readonly shareable_dir_path=\\"\\${executable_dir_path}/\\.\\./share/\\"$|readonly shareable_dir_path=\\"${shareable_dir_path}\\"|g" \
-        | sed "s|^readonly config_dir_path=\\"\\${executable_dir_path}/\\.\\./\\.\\./\\"$|readonly config_dir_path=\\"${config_dir_path}\\"|g" \
+sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${source_dir_path}/src/bin/adsorber" \
+        | sed "s|^readonly shareable_dir_path=\"\${executable_dir_path}/\\.\\./share/\"$|readonly shareable_dir_path=\"${shareable_dir_path}\"|g" \
+        | sed "s|^readonly config_dir_path=\"\${executable_dir_path}/\\.\\./\\.\\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" \
         > "${executable_path}"
 
-chmod u=rwx,g=rx,o=rx "${executable_path}"
-chown root:root "${executable_path}"
+chmod u=rwx,g=rx,o=rx "${executable_path}" 2>/dev/null # TODO same as in config.sh, Add proper error messages
+chown root:root "${executable_path}" 2>/dev/null
 
 
 ##[ Libaries ]##################################################################
@@ -79,8 +79,8 @@ mkdir -p "${library_dir_path}"
 
 cp -r "${source_dir_path}/src/lib/." "${library_dir_path}"
 
-chmod -R u=rwx,g=rx,o=rx "${library_dir_path}"
-chown -R root:root "${library_dir_path}"
+chmod -R u=rwx,g=rx,o=rx "${library_dir_path}" 2>/dev/null
+chown -R root:root "${library_dir_path}" 2>/dev/null
 
 
 ##[ Shareables ]################################################################
@@ -90,8 +90,8 @@ mkdir -p "${shareable_dir_path}"
 
 cp -r "${source_dir_path}/src/share/." "${shareable_dir_path}"
 
-chmod -R u=rwx,g=rx,o=rx "${shareable_dir_path}"
-chown -R root:root "${shareable_dir_path}"
+chmod -R u=rwx,g=rx,o=rx "${shareable_dir_path}" 2>/dev/null
+chown -R root:root "${shareable_dir_path}" 2>/dev/null
 
 
 ##[ Config files ]##############################################################
@@ -104,8 +104,8 @@ cp "${source_dir_path}/src/share/default/default-blacklist" "${config_dir_path}/
 cp "${source_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/whitelist"
 cp "${source_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"
 
-chmod -R u=rwx,g=rx,o=rx "${config_dir_path}"
-chown -R root:root "${config_dir_path}"
+chmod -R u=rwx,g=rx,o=rx "${config_dir_path}" 2>/dev/null
+chown -R root:root "${config_dir_path}" 2>/dev/null
 
 
 #echo "Installation into the system completed."
