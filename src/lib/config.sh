@@ -53,8 +53,8 @@ config_CopySourceList()
                 cp "${shareable_dir_path}/default/default-sources.list" "${config_dir_path}/sources.list" \
                         && echo "${prefix_warning}Created sources.list: to add new host sources edit this file."
 
-                chown root:root -R "${config_dir_path}/sources.list"
-                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/sources.list"
+                chown root:root -R "${config_dir_path}/sources.list" 2>/dev/null
+                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/sources.list" 2>/dev/null
         fi
 
         return 0
@@ -68,8 +68,8 @@ config_CopyWhiteList()
                 cp "${shareable_dir_path}/default/default-whitelist" "${config_dir_path}/whitelist" \
                         && echo "${prefix_warning}Created whitelist: to allow specific domains edit this file."
 
-                chown root:root -R "${config_dir_path}/whitelist"
-                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/whitelist"
+                chown root:root -R "${config_dir_path}/whitelist" 2>/dev/null
+                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/whitelist" 2>/dev/null
         fi
 
         return 0
@@ -83,8 +83,8 @@ config_CopyBlackList()
                 cp "${shareable_dir_path}/default/default-blacklist" "${config_dir_path}/blacklist" \
                         && echo "${prefix_warning}Created blacklist: to block additional domains edit this file."
 
-                chown root:root -R "${config_dir_path}/blacklist"
-                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/blacklist"
+                chown root:root -R "${config_dir_path}/blacklist" 2>/dev/null
+                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/blacklist" 2>/dev/null
         fi
 
         return 0
@@ -99,8 +99,8 @@ config_CopyConfig()
                 echo "${prefix_warning}Please re-run the command to continue."
                 sed "s|@.*|# Config file for Adsorber v${version}|g" "${shareable_dir_path}/default/default-adsorber.conf" > "${config_dir_path}/adsorber.conf"
 
-                chown root:root -R "${config_dir_path}/adsorber.conf"
-                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/adsorber.conf"
+                chown root:root -R "${config_dir_path}/adsorber.conf" 2>/dev/null
+                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/adsorber.conf" 2>/dev/null
                 exit 126
         fi
 
