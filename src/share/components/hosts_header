@@ -1,5 +1,5 @@
 # This file has been edited by Adsorber v#@version@# at #@date@#
-# Currently Adsorber is blocking #@blocked@# domain(s).
+# and is blocking #@blocked@# domain(s).
 #
 # To make any changes to this file please edit #@hosts_file_backup_path@#
 # and run 'adsorber update' to apply your changes.
