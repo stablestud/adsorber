@@ -31,7 +31,16 @@ echo " - other executables: ${library_dir_path}"
 echo " - configuration:     ${config_dir_path}"
 echo " - miscellaneous:     ${shareable_dir_path}"
 
+#printHelp() {
+#        echo "Help screen of install_to_system.sh"
+#        exit 0
+#}
+
 _prompt="${1}"
+
+#if [ "${_prompt}" = "help" ] || [ "${_prompt}" = "-[Hh]" ] || [ "${_prompt}" = "--help" ]; then
+#        printHelp
+#fi
 
 if [ -z "${_prompt}" ]; then
         printf "Are you sure you want to install Adsorber into the system? [(Y)es/(N)o]: "
@@ -70,11 +79,11 @@ sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|reado
 
 chmod u=rwx,g=rx,o=rx "${executable_path}" \
         || {
-                printf "%bCouldn't set permissions for %s" "${prefix_warning}" "${executable_path}"
+                printf "Couldn't set permissions for %s" "${executable_path}"
         }
 chown root:root "${executable_path}" \
         || {
-                printf "%bCouldn't set ownership fo %s" "${prefix_warning}" "${executable_path}"
+                printf "Couldn't set ownership fo %s" "${executable_path}"
         }
 
 
@@ -87,11 +96,11 @@ cp -r "${source_dir_path}/src/lib/." "${library_dir_path}"
 
 chmod -R u=rwx,g=rx,o=rx "${library_dir_path}" \
         || {
-                printf "%bCouldn't set permissions for %s" "${prefix_warning}" "${library_dir_path}"
+                printf "Couldn't set permissions for %s" "${library_dir_path}"
         }
 chown -R root:root "${library_dir_path}" \
         || {
-                printf "%bCouldn't set ownership of %s" "${prefix_warning}" "${library_dir_path}"
+                printf "Couldn't set ownership of %s" "${library_dir_path}"
         }
 
 ##[ Shareables ]################################################################
@@ -103,11 +112,11 @@ cp -r "${source_dir_path}/src/share/." "${shareable_dir_path}"
 
 chmod -R u=rwx,g=rx,o=rx "${shareable_dir_path}" \
         || {
-                printf "%bCouldn't set permissions for %s" "${prefix_warning}" "${shareable_dir_path}"
+                printf "Couldn't set permissions for %s" "${shareable_dir_path}"
         }
 chown -R root:root "${shareable_dir_path}" \
         || {
-                printf "%bCouldn't set ownership of %s" "${prefix_warning}" "${shareable_dir_path}"
+                printf "Couldn't set ownership of %s" "${shareable_dir_path}"
         }
 
 ##[ Config files ]##############################################################
@@ -122,11 +131,11 @@ cp "${source_dir_path}/src/share/default/default-sources.list" "${config_dir_pat
 
 chmod -R u=rwx,g=rx,o=rx "${config_dir_path}" \
         || {
-                printf "%bCouldn't set permissions for %s"  "${prefix_warning}" "${config_dir_path}"
+                printf "Couldn't set permissions for %s" "${config_dir_path}"
         }
 chown -R root:root "${config_dir_path}" \
         || {
-                printf "%bCouldn't set ownership of %s" "${prefix_warning}" "${config_dir_path}"
+                printf "Couldn't set ownership of %s" "${config_dir_path}"
         }
 
 

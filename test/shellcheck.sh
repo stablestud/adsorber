@@ -22,7 +22,7 @@ shellcheck -e SC2154 -e SC1090 -e SC2163 \
         "${source_dir_path}/../src/lib/colours.sh" \
         "${source_dir_path}/../src/lib/cron/cron.sh" \
         "${source_dir_path}/../src/lib/systemd/systemd.sh" \
-        "${source_dir_path}/../adsorber-portable.sh" \
-        "${source_dir_path}/../install-to-system.sh" \
-        "${source_dir_path}/../remove-from-system.sh" \
+        "${source_dir_path}/../portable_adsorber.sh" \
+        "${source_dir_path}/../install_to_system.sh" \
+        "${source_dir_path}/../remove_from_system.sh" \
         "${source_dir_path}/shellcheck.sh"

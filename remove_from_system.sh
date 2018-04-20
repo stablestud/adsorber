@@ -38,7 +38,18 @@ echo " - other executables: ${library_dir_path}"
 echo " - configuration:     ${config_dir_path}"
 echo " - miscellaneous:     ${shareable_dir_path}"
 
+#printHelp() {
+#	echo
+#	echo "Help screen of remove_from_system.sh"
+#
+#	exit 0
+#}
+
 _prompt="${1}"
+
+#if [ "${_prompt}" = "help" ] || [ "${_prompt}" = "-h" ] || [ "${_prompt}" = "--help" ]; then
+#	printHelp
+#fi
 
 # Prompt user if sure about to remove Adsorber from the system
 if [ -z "${_prompt}" ]; then

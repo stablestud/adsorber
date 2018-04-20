@@ -1,11 +1,10 @@
 ## Must:
 * README.md update
-* debugging of install_to_system.sh
-* debugging of remove_from_system.sh
-* debugging of portable_adsorber.sh
-* Add help screen to install_to_system
-* Add help screen to remove_from_system
-* Add warning messages to failed chown/chmod in config.sh,  install\_to\_system
+* debugging of install\_to\_system.sh
+* debugging of remove\_from\_system.sh
+* debugging of portable\_adsorber.sh
+* Add help screen to install\_to\_system
+* Add help screen to remove\_from\_system
 
 ## Should:
 * interactive ability to set the update frequency
@@ -13,6 +12,7 @@
 ## Could:
 * OpenRC support
 * log-file
+* save statisics to var/ and read from adsorber
 
 ## Wish:
 * bash completion
