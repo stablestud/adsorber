@@ -1,5 +1,5 @@
-sources.list
+.directory
 whitelist
 blacklist
-test.sh
-dummy.list
+sources.list
+adsorber.conf

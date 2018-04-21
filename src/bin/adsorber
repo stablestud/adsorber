@@ -4,13 +4,26 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
+# Variable naming:
+# under_score        - used for global variables which are accessible between functions.
+# _extra_under_score - used for local function variables. Should be unset afterwards.
+#          (Note the underscore in the beginning of _extra_under_score!)
 
 readonly tmp_dir_path="/tmp/adsorber"
-readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
-readonly sourcelist_file_path="${script_dir_path}/sources.list"
+readonly debug="false"
 
-readonly version="0.3.0"
 
+############[ DO NOT EDIT ]#####################################################
+# NOTE: following values will be changed when installed with
+# 'install-to-system.sh', if you want to change them, change them there
+readonly executable_dir_path="$(cd "$(dirname "${0}")" && pwd)"
+readonly library_dir_path="${executable_dir_path}/../lib/"
+readonly shareable_dir_path="${executable_dir_path}/../share/"
+readonly config_dir_path="${executable_dir_path}/../../"
+
+############[ End of configuration, script begins now ]#########################
+
+readonly version="0.4.0"
 readonly operation="${1}"
 
 if [ "${#}" -ne 0 ]; then
@@ -21,8 +34,9 @@ readonly options="${*}"
 
 checkRoot()
 {
+        # Changing the hosts file requires root rights!
         if [ "$(id -g)" -ne 0 ]; then
-                echo "This activity must be run as root." 1>&2
+        	echo "$(id -un), I require way more more power then this! How about.. root ..? ;)" 1>&2
                 exit 126
         fi
 
@@ -32,11 +46,11 @@ checkRoot()
 
 checkForWrongParameters()
 {
-        if [ -n "${wrong_operation}" ] || [ -n "${wrong_option}" ]; then
+        if [ -n "${_wrong_operation}" ] || [ -n "${_wrong_option}" ]; then
                 showUsage
         fi
 
-        if [ "${option_help}" = "true"  ]; then
+        if [ "${_option_help}" = "true"  ]; then
                 showSpecificHelp
         fi
 
@@ -46,24 +60,24 @@ checkForWrongParameters()
 
 showUsage()
 {
-        if [ -n "${wrong_operation}" ]; then
-                echo "Adsorber: Invalid operation: '${wrong_operation}'" 1>&2
+        if [ -n "${_wrong_operation}" ]; then
+                echo "Adsorber: Invalid operation: '${_wrong_operation}'" 1>&2
         fi
 
-        if [ -n "${wrong_option}" ]; then
-                echo "Adsorber: Invalid option: '${wrong_option}'" 1>&2
+        if [ -n "${_wrong_option}" ]; then
+                echo "Adsorber: Invalid option: '${_wrong_option}'" 1>&2
         fi
 
-        echo "Usage: ${0} <install|update|restore|revert|remove> [<options>]"
+        echo "Usage: adsorber <install|update|restore|revert|remove> [<options>]"
         echo "Try --help for more information."
 
-        exit 127
+        exit 80
 }
 
 
 showHelp()
 {
-        echo "Usage: ${0} <operation> [<options>]"
+        echo "Usage: adsorber <operation> [<options>]"
         echo ""
         echo "A(d)sorber blocks ads by 'absorbing' and dumbing them into void."
         echo "           (with the help of the hosts file)"
@@ -72,6 +86,7 @@ showHelp()
         echo "  install - setup necessary things needed for Adsorber"
         echo "              e.g., create backup file of hosts file,"
         echo "                    create scheduler which updates the host file once a week"
+        echo "            However this should've be done automatically."
         echo "  update  - update hosts file with newest ad servers"
         echo "  restore - restore hosts file to its original state"
         echo "            (it does not remove the schedule, this should be used temporary)"
@@ -82,7 +97,7 @@ showHelp()
         echo "  version - show version of this shell script"
         echo "  help    - show this help"
         echo ""
-        echo "Options: (not required)"
+        echo "Options: (optional)"
         echo "  -s,  --systemd           - use Systemd ..."
         echo "  -c,  --cron              - use Cronjob as scheduler (use with 'install')"
         echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'install')"
@@ -102,7 +117,7 @@ showSpecificHelp()
 {
         case "${operation}" in
                 install )
-                        printf "%badsorber.sh install [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber install [<options>]%b:\\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "You should run this command first."
                         echo
@@ -121,7 +136,7 @@ showSpecificHelp()
                         echo " -h,  --help               - show this help screen"
                         ;;
                 update )
-                        printf "%badsorber.sh update [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber update [<options>]%b:\\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To keep the hosts file up-to-date."
                         echo
@@ -134,7 +149,7 @@ showSpecificHelp()
                         echo " -h, --help       - show this help screen"
                         ;;
                 restore )
-                        printf "%badsorber.sh restore [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber restore [<options>]%b:\\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To restore the hosts file temporary, without removing the backup."
                         echo
@@ -152,7 +167,7 @@ showSpecificHelp()
                         echo " -h, --help       - show this help screen"
                         ;;
                 revert )
-                        printf "%badsorber.sh revert [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber revert [<options>]%b:\\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To revert to the last hosts file, good use if the"
                         echo "current host file was corrupted."
@@ -166,7 +181,7 @@ showSpecificHelp()
                         echo " -h, --help       - show this help screen"
                         ;;
                 remove )
-                        printf "%badsorber remove [<options>]%b:\n" "${uwhite}" "${prefix_reset}"
+                        printf "%badsorber remove [<options>]%b:\\n" "${uwhite}" "${prefix_reset}"
                         echo
                         echo "To completely remove changes made by Adsorber."
                         echo
@@ -204,67 +219,88 @@ showVersion()
 duplicateOption()
 {
         if [ "${1}" = "scheduler" ]; then
-                echo "Adsorber: Duplicate option for scheduler: '${option}'" 1>&2
+                echo "Adsorber: Duplicate option for scheduler: '${_option}'" 1>&2
                 echo "You may only select one:"
                 echo "  -s,  --systemd           - use Systemd ..."
                 echo "  -c,  --cron              - use Cronjob as scheduler (use with 'install')"
                 echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'install')"
         else
-                echo "Adsorber: Duplicate option: '${option}'" 1>&2
+                echo "Adsorber: Duplicate option: '${_option}'" 1>&2
                 showUsage
         fi
 
-        exit 127
+        exit 80
 }
 
 
 sourceFiles()
 {
-        . "${script_dir_path}/bin/install.sh"
-        . "${script_dir_path}/bin/remove.sh"
-        . "${script_dir_path}/bin/update.sh"
-        . "${script_dir_path}/bin/restore.sh"
-        . "${script_dir_path}/bin/revert.sh"
-        . "${script_dir_path}/bin/config.sh"
-        . "${script_dir_path}/bin/colours.sh"
+        . "${library_dir_path}/install.sh"
+        . "${library_dir_path}/remove.sh"
+        . "${library_dir_path}/update.sh"
+        . "${library_dir_path}/restore.sh"
+        . "${library_dir_path}/revert.sh"
+        . "${library_dir_path}/config.sh"
+        . "${library_dir_path}/colours.sh"
+        . "${library_dir_path}/cron/cron.sh"
+        . "${library_dir_path}/systemd/systemd.sh"
+
         return 0
 }
 
 
 sourceFiles
 
-for option in "${@}"; do
+for _option in "${@}"; do
 
-        case "${option}" in
+        case "${_option}" in
                 -[Ss] | --systemd )
-                        readonly reply_to_scheduler_prompt="systemd" 2>/dev/null || duplicateOption "scheduler"
+                        if [ -z "${reply_to_scheduler_prompt}" ]; then
+                                readonly reply_to_scheduler_prompt="systemd"
+                        else
+                                duplicateOption "scheduler"
+                        fi
                         ;;
                 -[Cc] | --cron )
-                        readonly reply_to_scheduler_prompt="cronjob" 2>/dev/null || duplicateOption "scheduler"
+                        if [ -z "${reply_to_scheduler_prompt}" ]; then
+                                readonly reply_to_scheduler_prompt="cronjob"
+                        else
+                                duplicateOption "scheduler"
+                        fi
                         ;;
                 -[Nn][Ss] | --no-scheduler )
-                        readonly reply_to_scheduler_prompt="no-scheduler" 2>/dev/null || duplicateOption "scheduler"
+                        if [ -z "${reply_to_scheduler_prompt}" ]; then
+                                readonly reply_to_scheduler_prompt="no-scheduler"
+                        else
+                                duplicateOption "scheduler"
+                        fi
                         ;;
                 -[Yy] | --[Yy][Ee][Ss] | --assume-yes )
-                        readonly reply_to_prompt="yes" 2>/dev/null || duplicateOption
+                        if [ -z "${reply_to_prompt}" ]; then
+                                readonly reply_to_prompt="yes"
+                        else
+                                duplicateOption
+                        fi
                         ;;
                 -[Ff] | --force )
-                        readonly reply_to_force_prompt="yes" 2>/dev/null || duplicateOption
+                        if [ -z "${reply_to_force_prompt}" ]; then
+                                readonly reply_to_force_prompt="yes"
+                        else
+                                duplicateOption
+                        fi
                         ;;
                 "" )
                         : # Do nothing
                         ;;
                 -[Hh] | --help | help )
-                        readonly option_help="true" 2>/dev/null
+                        _option_help="true"
                         ;;
                 * )
-                        wrong_option="${option}" 2>/dev/null
+                        _wrong_option="${_option}" 2>/dev/null
                         ;;
         esac
 
 done
-
-config_Copy
 
 case "${operation}" in
         install )
@@ -308,11 +344,11 @@ case "${operation}" in
                 showUsage
                 ;;
         * )
-                readonly wrong_operation="${operation}"
+                readonly _wrong_operation="${operation}"
                 showUsage
                 ;;
 esac
 
-printf "%bFinished successfully.%b\n" "${prefix_title}" "${prefix_reset}"
+printf "%bFinished successfully.%b\\n" "${prefix_title}" "${prefix_reset}"
 
 exit 0

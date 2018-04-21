@@ -4,6 +4,11 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
+# Variable naming:
+# under_score        - used for global variables which are accessible between functions.
+# _extra_under_score - used for local function variables. Should be unset afterwards.
+#          (Note the underscore in the beginning of _extra_under_score!)
+
 readonly prefix="  "
 readonly prefix_fatal="\033[0;91mE "    # 'E' in intensity red
 readonly prefix_info="\033[0;97m  "     # Intensity white
