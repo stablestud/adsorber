@@ -269,15 +269,6 @@ config_ReadConfig()
 
 config_IsVariableSet()
 {
-        # Check if essential configurations were set in the config file
-        # if not abort, and call error clean-up function
-        if [ -z "${hosts_file_path}" ] || [ -z "${hosts_file_backup_path}" ] || [ -z "${crontab_dir_path}" ] || [ -z "${systemd_dir_path}" ] || [ -z "${hosts_file_previous_path}" ] || [ -z "${hosts_file_previous_enable}" ]; then
-                printf "%bMissing setting(s) in adsorber.conf.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                printf "%bPlease delete adsorber.conf in %s and run '%s install' to create a new config file.%b\\n" "${prefix_fatal}" "${config_dir_path}" "${0}" "${prefix_reset}" 1>&2
-                remove_ErrorCleanUp
-                exit 127
-        fi
-
         # These configurations are not mandatory needed by Adsorber, thus
         # if any of them were not defined, Adsorber will use the default value
         if [ -z "${primary_list}" ]; then
@@ -293,6 +284,20 @@ config_IsVariableSet()
         if [ -z "${ignore_download_error}" ]; then
                 printf "%bignore_download_error not set in adsorber.conf. Using default value: false\\n" "${prefix_warning}" 1>&2
                 readonly ignore_download_error="false"
+        fi
+
+        if [ -z "${hosts_file_previous_enable}" ]; then
+                printf "%bhosts_file_previous_enable not set in adsorber.conf. Using default value: true\\n" "${prefix_warning}" 1>&2
+                readonly hosts_file_previous_enable="true"
+        fi
+
+        # Check if essential configurations were set in the config file
+        # if not abort, and call error clean-up function
+        if [ -z "${hosts_file_path}" ] || [ -z "${hosts_file_backup_path}" ] || [ -z "${crontab_dir_path}" ] || [ -z "${systemd_dir_path}" ] || [ -z "${hosts_file_previous_path}" ]; then
+                printf "%bMissing setting(s) in adsorber.conf.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bPlease delete adsorber.conf in %s and run 'adsorber install' to create a new config file.\\n" "${prefix_warning}" "${config_dir_path}" 1>&2
+                remove_ErrorCleanUp
+                exit 127
         fi
 
         return 0

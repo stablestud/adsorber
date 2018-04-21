@@ -39,7 +39,7 @@ restore_HostsFile()
                         }
 
                 printf "%bSuccessfully restored %s.\\n" "${prefix}" "${hosts_file_path}"
-                printf "%bTo reapply please run './adsorber.sh update'.\\n" "${prefix}"
+                printf "%bTo reapply please run 'adsorber update'.\\n" "${prefix}"
         else
                 # If /etc/hosts.previous was not found, abort and call error clean-up function
                 printf "%bCan't restore hosts file. Original hosts file does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2

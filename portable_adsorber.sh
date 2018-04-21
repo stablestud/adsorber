@@ -19,6 +19,7 @@ runAdsorber()
         ( "${source_dir_path}/src/bin/adsorber" ${parameters} )
         exit_code="${?}"
         echo ""
+        return "${exit_code}"
 }
 
 if runAdsorber; then

@@ -1,6 +1,5 @@
-## NOTE: master is a development branch, for a stable version take a look at the releases
-
 # Adsorber
+**NOTE: master is beta quality, for a stable version take a look at the [release page](https://github.com/stablestud/adsorber/releases)**
 A(d)sorber blocks ads by 'absorbing' and dumbing them into void.
 Technically speaking, it adds ad-domains to the hosts file `/etc/hosts` with a redirection to a non-existent ip `0.0.0.0`.
 
@@ -26,7 +25,7 @@ To add your own hosts lists, just add them to the `sources.list` file.
 ## Usage
 
 ```
-Usage: ./adsorber.sh [OPERATION] {options}
+Usage: adsorber [OPERATION] {options}
 
 A(d)sorber blocks ads by 'absorbing' and dumbing them into void.
            (with the help of the hosts file)

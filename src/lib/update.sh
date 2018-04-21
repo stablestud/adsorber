@@ -50,8 +50,8 @@ update_CheckBackupExist()
                 # hostname association with 127.0.0.1 and localhost will be lost.
                 # The user may interactively decide here wheter to proceed or not.
                 if [ -z "${reply_to_force_prompt}" ]; then
-                        printf "%bBackup of %s does not exist. To backup run '%s install'.%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${0}" "${prefix_reset}" 1>&2
-                        printf "%bIgnore issue and continue? (May break your system, not recommended) [YES/n]: %b" "${prefix_input}" "${prefix_reset}"
+                        printf "%bBackup of %s does not exist. To backup run 'adsorber install'.%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
+                        printf "%bIgnore issue and continue? (May break your hostfile, not recommended) [YES/n]: %b" "${prefix_input}" "${prefix_reset}"
                         read -r reply_to_force_prompt
                 fi
 
@@ -204,7 +204,7 @@ update_FetchSources()
 
         if [ "${_successful_count}" -eq 0 ]; then
                 printf "%bNothing to apply [%d/%d].\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
-                echo "Perhaps a proxy server must be set?" 1>&2
+                echo "${prefix}Perhaps a proxy server must be set?" 1>&2
                 return 1
         elif [ "${ignore_download_error}" = "false" ] && [ "${_successful_count}" -ne "${_total_count}" ]; then
                 printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2

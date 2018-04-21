@@ -23,17 +23,36 @@ readonly config_dir_path="/usr/local/etc/adsorber/"
 # Resolve script directory.
 readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
-echo "Current script location: ${script_dir_path}"
 
-echo "Going to place files to:"
-echo " - main exectuable:   ${executable_path}"
-echo " - other executables: ${library_dir_path}"
-echo " - configuration:     ${config_dir_path}"
-echo " - miscellaneous:     ${shareable_dir_path}"
+printLocation()
+{
+        echo "Going to place files to:"
+        echo " - main exectuable:   ${executable_path}"
+        echo " - other executables: ${library_dir_path}"
+        echo " - configuration:     ${config_dir_path}"
+        echo " - miscellaneous:     ${shareable_dir_path}"
 
-printHelp() {
+        return 0
+}
+
+printHelp()
+{
+        printf "\\033[4;37minstall_to_system.sh\\033[0m:\\n\\n"
+        echo "   Will place Adsorbers executables and other"
+        echo "   files relevant to Adsorber into the system."
         echo
-        echo "Help screen of install_to_system.sh"
+        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'install' command will not do the same\\n"
+        echo "action as this script."
+        echo "Instead, it will only setup the scheduler and backup the original hosts file."
+        echo
+        echo "Usage: ${0} [option]:"
+        echo
+        echo "Options:"
+        echo "  -y, --yes       automatically reply the prompt with yes"
+        echo "  -h, --help      show this help screen"
+        echo
+        printLocation
+
         exit 0
 }
 
@@ -42,6 +61,10 @@ prompt="${1}"
 if [ "${prompt}" = "help" ] || [ "${prompt}" = "h" ] || [ "${prompt}" = "-h" ] || [ "${prompt}" = "--help" ]; then
         printHelp
 fi
+
+echo "Current script location: ${script_dir_path}"
+printLocation
+echo
 
 if [ -z "${prompt}" ]; then
         printf "Are you sure you want to install Adsorber into the system? [(Y)es/(N)o]: "
@@ -64,8 +87,7 @@ if [ "$(id -g)" -ne 0 ]; then
         exit 126
 fi
 
-echo ""
-
+echo
 
 ##[ Main exectuable ]###########################################################
 echo "Placing main executable to ${executable_path}"
@@ -88,7 +110,7 @@ chown root:root "${executable_path}" \
         }
 
 
-##[ Libaries ]##################################################################
+##[ Libraries ]#################################################################
 echo "Placing other executables to ${library_dir_path}"
 
 mkdir -p "${library_dir_path}"
@@ -139,12 +161,6 @@ chown -R root:root "${config_dir_path}" \
                 printf "Couldn't set ownership of %s" "${config_dir_path}"
         }
 
-
-
-#echo "Installation into the system completed."
-#echo "Running Adsorber..."
-#echo ""
-
 echo
 
 ## We don't run Adsorber after installation yet
@@ -157,5 +173,6 @@ echo
 #                echo "Run 'adsorber install' to try again."
 #        }
 
-echo "Installation completed. You may want to run 'adsorber install'"
+echo "Installation completed."
+printf "\\033[1;37mTo setup the scheduler and to backup the hosts file run 'adsorber install'\\033[0m\\n"
 echo "You can now delete this folder."

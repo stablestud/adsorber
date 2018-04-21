@@ -32,26 +32,51 @@ readonly systemd_service_path="/etc/systemd/system/adsorber.service"
 readonly crontab_path="/etc/cron.weekly/80adsorber"
 readonly tmp_dir_path="/tmp/adsorber"
 
-echo "Current script location: ${script_dir_path}"
 
-echo "Going to remove files from:"
-echo " - main exectuable:   ${executable_path}"
-echo " - other executables: ${library_dir_path}"
-echo " - configuration:     ${config_dir_path}"
-echo " - miscellaneous:     ${shareable_dir_path}"
+printLocation()
+{
+        echo "Going to remove files from:"
+        echo " - main exectuable:   ${executable_path}"
+        echo " - other executables: ${library_dir_path}"
+        echo " - configuration:     ${config_dir_path}"
+        echo " - miscellaneous:     ${shareable_dir_path}"
 
-printHelp() {
-	echo
-	echo "Help screen of remove_from_system.sh"
+        return 0
+}
+
+
+printHelp()
+{
+        printf "\\033[4;37mremove_from_system.sh\\033[0m:\\n\\n"
+        echo "   Will remove Adsorbers executables and other"
+        echo "   files relevant to Adsorber from the system."
+        echo
+        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'remove' command will not do the same\\n"
+        echo "action as this script."
+        echo "Instead, it will only remove the scheduler and restore the original hosts"
+        echo "file but Adsorber will still be present on the system. "
+        echo
+        echo "Usage: ${0} [option]:"
+        echo
+        echo "Options:"
+        echo "  -y, --yes       automatically reply the prompt with yes"
+        echo "  -h, --help      show this help screen"
+        echo
+        printLocation
 
 	exit 0
 }
+
 
 prompt="${1}"
 
 if [ "${prompt}" = "help" ] || [ "${prompt}" = "h" ] || [ "${prompt}" = "-h" ] || [ "${prompt}" = "--help" ]; then
 	printHelp
 fi
+
+echo "Current script location: ${script_dir_path}"
+printLocation
+echo
 
 # Prompt user if sure about to remove Adsorber from the system
 if [ -z "${prompt}" ]; then
@@ -75,14 +100,13 @@ if [ "$(id -g)" -ne 0 ]; then
         exit 126
 fi
 
-echo
-
-echo "Running 'adsorber remove -y' ..."
-( adsorber remove -x ) \
+# Run Adsorber's own removal, if it fails do it manually
+printf "\\nRunning 'adsorber remove -y' ...\\n"
+( adsorber remove -y ) \
         || {
                 echo
                 printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nDoing it the hard way ...\\n\\033[0m"
-                echo "Maybe Adsorber has been removed already?"
+                echo "Maybe Adsorber has been already removed ?"
 
                 # Doing it the hard way .., removing everything manually
                 rm "${systemd_timer_path}" 2>/dev/null && echo "Removed ${systemd_timer_path}"
@@ -107,8 +131,9 @@ rm -r "${library_dir_path}" 2>/dev/null && echo "Cleaned ${library_dir_path}"
 rm -r "${shareable_dir_path}" 2>/dev/null && echo "Cleaned ${shareable_dir_path}"
 rm -r "${config_dir_path}" 2>/dev/null && echo "Cleaned ${config_dir_path}"
 
-echo "Clearing adsorber from shell cache ..."
 # Remove the adsorber command from cache/hashtable
+## TODO: Fix, as it does not work reliable
+echo "Clearing adsorber from shell cache ..."
 if command -v hash 1>/dev/null; then
         # Works in bash
         hash -d adsorber 2>/dev/null

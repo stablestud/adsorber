@@ -50,7 +50,7 @@ remove_ErrorCleanUp()
 
         # Remove backup if backed-up in the same run
         if [ "${backedup}" = "true" ]; then
-                echo "${prefix_warning}Removed backup as the installation failed."
+                echo "${prefix}Removed backup as the installation failed."
                 rm "${hosts_file_backup_path}"
         fi
 
