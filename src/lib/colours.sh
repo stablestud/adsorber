@@ -10,12 +10,13 @@
 #          (Note the underscore in the beginning of _extra_under_score!)
 
 readonly prefix="  "
-readonly prefix_fatal="\033[0;91mE "    # 'E' in intensity red
-readonly prefix_info="\033[0;97m  "     # Intensity white
+readonly prefix_fatal="\\033[0;91mE "    # 'E' in intensity red
+readonly prefix_info="\\033[0;97m  "     # Intensity white
 readonly prefix_input="> "
-readonly prefix_title="\033[1;37m"      # Bold white
+readonly prefix_title="\\033[1;37m"       # Bold white
 readonly prefix_warning="- "
-readonly prefix_reset='\033[0m'         # Default colour
+readonly prefix_reset="\\033[0m"          # Default colour
+readonly prefix_underline="\\033[4;37m"   # White Underline
 
 # Regular Colors
 #readonly BLACK='\033[0;30m'        # Black
@@ -45,7 +46,7 @@ readonly prefix_reset='\033[0m'         # Default colour
 #readonly UBLUE='\033[4;34m'        # Blue
 #readonly UPURPLE='\033[4;35m'      # Purple
 #readonly UCYAN='\033[4;36m'        # Cyan
-readonly uwhite='\033[4;37m'        # White
+#readonly uwhite='\033[4;37m'        # White
 
 # Background
 #readonly BG_BLACK='\033[40m'       # Black

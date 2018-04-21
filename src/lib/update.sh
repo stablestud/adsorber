@@ -180,7 +180,7 @@ update_FetchSources()
                         if wget "${_domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${tmp_dir_path}/fetched"; then
                                 _successful_count=$((_successful_count+1))
                         else
-                                printf "%bwget couldn't fetch: %s\\n" "${_domain}" 1>&2
+                                printf "%bwget couldn't fetch: %s\\n" "${prefix_warning}" "${_domain}" 1>&2
                         fi
                 # Is curl installed? If yes download the hosts files.
                 elif command -v curl 2>/dev/null 1>&2; then

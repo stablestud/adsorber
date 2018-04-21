@@ -75,11 +75,12 @@ fi
 
 echo ""
 
+echo "Running 'adsorber remove -y' ..."
 (adsorber remove -y) \
         || {
                 echo ""
-                printf "\033[0;93mSomething went wrong at running Adsorber's own removal action. Doing it the hard way...\\n\033[0m"
-                echo "Maybe Adsorber has been already removed?"
+                printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nDoing it the hard way ...\\n\\033[0m"
+                echo "Maybe Adsorber has been removed already?"
 
                 # Doing it the hard way .., removing everything manually
                 rm "${systemd_timer_path}" 2>/dev/null && echo "Removed ${systemd_timer_path}"
@@ -93,9 +94,22 @@ echo ""
 
 # Remove placed files from the specified locations
 rm -r "${executable_path}" 2>/dev/null && echo "Removed ${executable_path}"
-rm -r "${library_dir_path}" 2>/dev/null && echo "Removed ${library_dir_path}"
-rm -r "${shareable_dir_path}" 2>/dev/null && echo "Removed ${shareable_dir_path}"
-rm -r "${config_dir_path}" 2>/dev/null && echo "Removed ${config_dir_path}"
+rm -r "${library_dir_path}" 2>/dev/null && echo "Cleaned ${library_dir_path}"
+rm -r "${shareable_dir_path}" 2>/dev/null && echo "Cleaned ${shareable_dir_path}"
+rm -r "${config_dir_path}" 2>/dev/null && echo "Cleaned ${config_dir_path}"
+
+echo "Clearing shell cache ..."
+# Remove the adsorber command from cache/hashtable
+if command -v hash 1>/dev/null; then
+        # Works in bash
+        hash -d adsorber 2>/dev/null
+elif command -v rehash 1>/dev/null; then
+        # For csh and zsh shells
+        rehash
+else
+        # Should work in all shells
+        export PATH="${PATH}"
+fi
 
 echo ""
 

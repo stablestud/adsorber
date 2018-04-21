@@ -11,7 +11,7 @@ fi
 
 echo "Running shellcheck ..."
 
-shellcheck -e SC2154 -e SC1090 -e SC2163 \
+shellcheck  -e SC1090,SC2086,SC2154,SC2163 \
         "${source_dir_path}/../src/bin/adsorber" \
         "${source_dir_path}/../src/lib/config.sh" \
         "${source_dir_path}/../src/lib/install.sh" \
