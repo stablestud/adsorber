@@ -25,6 +25,7 @@
 # remove_CleanUp       src/lib/remove.sh
 # remove_ErrorCleanUp  src/lib/remove.sh
 
+# shellcheck disable=SC2154
 
 restore_HostsFile()
 {

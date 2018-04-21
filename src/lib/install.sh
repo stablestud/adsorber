@@ -28,6 +28,7 @@
 # remove_ErrorCleanUp  src/lib/remove.sh
 # systemdInstall       src/lib/systemd/systemd.sh
 
+# shellcheck disable=SC2154
 
 install_BackupHostsFile()
 {

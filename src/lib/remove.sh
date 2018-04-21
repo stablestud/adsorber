@@ -31,6 +31,7 @@
 # systemdRemove      src/lib/systemd/systemd.sh
 # crontabRemove      src/lib/cron/cron.sh
 
+# shellcheck disable=SC2154
 
 # This function cleans-up all changed files if Adsorber runs into a problem
 remove_ErrorCleanUp()

@@ -25,6 +25,7 @@
 # ---function:-----    ---function defined in:---
 # remove_ErrorCleanUp  src/lib/remove.sh
 
+# shellcheck disable=SC2154
 
 crontabInstall()
 {

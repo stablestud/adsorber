@@ -9,8 +9,11 @@
 # _extra_under_score - used for local function variables. Should be unset afterwards.
 #          (Note the underscore in the beginning of _extra_under_score!)
 
+# shellcheck disable=SC2154
+
 readonly tmp_dir_path="/tmp/adsorber"
 readonly debug="false"
+
 
 ############[ DO NOT EDIT ]#####################################################
 # NOTE: following values will be changed when installed with
@@ -232,16 +235,28 @@ duplicateOption()
 }
 
 
+
 sourceFiles()
 {
+        # shellcheck source=../src/lib/install.sh
         . "${library_dir_path}/install.sh"
+        # shellcheck source=../src/lib/remove.sh
         . "${library_dir_path}/remove.sh"
+        # shellcheck source=../src/lib/update.sh
         . "${library_dir_path}/update.sh"
+        # shellcheck source=../src/lib/restore.sh
         . "${library_dir_path}/restore.sh"
+        # shellcheck source=../src/lib/revert.sh
         . "${library_dir_path}/revert.sh"
+        # shellcheck source=../src/lib/config.sh
         . "${library_dir_path}/config.sh"
+        # shellcheck source=../src/lib/colours.sh
         . "${library_dir_path}/colours.sh"
+
+        # Only source when needed?
+        # shellcheck source=../src/lib/cron/cron.sh
         . "${library_dir_path}/cron/cron.sh"
+        # shellcheck source=../src/lib/systemd/systemd.sh
         . "${library_dir_path}/systemd/systemd.sh"
 
         return 0
