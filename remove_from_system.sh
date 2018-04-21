@@ -40,26 +40,26 @@ echo " - other executables: ${library_dir_path}"
 echo " - configuration:     ${config_dir_path}"
 echo " - miscellaneous:     ${shareable_dir_path}"
 
-#printHelp() {
-#	echo
-#	echo "Help screen of remove_from_system.sh"
-#
-#	exit 0
-#}
+printHelp() {
+	echo
+	echo "Help screen of remove_from_system.sh"
 
-_prompt="${1}"
+	exit 0
+}
 
-#if [ "${_prompt}" = "help" ] || [ "${_prompt}" = "-h" ] || [ "${_prompt}" = "--help" ]; then
-#	printHelp
-#fi
+prompt="${1}"
 
-# Prompt user if sure about to remove Adsorber from the system
-if [ -z "${_prompt}" ]; then
-        printf "Are you sure you want to remove Adsorber from the system? [(Y)es/(N)o]: "
-        read -r _prompt
+if [ "${prompt}" = "help" ] || [ "${prompt}" = "h" ] || [ "${prompt}" = "-h" ] || [ "${prompt}" = "--help" ]; then
+	printHelp
 fi
 
-case "${_prompt}" in
+# Prompt user if sure about to remove Adsorber from the system
+if [ -z "${prompt}" ]; then
+        printf "Are you sure you want to remove Adsorber from the system? [(Y)es/(N)o]: "
+        read -r prompt
+fi
+
+case "${prompt}" in
         -[Yy] | --[Yy][Ee][Ss] | [Yy] | [Yy][Ee][Ss] )
                 :
                 ;;
@@ -75,12 +75,12 @@ if [ "$(id -g)" -ne 0 ]; then
         exit 126
 fi
 
-echo ""
+echo
 
 echo "Running 'adsorber remove -y' ..."
 ( adsorber remove -x ) \
         || {
-                echo ""
+                echo
                 printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nDoing it the hard way ...\\n\\033[0m"
                 echo "Maybe Adsorber has been removed already?"
 
@@ -99,7 +99,7 @@ echo "Running 'adsorber remove -y' ..."
                 fi
         }
 
-echo ""
+echo
 
 # Remove placed files from the specified locations
 rm -r "${executable_path}" 2>/dev/null && echo "Removed ${executable_path}"
@@ -109,17 +109,17 @@ rm -r "${config_dir_path}" 2>/dev/null && echo "Cleaned ${config_dir_path}"
 
 echo "Clearing adsorber from shell cache ..."
 # Remove the adsorber command from cache/hashtable
-#if command -v hash 1>/dev/null; then
+if command -v hash 1>/dev/null; then
         # Works in bash
-#        hash -d adsorber 2>/dev/null
-#elif command -v rehash 1>/dev/null; then
+        hash -d adsorber 2>/dev/null
+elif command -v rehash 1>/dev/null; then
         # For csh and zsh shells
-#        rehash
-#else
+        rehash
+else
         # Should work for all shells
         export PATH="${PATH}"
-#fi
+fi
 
-echo ""
+echo
 
 echo "Done. Adsorber has been removed from the system."

@@ -29,6 +29,7 @@
 # ---function:-----     ---function defined in:---
 # remove_ErrorCleanUp   src/lib/remove.sh
 
+# shellcheck disable=SC2154
 
 config_CreateTmpDir()
 {
@@ -55,11 +56,11 @@ config_CopySourceList()
 
                 chown root:root -R "${config_dir_path}/sources.list" \
                         || {
-                                printf "%bCouldn't set ownership of %s" "${prefix_warning}" "${config_dir_path}"
+                                printf "%bCouldn't set ownership of %s\\n" "${prefix_warning}" "${config_dir_path}"
                         }
                 chmod u=rwx,g=rx,o=r -R "${config_dir_path}/sources.list" \
                         || {
-                                printf "%bCouldn't set permissions for %s" "${prefix_warning}" "${config_dir_path}"
+                                printf "%bCouldn't set permissions for %s\\n" "${prefix_warning}" "${config_dir_path}"
                         }
         fi
 
@@ -76,11 +77,11 @@ config_CopyWhiteList()
 
                 chown root:root -R "${config_dir_path}/whitelist" \
                         || {
-                                printf "%bCouldn't set ownership of %s" "${prefix_warning}" "${config_dir_path}"
+                                printf "%bCouldn't set ownership of %s\\n" "${prefix_warning}" "${config_dir_path}"
                         }
                 chmod u=rwx,g=rx,o=r -R "${config_dir_path}/whitelist" \
                         || {
-                                printf "%bCouldn't set permissions for %s" "${prefix_warning}" "${config_dir_path}"
+                                printf "%bCouldn't set permissions for %s\\n" "${prefix_warning}" "${config_dir_path}"
                         }
         fi
 
@@ -97,11 +98,11 @@ config_CopyBlackList()
 
                 chown root:root -R "${config_dir_path}/blacklist" \
                         || {
-                                printf "%bCouldn't set ownership of %s" "${prefix_warning}" "${config_dir_path}"
+                                printf "%bCouldn't set ownership of %s\\n" "${prefix_warning}" "${config_dir_path}"
                         }
                 chmod u=rwx,g=rx,o=r -R "${config_dir_path}/blacklist" \
                         || {
-                                printf "%bCouldn't set permissions for %s" "${prefix_warning}" "${config_dir_path}"
+                                printf "%bCouldn't set permissions for %s\\n" "${prefix_warning}" "${config_dir_path}"
                         }
         fi
 
@@ -115,15 +116,16 @@ config_CopyConfig()
         if [ ! -s "${config_dir_path}/adsorber.conf" ] || [ ! -f "${config_dir_path}/adsorber.conf" ]; then
                 printf "%bNo config file found. Creating default.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 echo "${prefix_warning}Please re-run the command to continue."
+
                 sed "s|@.*|# Config file for Adsorber v${version}|g" "${shareable_dir_path}/default/default-adsorber.conf" > "${config_dir_path}/adsorber.conf"
 
                 chown root:root -R "${config_dir_path}/adsorber.conf" \
                         || {
-                                printf "%bCouldn't set ownership of %s" "${prefix_warning}" "${config_dir_path}"
+                                printf "%bCouldn't set ownership of %s\\n" "${prefix_warning}" "${config_dir_path}"
                         }
                 chmod u=rwx,g=rx,o=r -R "${config_dir_path}/adsorber.conf" \
                         || {
-                                printf "%bCouldn't set permissions for %s" "${prefix_warning}" "${config_dir_path}"
+                                printf "%bCouldn't set permissions for %s\\n" "${prefix_warning}" "${config_dir_path}"
                         }
                 exit 126
         fi
@@ -191,14 +193,16 @@ config_ReadConfig()
                                 ;;
                         http_proxy=* )
                                 if [ -z "${http_proxy}" ]; then
-                                        export "${_line?}"
+                                        # shellcheck disable=SC2163
+                                        export "${_line}"
                                 else
                                         echo "${prefix_warning}'http_proxy' already defined, using: ${http_proxy}"
                                 fi
                                 ;;
                         https_proxy=* )
                                 if [ -z "${https_proxy}" ]; then
-                                        export "${_line?}"
+                                        # shellcheck disable=SC2163
+                                        export "${_line}"
                                 else
                                         echo "${prefix_warning}'https_proxy' already defined, using: ${https_proxy}"
                                 fi
@@ -249,7 +253,7 @@ config_ReadConfig()
                                 # This should never be reached, as the config
                                 # file was filtered by config_FilterConfig and
                                 # should not contain any unknown lines
-                                printf "%bThis is scary: I extracted %s from the config file, however I shouldn't be able to.%b" "${prefix_fatal}" "${_line}" "${prefix_reset}"
+                                printf "%bThis is scary: I extracted %s from the config file, however I shouldn't be able to.%b\\n" "${prefix_fatal}" "${_line}" "${prefix_reset}"
                                 echo "Please report this error with your config file to https://github.com/stablestud/adsorber"
                                 remove_ErrorCleanUp
                                 exit 1

@@ -11,9 +11,13 @@ fi
 
 echo "Running shellcheck ..."
 
-shellcheck -x \
-        "${source_dir_path}/../src/bin/adsorber" \
-        "${source_dir_path}/../portable_adsorber.sh" \
-        "${source_dir_path}/../install_to_system.sh" \
-        "${source_dir_path}/../remove_from_system.sh" \
-        "${source_dir_path}/shellcheck.sh"
+(
+        cd -P -e "${source_dir_path}" || { echo "Couldn't descend to ${source_dir_path}"; exit 1; }
+        
+        shellcheck -x \
+                "${source_dir_path}/../src/bin/adsorber" \
+                "${source_dir_path}/../portable_adsorber.sh" \
+                "${source_dir_path}/../install_to_system.sh" \
+                "${source_dir_path}/../remove_from_system.sh" \
+                "${source_dir_path}/shellcheck.sh"
+)

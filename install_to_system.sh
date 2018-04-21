@@ -31,23 +31,24 @@ echo " - other executables: ${library_dir_path}"
 echo " - configuration:     ${config_dir_path}"
 echo " - miscellaneous:     ${shareable_dir_path}"
 
-#printHelp() {
-#        echo "Help screen of install_to_system.sh"
-#        exit 0
-#}
+printHelp() {
+        echo
+        echo "Help screen of install_to_system.sh"
+        exit 0
+}
 
-_prompt="${1}"
+prompt="${1}"
 
-#if [ "${_prompt}" = "help" ] || [ "${_prompt}" = "-[Hh]" ] || [ "${_prompt}" = "--help" ]; then
-#        printHelp
-#fi
-
-if [ -z "${_prompt}" ]; then
-        printf "Are you sure you want to install Adsorber into the system? [(Y)es/(N)o]: "
-        read -r _prompt
+if [ "${prompt}" = "help" ] || [ "${prompt}" = "h" ] || [ "${prompt}" = "-h" ] || [ "${prompt}" = "--help" ]; then
+        printHelp
 fi
 
-case "${_prompt}" in
+if [ -z "${prompt}" ]; then
+        printf "Are you sure you want to install Adsorber into the system? [(Y)es/(N)o]: "
+        read -r prompt
+fi
+
+case "${prompt}" in
         -[Yy] | --[Yy][Ee][Ss] | [Yy] | [Yy][Ee][Ss] )
                 :
                 ;;
@@ -144,7 +145,7 @@ chown -R root:root "${config_dir_path}" \
 #echo "Running Adsorber..."
 #echo ""
 
-echo ""
+echo
 
 ## We don't run Adsorber after installation yet
 #adsorber install \
