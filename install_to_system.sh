@@ -20,10 +20,10 @@ readonly config_dir_path="/usr/local/etc/adsorber/"
 # Define the location of the log file. Not in use (yet).
 #readonly log_file_path="/var/log/adsorber.log"
 
-# Resolve source directory.
-readonly source_dir_path="$(cd "$(dirname "${0}")" && pwd)"
+# Resolve script directory.
+readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
-echo "Current script location: ${source_dir_path}"
+echo "Current script location: ${script_dir_path}"
 
 echo "Going to place files to:"
 echo " - main exectuable:   ${executable_path}"
@@ -72,7 +72,7 @@ echo "Placing main executable to ${executable_path}"
 mkdir -p "$(dirname ${executable_path})"
 
 # Replacing the path to the libraries with the ones defined above.
-sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${source_dir_path}/src/bin/adsorber" \
+sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${script_dir_path}/src/bin/adsorber" \
         | sed "s|^readonly shareable_dir_path=\"\${executable_dir_path}/\\.\\./share/\"$|readonly shareable_dir_path=\"${shareable_dir_path}\"|g" \
         | sed "s|^readonly config_dir_path=\"\${executable_dir_path}/\\.\\./\\.\\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" \
         > "${executable_path}"
@@ -92,7 +92,7 @@ echo "Placing other executables to ${library_dir_path}"
 
 mkdir -p "${library_dir_path}"
 
-cp -r "${source_dir_path}/src/lib/." "${library_dir_path}"
+cp -r "${script_dir_path}/src/lib/." "${library_dir_path}"
 
 chmod -R u=rwx,g=rx,o=rx "${library_dir_path}" \
         || {
@@ -108,7 +108,7 @@ echo "Placing miscellaneous to ${shareable_dir_path}"
 
 mkdir -p "${shareable_dir_path}"
 
-cp -r "${source_dir_path}/src/share/." "${shareable_dir_path}"
+cp -r "${script_dir_path}/src/share/." "${shareable_dir_path}"
 
 chmod -R u=rwx,g=rx,o=rx "${shareable_dir_path}" \
         || {
@@ -124,10 +124,10 @@ echo "Placing config files to ${config_dir_path}"
 
 mkdir -p "${config_dir_path}"
 
-cp "${source_dir_path}/src/share/default/default-adsorber.conf" "${config_dir_path}/adsorber.conf"
-cp "${source_dir_path}/src/share/default/default-blacklist" "${config_dir_path}/blacklist"
-cp "${source_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/whitelist"
-cp "${source_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"
+cp "${script_dir_path}/src/share/default/default-adsorber.conf" "${config_dir_path}/adsorber.conf"
+cp "${script_dir_path}/src/share/default/default-blacklist" "${config_dir_path}/blacklist"
+cp "${script_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/whitelist"
+cp "${script_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"
 
 chmod -R u=rwx,g=rx,o=rx "${config_dir_path}" \
         || {

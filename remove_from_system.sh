@@ -19,18 +19,20 @@ readonly config_dir_path="/usr/local/etc/adsorber/"
 # Define the location of the log file. Not in use (yet).
 #readonly log_file_path="/var/log/adsorber.log"
 
-# Resolve source directory.
-readonly source_dir_path="$(cd "$(dirname "${0}")" && pwd)"
+# Resolve script directory.
+readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
 ## Following variables are only used when Adsorber's own removal activity failed
-## and are used to remove Adsorber onyl in the 'hard' way. Please change according
+## and are used to remove Adsorber in the 'hard' way. Please change according to
 ## your system configuration
+readonly hosts_file_path="/etc/hosts"
+readonly hosts_file_backup_path="/etc/hosts.original"
 readonly systemd_timer_path="/etc/systemd/system/adsorber.timer"
 readonly systemd_service_path="/etc/systemd/system/adsorber.service"
 readonly crontab_path="/etc/cron.weekly/80adsorber"
 readonly tmp_dir_path="/tmp/adsorber"
 
-echo "Current script location: ${source_dir_path}"
+echo "Current script location: ${script_dir_path}"
 
 echo "Going to remove files from:"
 echo " - main exectuable:   ${executable_path}"
@@ -76,7 +78,7 @@ fi
 echo ""
 
 echo "Running 'adsorber remove -y' ..."
-(adsorber remove -y) \
+( adsorber remove -x ) \
         || {
                 echo ""
                 printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nDoing it the hard way ...\\n\\033[0m"
@@ -84,10 +86,17 @@ echo "Running 'adsorber remove -y' ..."
 
                 # Doing it the hard way .., removing everything manually
                 rm "${systemd_timer_path}" 2>/dev/null && echo "Removed ${systemd_timer_path}"
+                rm "${systemd_timer_path}" 2>/dev/null && echo "Removed ${systemd_timer_path}"
                 rm "${systemd_service_path}" 2>/dev/null && echo "Removed ${systemd_service_path}"
+                systemctl daemon-reload 2>/dev/null && echo "Reloaded systemctl daemon"
                 rm "${crontab_path}" 2>/dev/null && echo "Removed ${crontab_path}"
                 rm -r "${tmp_dir_path}" 2>/dev/null && echo "Removed ${tmp_dir_path}"
-                # TODO restore hosts file
+
+                if [ -f "${hosts_file_backup_path}" ]; then
+                        echo "Backup of hosts file found at ${hosts_file_backup_path}"
+                        echo "Relacing current hosts file with backup ..."
+                        mv "${hosts_file_backup_path}" "${hosts_file_path}"
+                fi
         }
 
 echo ""
@@ -98,18 +107,18 @@ rm -r "${library_dir_path}" 2>/dev/null && echo "Cleaned ${library_dir_path}"
 rm -r "${shareable_dir_path}" 2>/dev/null && echo "Cleaned ${shareable_dir_path}"
 rm -r "${config_dir_path}" 2>/dev/null && echo "Cleaned ${config_dir_path}"
 
-echo "Clearing shell cache ..."
+echo "Clearing adsorber from shell cache ..."
 # Remove the adsorber command from cache/hashtable
-if command -v hash 1>/dev/null; then
+#if command -v hash 1>/dev/null; then
         # Works in bash
-        hash -d adsorber 2>/dev/null
-elif command -v rehash 1>/dev/null; then
+#        hash -d adsorber 2>/dev/null
+#elif command -v rehash 1>/dev/null; then
         # For csh and zsh shells
-        rehash
-else
-        # Should work in all shells
+#        rehash
+#else
+        # Should work for all shells
         export PATH="${PATH}"
-fi
+#fi
 
 echo ""
 
