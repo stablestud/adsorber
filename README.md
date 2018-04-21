@@ -1,3 +1,5 @@
+# NOTE: master branch is in development, for a stable version take a look at the releases
+
 # Adsorber
 A(d)sorber blocks ads by 'absorbing' and dumbing them into void.
 Technically speaking, it adds ad domains to the hosts file `/etc/hosts` with a redirection to a non-existent ip `0.0.0.0`.
