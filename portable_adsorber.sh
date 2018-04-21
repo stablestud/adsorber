@@ -14,19 +14,19 @@ readonly source_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 echo ""
 
 # Call adsorber from the src/bin/ directory
-if ("${source_dir_path}/src/bin/adsorber" ${parameters}); then
-        exit_code=$?
-
+runAdsorber()
+{
+        ( "${source_dir_path}/src/bin/adsorber" ${parameters} )
+        _exit_code="${?}"
         echo ""
-        echo "Adsorber in portable-mode exited with code ${exit_code}."
+}
+if runAdsorber; then
+        echo "Adsorber in portable-mode exited with code ${_exit_code}."
 else
-        exit_code=$?
-
-        echo ""
         # I defined exit code 80 as an error code if wrong or no input has been made
-        if [ "${exit_code}" -eq 80 ]; then
+        if [ "${_exit_code}" -eq 80 ]; then
                 echo "You've supplied no or wrong parameters."
         fi
 
-        echo "Adsorber in portable-mode exited with code ${exit_code}. Thats an error."
+        echo "Adsorber in portable-mode exited with code ${_exit_code}. Thats an error."
 fi
