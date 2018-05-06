@@ -51,9 +51,8 @@ printHelp()
         echo "   Will remove Adsorbers executables and other"
         echo "   files relevant to Adsorber from the system."
         echo
-        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'remove' command will not do the same\\n"
-        echo "action as this script."
-        echo "Instead, it will only remove the scheduler and restore the original hosts"
+        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'remove' command will not do the same action as\\n"
+        echo "this script, it will only remove the scheduler and restore the original hosts"
         echo "file but Adsorber will still be present on the system. "
         echo
         echo "Usage: ${0} [option]:"

@@ -41,9 +41,8 @@ printHelp()
         echo "   Will place Adsorbers executables and other"
         echo "   files relevant to Adsorber into the system."
         echo
-        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'install' command will not do the same\\n"
-        echo "action as this script."
-        echo "Instead, it will only setup the scheduler and backup the original hosts file."
+        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'install' command will not do the same action as\\n"
+        echo "this script, it will only setup the scheduler and backup the original hosts file."
         echo
         echo "Usage: ${0} [option]:"
         echo
