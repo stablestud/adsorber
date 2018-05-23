@@ -73,7 +73,8 @@ If you encounter any issues please report them to the Github repository.
 Note: to get further information about a operation run `adsorber <operation> --help`
 
 #### `adsorber install {options}`:
-You should run this command first.    
+You should run this command first.
+
 The command will:
 * backup your `/etc/hosts` file to `/etc/hosts.original` (if not other specified in `adsorber.conf`)
 * install a scheduler which updates your hosts file with ad-server domains once a week. (either systemd, cronjob or none)
@@ -87,7 +88,8 @@ Possible options are:
 * `-h,  --help`
 
 #### `adsorber update {options}`:
-To keep the hosts file up-to-date.    
+To keep the hosts file up-to-date.
+
 The command will:
 * copy the current `/etc/hosts` to `/etc/hosts.previous`, if not disabled in `adsorber.conf`
 * download ad-server lists from servers listed in `sources.list`
@@ -98,7 +100,8 @@ Possible options are:
 * `-h,  --help`
 
 #### `adsorber revert {options}`:
-To revert to the last applied hosts-file by Adsorber.    
+To revert to the last applied hosts-file by Adsorber.
+
 The command will:
 * copy `/etc/hosts.previous` to `/etc/hosts`, overwriting the newest `/etc/hosts`.
 
@@ -109,7 +112,8 @@ Possible option:
 * `-h,  --help`
 
 #### `adsorber restore {options}`:
-To restore the hosts file temporary, without removing the backup.    
+To restore the hosts file temporary, without removing the backup.
+
 The command will:
 * copy `/etc/hosts.original` to `/etc/hosts`, overwriting the modified `/etc/hosts` by Adsorber.
 
@@ -121,7 +125,8 @@ Possible option:
 * `-h,  --help`
 
 #### `adsorber remove {options}`:
-To completely remove changes made by Adsorber.    
+To completely remove changes made by Adsorber.
+
 The command will:
 * remove all schedulers (systemd, cronjob)
 * restore the hosts file to it's original state
@@ -135,20 +140,18 @@ Possible options are:
 
 #### `-s, --systemd`:
 Use with `install`.    
-* Installs the systemd.timer scheduler, skipping the scheduler prompt.
-Files are placed into `/etc/systemd/system` by default.
+* Installs systemd scheduler, skipping the scheduler prompt. Files are placed into `/etc/systemd/system` by default.
 #### `-c, --cronjob`:
 Use with `install`.    
-* Installs the cron scheduler, skipping the scheduler prompt.
-File is placed into `/etc/cron.weekly/` by default.    
+* Installs the cron scheduler, skipping the scheduler prompt. File is placed into `/etc/cron.weekly/` by default.    
 #### `-ns, --no-scheduler`:
 Use with `install`    
-* Skips the installation of a scheduler.
-You'll need to update Adsorber manually.    
+* Skips the installation of a scheduler. You'll need to update Adsorber manually with `adsorber update`.
 #### `-y, --yes, --assume-yes`:
 Answers all prompts with `yes` e.g.,
 * `Do you really want to install Adsorber?`
 * `Do you really want to remove Adsorber?`
+
 It'll not answer prompts which may harm your system. But `--force` will do it.
 #### `-f, --force`:
 This will force the script to continue (dangerous) the update e.g.,    
