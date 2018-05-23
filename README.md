@@ -26,12 +26,12 @@ To add your own hosts sources, just add them to the `sources.list` file.
 ## Usage
 
 ### Installation to system
-Adsorber from v0.4.0 provides the possibility to install itself into the system.    
+Adsorber can be installed into the system (recommended) fora more stable and robust usage.    
 This can be achieved through running `install_to_system.sh` - files will placed to `/usr/local/` if not other specified.    
 If you don't want Adsorber to be installed into your system run `portable_adsorber.sh`.
 
 Installing Adsorber into the system has the advantage that Adsorber can run independently from the user who downloaded it.    
-Also it prevents broken cronjobs/systemd service as there is no risk that the files/directory of Adsorber will be accidentally deleted or moved.
+Also it prevents broken cronjobs/services as there is no risk that the files/directory of Adsorber will be accidentally deleted or moved.
 
 To configure where it should be installed (to fit your system), edit the relevant lines in `install_to_system.sh` and `remove_from_system.sh`. For more help about the specific file run it with `--help`.
 
@@ -69,7 +69,7 @@ Options: (optional)
 Documentation: https://github.com/stablestud/adsorber
 If you encounter any issues please report them to the Github repository.
 ```
-### Operations: (required)
+### Operations (required):
 Note: to get further information about a operation run `adsorber <operation> --help`
 
 #### `adsorber install {options}`:
@@ -131,19 +131,19 @@ Possible options are:
 * `-y, --yes, --assume-yes`
 * `-h,  --help`
 
-### Options:
+### Options (optional):
 
 #### `-s, --systemd`:
-Used with `install`.    
-* installs the systemd.timer scheduler, skipping the scheduler prompt.    
+Use with `install`.    
+* Installs the systemd.timer scheduler, skipping the scheduler prompt.
 Files are placed into `/etc/systemd/system` by default.
 #### `-c, --cronjob`:
-Used with `install`.    
-* installs the cron scheduler, skipping the scheduler prompt.    
+Use with `install`.    
+* Installs the cron scheduler, skipping the scheduler prompt.
 File is placed into `/etc/cron.weekly/` by default.    
 #### `-ns, --no-scheduler`:
-Used with `install`    
-* skips the installation of a scheduler.
+Use with `install`    
+* Skips the installation of a scheduler.
 You'll need to update Adsorber manually.    
 #### `-y, --yes, --assume-yes`:
 Answers all prompts with `yes` e.g.,
@@ -157,7 +157,7 @@ This will force the script to continue (dangerous) the update e.g.,
 If specified in conjunction with an operation, it'll show extended help about the operation.
 
 ## Settings:
-To add or remove sources edit the `soures.list` file which is created after the installation of Adsorber.    
+To add or remove ad-domain sources edit the `soures.list` file which is created after the installation of Adsorber.    
 For a general configuration of Adsorber e.g., the path of the crontab installation, edit `adsorber.conf`    
 To add domains to the `whilelist` or `blacklist` edit the relevant files at the default config location.
 
@@ -165,9 +165,7 @@ The configuration's default location is at `/usr/local/etc/adsorber/` if install
 If not, the config files should be placed at the scripts root directory.
 
 ## Todo for future releases
-
-Take a look here: [TODO.md](https://github.com/stablestud/adsorber/blob/master/TODO.md)    
-You're free to implement things listed/not listed in `TODO.md` to Adsorber.    
+You're free to implement things listed/not listed in `[TODO.md](https://github.com/stablestud/adsorber/blob/master/TODO.md)`  to Adsorber.    
 Any additions are appreciated. :)
 
 ## License
