@@ -26,16 +26,16 @@ To add your own hosts sources, just add them to the `sources.list` file.
 ## Usage
 
 ### Installation to system
-Adsorber from v0.4.0 provides the possibility to install itself into the system.
-This can be achieved through running `install_to_system.sh` - files will placed to `/usr/local/` if not other specified.
+Adsorber from v0.4.0 provides the possibility to install itself into the system.    
+This can be achieved through running `install_to_system.sh` - files will placed to `/usr/local/` if not other specified.    
 If you don't want Adsorber to be installed into your system run `portable_adsorber.sh`.
 
 Installing Adsorber into the system has the advantage that Adsorber can run independently from the user who downloaded it.    
 Also it prevents broken cronjobs/systemd service as there is no risk that the files/directory of Adsorber will be accidentally deleted or moved.
 
-To configure where it should be installed (to fit your system), edit the relevant lines in `install_to_system.sh` and `remove_from_system.sh`. For more help about the specific file run them with the `--help` option.
+To configure where it should be installed (to fit your system), edit the relevant lines in `install_to_system.sh` and `remove_from_system.sh`. For more help about the specific file run it with `--help`.
 
-#### Default help screen of `adsorber help`
+### Default help screen of `adsorber help`
 ```
 Usage: adsorber <operation> [<options>]
 
