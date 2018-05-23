@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# A(d)sorber v#@version@# crontab file
+# (Ad)sorber v#@version@# crontab file
 # Updates the hosts file once a week.
 #
 # For more information: https://github.com/stablestud/adsorber

@@ -81,7 +81,7 @@ showHelp()
 {
         echo "Usage: adsorber <operation> [<options>]"
         echo ""
-        echo "A(d)sorber blocks ads by 'absorbing' and dumbing them into void."
+        echo "(Ad)sorber blocks ads by 'absorbing' and dumbing them into void."
         echo "           (with the help of the hosts file)"
         echo ""
         echo "Operations:"
@@ -211,7 +211,7 @@ showSpecificHelp()
 
 showVersion()
 {
-        echo "A(d)sorber ${version}"
+        echo "(Ad)sorber ${version}"
         echo ""
         echo "  License MIT"
         echo "  Copyright (c) 2017 stablestud <adsorber@stablestud.org>"

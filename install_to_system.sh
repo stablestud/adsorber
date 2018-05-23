@@ -4,8 +4,10 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
-# Define where the executable 'adsorber' file will be placed, it must be found
-# when you type 'adsorber' into your console
+##########[ Edit to fit your system ]###########################################
+
+# Define where the executable 'adsorber(.sh)' file will be placed, it must be
+# found when you type 'adsorber' into your console
 readonly executable_path="/usr/local/bin/adsorber"
 
 # Define where the other executables will be placed.
@@ -22,6 +24,8 @@ readonly config_dir_path="/usr/local/etc/adsorber/"
 
 # Resolve script directory.
 readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
+
+##########[ End of configuration ]##############################################
 
 
 printLocation()
@@ -94,7 +98,7 @@ echo "Placing main executable to ${executable_path}"
 mkdir -p "$(dirname ${executable_path})"
 
 # Replacing the path to the libraries with the ones defined above.
-sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${script_dir_path}/src/bin/adsorber" \
+sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${script_dir_path}/src/bin/adsorber.sh" \
         | sed "s|^readonly shareable_dir_path=\"\${executable_dir_path}/\\.\\./share/\"$|readonly shareable_dir_path=\"${shareable_dir_path}\"|g" \
         | sed "s|^readonly config_dir_path=\"\${executable_dir_path}/\\.\\./\\.\\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" \
         > "${executable_path}"
@@ -105,7 +109,7 @@ chmod u=rwx,g=rx,o=rx "${executable_path}" \
         }
 chown root:root "${executable_path}" \
         || {
-                printf "Couldn't set ownership fo %s" "${executable_path}"
+                printf "Couldn't set ownership of %s" "${executable_path}"
         }
 
 

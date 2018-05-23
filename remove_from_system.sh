@@ -4,6 +4,8 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
+##########[ Edit to fit your system ]###########################################
+
 # Define where the executable 'adsorber' is.
 readonly executable_path="/usr/local/bin/adsorber"
 
@@ -31,6 +33,8 @@ readonly systemd_timer_path="/etc/systemd/system/adsorber.timer"
 readonly systemd_service_path="/etc/systemd/system/adsorber.service"
 readonly crontab_path="/etc/cron.weekly/80adsorber"
 readonly tmp_dir_path="/tmp/adsorber"
+
+##########[ End of configuration ]##############################################
 
 
 printLocation()
@@ -131,7 +135,7 @@ rm -r "${shareable_dir_path}" 2>/dev/null && echo "Cleaned ${shareable_dir_path}
 rm -r "${config_dir_path}" 2>/dev/null && echo "Cleaned ${config_dir_path}"
 
 # Remove the adsorber command from cache/hashtable
-## TODO: Fix, as it does not work reliable
+# Shells must be reloaded / reopened to have an effect
 echo "Clearing adsorber from shell cache ..."
 if command -v hash 1>/dev/null; then
         # Works in bash
