@@ -169,6 +169,7 @@ update_FetchSources()
                 echo "${prefix}Using HTTPS proxy: ${https_proxy}"
         fi
 
+        # Read the links line by line from filtered sources.list
         while read -r _domain; do
                 _total_count=$((_total_count+1))
 

@@ -1,5 +1,5 @@
 # Adsorber
-**NOTE: master is beta quality, for a stable version take a look at the [release page](https://github.com/stablestud/adsorber/releases)**
+**NOTE: master is beta quality, for a stable version take a look at the [release page](https://github.com/stablestud/adsorber/releases)**    
 A(d)sorber blocks ads by 'absorbing' and dumbing them into void.
 Technically speaking, it adds ad-domains to the hosts file `/etc/hosts` with a redirection to a non-existent ip `0.0.0.0`.
 

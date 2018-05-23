@@ -169,7 +169,7 @@ config_ReadConfig()
         # Check if a configuration has been already defined, if yes,
         # print out a error message and keep the previous defined value
         while read -r _line; do
-                case "${_line}" in      # TODO FIXME
+                case "${_line}" in
                         primary_list=* )
                                 if [ -z "${primary_list}" ]; then
                                         readonly "${_line}"
@@ -283,7 +283,7 @@ config_IsVariableSet()
 
         if [ -z "${ignore_download_error}" ]; then
                 printf "%bignore_download_error not set in adsorber.conf. Using default value: false\\n" "${prefix_warning}" 1>&2
-                readonly ignore_download_error="false"
+                readonly ignore_download_error="true"
         fi
 
         if [ -z "${hosts_file_previous_enable}" ]; then
