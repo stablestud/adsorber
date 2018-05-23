@@ -22,11 +22,10 @@ readonly config_dir_path="/usr/local/etc/adsorber/"
 # Define the location of the log file. Not in use (yet).
 #readonly log_file_path="/var/log/adsorber.log"
 
-# Resolve script directory.
-readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
-
 ##########[ End of configuration ]##############################################
 
+# Resolve script directory.
+readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
 printLocation()
 {
@@ -46,7 +45,8 @@ printHelp()
         echo "   files relevant to Adsorber into the system."
         echo
         printf "\\033[4;37mNote\\033[0m: Adsorbers own 'install' command will not do the same action as\\n"
-        echo "this script, it will only setup the scheduler and backup the original hosts file."
+        echo "this script, as it will only setup the scheduler and backup the original hosts file."
+        echo "You may want to run 'adsorber install' afterwards"
         echo
         echo "Usage: ${0} [option]:"
         echo
@@ -177,5 +177,5 @@ echo
 #        }
 
 echo "Installation completed."
-printf "\\033[1;37mTo setup the scheduler and to backup the hosts file run 'adsorber install'\\033[0m\\n"
+printf "\\033[1;37mTo start going and to setup the scheduler or to backup the hosts file run 'adsorber install'\\033[0m\\n"
 echo "You can now delete this folder."

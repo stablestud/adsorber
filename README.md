@@ -11,7 +11,7 @@ Technically speaking, it adds ad-domains to the hosts file `/etc/hosts` with a r
 * Prevents annoying anti-adblockers from triggering.
 * Update your blocked ad-domain list from external hosts-servers (like https://adaway.org/hosts.txt).
 * Automatically update the hosts file per cronjob or systemd service.
-* Save the last applied hosts-file as a backup if the current hosts-file contains broken ad-servers
+* Revert to the previous hosts-file if the current hosts-file contains broken ad-servers
 * White- and blacklist.
 
 Also it saves data, speeds up loading time and prevents some tracking of your browsing habits. For extensive privacy, I recommend using the script along browser add-ons like  [NoScript](https://addons.mozilla.org/en-US/firefox/addon/noscript/) (for [Firefox 56 and below](https://noscript.net/getit)), [Privacy Badger](https://addons.mozilla.org/en-US/firefox/addon/privacy-badger17/) and [HTTPS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/https-everywhere/).
@@ -24,6 +24,16 @@ Currently we are using the following hosts lists:
 To add your own hosts sources, just add them to the `sources.list` file.
 
 ## Usage
+
+### Installation to system
+Adsorber from v0.4.0 provides the possibility to install itself into the system.
+This can be achieved through running `install_to_system.sh` - files will placed to `/usr/local/` if not other specified.
+If you don't want Adsorber to be installed into your system run `portable_adsorber.sh`.
+
+Installing Adsorber into the system has the advantage that Adsorber can run independently from the user who downloaded it.    
+Also it prevents broken cronjobs/systemd service as there is no risk that the files/directory of Adsorber will be accidentally deleted or moved.
+
+To configure where it should be installed (to fit your system), edit the relevant lines in `install_to_system.sh` and `remove_from_system.sh`. For more help about the specific file run them with the `--help` option.
 
 #### Default help screen of `adsorber help`
 ```
@@ -121,45 +131,47 @@ Possible options are:
 * `-y, --yes, --assume-yes`
 * `-h,  --help`
 
-### Information about options:
+### Options:
 
-#### `-s, --systemd`
+#### `-s, --systemd`:
 Used with `install`.    
-It installs the systemd.timer scheduler, skipping the scheduler prompt.    
+* installs the systemd.timer scheduler, skipping the scheduler prompt.    
 Files are placed into `/etc/systemd/system` by default.
-#### `-c, --cronjob`
+#### `-c, --cronjob`:
 Used with `install`.    
-It installs the cron scheduler, skipping the scheduler prompt.    
+* installs the cron scheduler, skipping the scheduler prompt.    
 File is placed into `/etc/cron.weekly/` by default.    
-#### `-ns, --no-scheduler`
+#### `-ns, --no-scheduler`:
 Used with `install`    
-It will skip the installation of a scheduler. You'll need to update Adsorber manually.    
-#### `-y, --yes, --assume-yes`
+* skips the installation of a scheduler.
+You'll need to update Adsorber manually.    
+#### `-y, --yes, --assume-yes`:
 Answers all prompts with `yes` e.g.,
 * `Do you really want to install Adsorber?`
 * `Do you really want to remove Adsorber?`
 It'll not answer prompts which may harm your system. But `--force` will do it.
-#### `-f, --force`
+#### `-f, --force`:
 This will force the script to continue (dangerous) the update e.g.,    
 * Continue if no backup has been created, overwriting the existing hosts file.
-#### `-h, --help`
+#### `-h, --help`:
 If specified in conjunction with an operation, it'll show extended help about the operation.
 
 ## Settings:
 To add or remove sources edit the `soures.list` file which is created after the installation of Adsorber.    
 For a general configuration of Adsorber e.g., the path of the crontab installation, edit `adsorber.conf`    
-To add domains to the `whilelist` or `blacklist` edit the relevant files at the default config location.    
+To add domains to the `whilelist` or `blacklist` edit the relevant files at the default config location.
+
 The configuration's default location is at `/usr/local/etc/adsorber/` if installed to system.    
-If not the config files should be placed at the scripts root directory.
+If not, the config files should be placed at the scripts root directory.
 
 ## Todo for future releases
 
-Take a look here: [TODO.md](https://github.com/stablestud/adsorber/blob/master/TODO.md)
-You're free to implement things listed/not listed in `TODO.md` to Adsorber. Any additions are appreciated. :)
+Take a look here: [TODO.md](https://github.com/stablestud/adsorber/blob/master/TODO.md)    
+You're free to implement things listed/not listed in `TODO.md` to Adsorber.    
+Any additions are appreciated. :)
 
 ## License
-[MIT License](https://github.com/stablestud/adsorber/blob/master/LICENSE)    
-
+[![GitHub license](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
 ```
 MIT License
 

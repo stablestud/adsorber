@@ -4,6 +4,9 @@
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
 
+# This file can run independently, no need to download the full repository to
+# remove an existing installation.
+
 ##########[ Edit to fit your system ]###########################################
 
 # Define where the executable 'adsorber' is.
@@ -21,21 +24,20 @@ readonly config_dir_path="/usr/local/etc/adsorber/"
 # Define the location of the log file. Not in use (yet).
 #readonly log_file_path="/var/log/adsorber.log"
 
-# Resolve script directory.
-readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
-
 ## Following variables are only used when Adsorber's own removal activity failed
 ## and are used to remove Adsorber in the 'hard' way. Please change according to
 ## your system configuration
 readonly hosts_file_path="/etc/hosts"
 readonly hosts_file_backup_path="/etc/hosts.original"
-readonly systemd_timer_path="/etc/systemd/system/adsorber.timer"
-readonly systemd_service_path="/etc/systemd/system/adsorber.service"
-readonly crontab_path="/etc/cron.weekly/80adsorber"
+readonly hosts_file_previous_path="/etc/hosts.previous"
+readonly systemd_dir_path="/etc/systemd/system"
+readonly crontab_file_path="/etc/cron.weekly/80adsorber"
 readonly tmp_dir_path="/tmp/adsorber"
 
 ##########[ End of configuration ]##############################################
 
+# Resolve script directory.
+readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
 printLocation()
 {
@@ -56,7 +58,7 @@ printHelp()
         echo "   files relevant to Adsorber from the system."
         echo
         printf "\\033[4;37mNote\\033[0m: Adsorbers own 'remove' command will not do the same action as\\n"
-        echo "this script, it will only remove the scheduler and restore the original hosts"
+        echo "this script, as it will only remove the scheduler and restore the original hosts"
         echo "file but Adsorber will still be present on the system. "
         echo
         echo "Usage: ${0} [option]:"
@@ -108,15 +110,14 @@ printf "\\nRunning 'adsorber remove -y' ...\\n"
 ( adsorber remove -y ) \
         || {
                 echo
-                printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nDoing it the hard way ...\\n\\033[0m"
+                printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nNo worries, I can handle it ...\\n\\033[0m"
                 echo "Maybe Adsorber has been already removed ?"
 
                 # Doing it the hard way .., removing everything manually
-                rm "${systemd_timer_path}" 2>/dev/null && echo "Removed ${systemd_timer_path}"
-                rm "${systemd_timer_path}" 2>/dev/null && echo "Removed ${systemd_timer_path}"
-                rm "${systemd_service_path}" 2>/dev/null && echo "Removed ${systemd_service_path}"
+                rm "${systemd_dir_path}/adsorber.timer" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.timer"
+                rm "${systemd_dir_path}/adsorber.service" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.service"
                 systemctl daemon-reload 2>/dev/null && echo "Reloaded systemctl daemon"
-                rm "${crontab_path}" 2>/dev/null && echo "Removed ${crontab_path}"
+                rm "${crontab_file_path}" 2>/dev/null && echo "Removed ${crontab_file_path}"
                 rm -r "${tmp_dir_path}" 2>/dev/null && echo "Removed ${tmp_dir_path}"
 
                 if [ -f "${hosts_file_backup_path}" ]; then
@@ -124,6 +125,8 @@ printf "\\nRunning 'adsorber remove -y' ...\\n"
                         echo "Relacing current hosts file with backup ..."
                         mv "${hosts_file_backup_path}" "${hosts_file_path}"
                 fi
+
+                rm "${hosts_file_previous_path}" 2>/dev/null && echo "Removed ${hosts_file_previous_path}"
         }
 
 echo

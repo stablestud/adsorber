@@ -5,11 +5,11 @@
 
 ## Should:
 * interactive ability to set the update frequency
+* save statistics to var/ and read from Adsorber
 
 ## Could:
 * OpenRC support
 * log-file
-* save statistics to var/ and read from Adsorber
 * bash completion
 * proper unittest
 

@@ -21,4 +21,6 @@ echo "Running shellcheck ..."
                 "${script_dir_path}/../install_to_system.sh" \
                 "${script_dir_path}/../remove_from_system.sh" \
                 "${script_dir_path}/shellcheck.sh"
+
+        echo "Done."
 )
