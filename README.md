@@ -25,9 +25,9 @@ To add your own hosts sources, just add them to the `sources.list` file.
 
 ## Usage
 
-### Installation to system
-Adsorber can be installed into the system (recommended) fora more stable and robust usage.    
-This can be achieved through running `install_to_system.sh` - files will placed to `/usr/local/` if not other specified.    
+### First steps .. installation to system
+Adsorber can be installed into the system (recommended) for a more stable and robust usage.    
+This can be achieved through running `install_to_system.sh`, files will placed to `/usr/local/` if not other specified.    
 If you don't want Adsorber to be installed into your system run `portable_adsorber.sh`.
 
 Installing Adsorber into the system has the advantage that Adsorber can run independently from the user who downloaded it.    
@@ -50,7 +50,7 @@ Operations:
   update  - update hosts file with newest ad servers
   restore - restore hosts file to its original state
             (it does not remove the schedule, this should be used temporary)
-  revert  - reverts the hosts file to the lastest applied host file.
+  revert  - reverts the hosts file to the last applied host file.
   remove  - completely remove changes made by Adsorber
               e.g., remove scheduler (if set)
                     restore hosts file to its original state
