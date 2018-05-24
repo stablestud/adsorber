@@ -12,17 +12,17 @@
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:--------   ---default value:------------     ----declared in:-----
-# config_dir_path        ${executable_dir_path}/../../     src/bin/adsorber
-# debug                  false                             src/bin/adsorber
-# options                every parameter but first         src/bin/adsorber
-# operations             the first parameter               src/bin/adsorber
+# config_dir_path        ${executable_dir_path}/../../     src/bin/adsorber.sh
+# debug                  false                             src/bin/adsorber.sh
+# options                every parameter but first         src/bin/adsorber.sh
+# operations             the first parameter               src/bin/adsorber.sh
 # prefix                 '  ' (two spaces)                 src/lib/colours.sh
 # prefix_reset           \033[0m                           src/lib/colours.sh
 # prefix_title           \033[1;37m                        src/lib/colours.sh
 # prefix_warning         '- '                              src/lib/colours.sh
-# shareable_dir_path     ${executable_dir_path}/../share/  src/bin/adsorber
-# tmp_dir_path           /tmp/adsorber                     src/bin/adsorber
-# version                0.2.2 or similar                  src/bin/adsorber
+# shareable_dir_path     ${executable_dir_path}/../share/  src/bin/adsorber.sh
+# tmp_dir_path           /tmp/adsorber                     src/bin/adsorber.sh
+# version                0.2.2 or similar                  src/bin/adsorber.sh
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
@@ -364,7 +364,7 @@ config_IsVariableValid()
 
 config_PrintVariables()
 {
-        # Used for debugging and is only run when 'debug' is set to 'true' in src/bin/adsorber
+        # Used for debugging and is only run when 'debug' is set to 'true' in src/bin/adsorber.sh
         echo "  Invoked with: ${0} ${operation} ${options}"
         echo "  - primary_list: ${primary_list}"
         echo "  - use_partial_matching: ${use_partial_matching}"

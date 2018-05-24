@@ -12,7 +12,7 @@
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:----------      ---default value:------------  ---declared in:----
-# config_dir_path             ${executable_dir_path}/../../  src/bin/adsorber
+# config_dir_path             ${executable_dir_path}/../../  src/bin/adsorber.sh
 # hosts_file_backup_path      /etc/hosts.original            src/lib/config.sh, adsorber.conf
 # hosts_file_path             /etc/hosts                     src/lib/config.sh, adsorber.conf
 # hosts_file_previous_enable  true                           src/lib/config.sh, adsorber.conf
@@ -28,10 +28,10 @@
 # prefix_title                \033[1;37m                     src/lib/colours.sh
 # prefix_warning              '- '                           src/lib/colours.sh
 # primary_list                blacklist                      src/lib/config.sh, adsorber.conf
-# reply_to_force_prompt       Null (not set)                 src/lib/install.sh, src/bin/adsorber
-# tmp_dir_path                /tmp/adsorber                  src/bin/adsorber
+# reply_to_force_prompt       Null (not set)                 src/lib/install.sh, src/bin/adsorber.sh
+# tmp_dir_path                /tmp/adsorber                  src/bin/adsorber.sh
 # use_partial_matching        true                           src/lib/config.sh, adsorber.conf
-# version                     0.2.2 or similar               src/bin/adsorber
+# version                     0.2.2 or similar               src/bin/adsorber.sh
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:

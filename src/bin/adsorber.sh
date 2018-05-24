@@ -17,7 +17,7 @@ readonly debug="false"
 ############[ DO NOT EDIT ]#####################################################
 
 # NOTE: following values will be changed when installed with
-# 'install-to-system.sh', if you want to change them, change them there
+# 'install_to_system.sh', if you want to change them, change them there
 
 readonly executable_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 readonly library_dir_path="${executable_dir_path}/../lib/"
