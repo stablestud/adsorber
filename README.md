@@ -1,6 +1,6 @@
 # Adsorber
-[![GitHub license](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
-[![Adsorber latest version](https://img.shields.io/badge/Adsorber-v.0.4.0-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
+[![Latest version](https://img.shields.io/badge/latest-v0.4.0-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
+[![License](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/stargazers)
 
 (Ad)sorber blocks ads by 'absorbing' and dumbing them into void.    
@@ -168,11 +168,11 @@ The configuration's default location is at `/usr/local/etc/adsorber/` if install
 If not, the config files should be placed at the scripts root directory.
 
 ## Todo for future releases
-You're free to implement things listed/not listed in `[TODO.md](https://github.com/stablestud/adsorber/blob/master/TODO.md)`  to Adsorber.    
+You're free to implement things listed/not listed in [`TODO.md`](https://github.com/stablestud/adsorber/blob/master/TODO.md)  to Adsorber.    
 Any additions are appreciated. :)
 
 ## License
-[![GitHub license](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
 ```
 MIT License
 
