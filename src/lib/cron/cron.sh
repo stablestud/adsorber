@@ -13,8 +13,8 @@
 # If you run this file independently following variables need to be set:
 # ---variable:-------   ---default value:--             ---declared in:---------
 # crontab_dir_path      /etc/cron.weekly                src/lib/config.sh, adsorber.conf
-# executable_dir_path   the root dir of the script      src/bin/adsorber.sh
-# library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber.sh
+# executable_dir_path   the root dir of the script      src/bin/adsorber
+# library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber
 # prefix                '  ' (two spaces)               src/lib/colours.sh
 # prefix_fatal          '\033[0;91mE '                  src/lib/colours.sh
 # prefix_reset          \033[0m                         src/lib/colours.sh

@@ -22,8 +22,8 @@
 # prefix_reset            \033[0m               src/lib/colours.sh
 # prefix_title            \033[1;37m            src/lib/colours.sh
 # prefix_warning          '- '                  src/lib/colours.sh
-# reply_to_prompt         Null (not set)        src/bin/adsorber.sh
-# tmp_dir_path            /tmp/adsorber         src/bin/adsorber.sh
+# reply_to_prompt         Null (not set)        src/bin/adsorber
+# tmp_dir_path            /tmp/adsorber         src/bin/adsorber
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:

@@ -98,7 +98,7 @@ echo "Placing main executable to ${executable_path}"
 mkdir -p "$(dirname ${executable_path})"
 
 # Replacing the path to the libraries with the ones defined above.
-sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${script_dir_path}/src/bin/adsorber.sh" \
+sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${script_dir_path}/src/bin/adsorber" \
         | sed "s|^readonly shareable_dir_path=\"\${executable_dir_path}/\\.\\./share/\"$|readonly shareable_dir_path=\"${shareable_dir_path}\"|g" \
         | sed "s|^readonly config_dir_path=\"\${executable_dir_path}/\\.\\./\\.\\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" \
         > "${executable_path}"

@@ -6,6 +6,8 @@
 
 # This file can run independently, no need to download the full repository to
 # remove an existing installation.
+# Note: only run this file if Adsorber was installed into the system and not if
+# it was used with portable-mode (portable_adsorber.sh)
 
 ##########[ Edit to fit your system ]###########################################
 

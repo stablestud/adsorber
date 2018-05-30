@@ -16,7 +16,7 @@ echo "Running shellcheck ..."
         cd -P -e "${script_dir_path}" || { echo "Couldn't descend to ${script_dir_path}"; exit 1; }
 
         shellcheck -x \
-                "${script_dir_path}/../src/bin/adsorber.sh" \
+                "${script_dir_path}/../src/bin/adsorber" \
                 "${script_dir_path}/../portable_adsorber.sh" \
                 "${script_dir_path}/../install_to_system.sh" \
                 "${script_dir_path}/../remove_from_system.sh" \
