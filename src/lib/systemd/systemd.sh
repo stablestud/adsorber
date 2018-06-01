@@ -62,7 +62,7 @@ systemdSetup()
                 if ! systemctl start adsorber.timer 2>/dev/null; then
                         # Systemd couldn't be run, probably it's a systemd-less system like Gentoo
                         printf "%bCouldn't start systemd service.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                        echo "${prefix}Is Systemd installed? If not use cron instead."
+                        echo "${prefix}Is Systemd installed? If not use Cron instead."
                         systemdRemove
                         remove_ErrorCleanUp
                         exit 126

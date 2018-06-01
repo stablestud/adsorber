@@ -132,7 +132,7 @@ showSpecificHelp()
                         echo "   (if not other specified in adsorber.conf)"
                         echo " - setup a scheduler which updates your hosts file with ad-domains"
                         echo "   once a week. (either systemd, cronjob or none)"
-                        echo " - fetch the newest ad-domains in your hosts file."
+                        echo " - fetch the newest ad-domains to your hosts file."
                         echo "   (same as 'adsorber update')"
                         echo
                         echo "Note: this is not the same as the install_to_system.sh script."

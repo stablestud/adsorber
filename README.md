@@ -23,6 +23,14 @@ Currently we are using the following hosts lists:
 
 To add your own hosts sources, just add them to the `sources.list` file.
 
+## Requirements
+* `*nix` like distribution (`Ubuntu, Debian, Mint, Gentoo, Archlinux, Fedora, etc.`)
+* POSIX-compliant shell (`bash, dash, fish, ksh, zsh, sh, etc.`)
+* Support for `hosts` file
+* `root` rights (e.g. with `sudo`)
+* `curl` or `wget`
+Note: If you've any of the above listed distributions you don't need to worry about the requirements, as they are fulfilled by default .
+
 ## Usage
 
 ### First steps .. installation to system or portable mode
@@ -33,7 +41,7 @@ If you don't want Adsorber to be installed into your system run `portable_adsorb
 Installing Adsorber into the system has the advantage that Adsorber can run independently from the user who downloaded it.
 Also it prevents broken cronjobs/services as there is no risk that the files/directory of Adsorber will be accidentally deleted or moved.
 
-To configure where it should be installed (to fit your system), edit the relevant lines in `install_to_system.sh` and `remove_from_system.sh`. For more help about the specific file run it with `--help`.
+To configure where it should be installed (to fit your system), edit the relevant lines in `install_to_system.sh` and `remove_from_system.sh`. For more help about the specific files run them with `--help`.
 
 ### Default help screen of `adsorber help`
 ```
