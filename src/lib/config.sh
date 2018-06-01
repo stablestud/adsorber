@@ -11,7 +11,7 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:--------   ---default value:------------     ----declared in:-----
+# ---variable:--------   ---default value:---------------  ----declared in:-----
 # config_dir_path        ${executable_dir_path}/../../     src/bin/adsorber
 # debug                  false                             src/bin/adsorber
 # options                every parameter but first         src/bin/adsorber

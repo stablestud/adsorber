@@ -11,11 +11,12 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:-------   ---default value:--             ---declared in:---------
+# ---variable:-------   ---default value:------------   ---declared in:---------
 # crontab_dir_path      /etc/cron.weekly                src/lib/config.sh, adsorber.conf
 # executable_dir_path   the root dir of the script      src/bin/adsorber
 # library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber
 # prefix                '  ' (two spaces)               src/lib/colours.sh
+# prefix_input          '  ' (two spaces)               src/lib/colours.sh
 # prefix_fatal          '\033[0;91mE '                  src/lib/colours.sh
 # prefix_reset          \033[0m                         src/lib/colours.sh
 # prefix_warning        '- '                            src/lib/colours.sh
@@ -53,6 +54,43 @@ crontabSetup()
         readonly setup_scheduler="cronjob"
 
         return 0
+}
+
+
+crontabPromptFrequency()
+{
+        printf "%bHow often should the crontab be triggered? " "${prefix_input}"
+        read -r frequency
+
+        case "${frequency}" in
+                "" )
+                        echo "default"
+                        ;;
+                [Hh] | [Hh][Oo][Uu][Rr] | [Hh][Oo][Uu][Rr][Ll][YY] )
+                        echo "hourly"
+                        ;;
+                [Dd] | [Dd][Aa][Yy] | [Dd][Aa][Ii][Ll][Yy] )
+                        echo "daily"
+                        ;;
+                [Ww] | [Ww][Ee][Ee][Kk] | [Ww][Ee][Ee][Kk][Ll][Yy] )
+                        echo "weekly"
+                        ;;
+                [Mm] | [Mm][Oo][Nn][Tt][Hh] | [Mm][Oo][Nn][Tt][Hh][Ll][Yy] )
+                        echo "monthly"
+                        ;;
+                [Yy] | [Yy][Ee][Aa][Rr] | [Yy][Ee][Aa][Rr][Ll][Yy] | [Aa] | [Aa][Nn][Nn][Uu][Aa][Ll] | [Aa][Nn][Nn][Uu][Aa][Ll][Ll][Yy] )
+                        echo "yearly - only available with systemd"
+                        ;;
+                [Qq] | [Qq][Uu][Aa][Rr][Tt][Ee][Rr] | [Qq][Uu][Aa][Rr][Tt][Ee][Rr][Ll][Yy] | )
+                        echo "quarterly - only available wih systemd"
+                        ;;
+                [Ss] | [Ss][Ee][Mm][Ii] | [Ss][Ee][Mm][Ii][Aa][Nn][Nn][Uu][Aa][Ll][Ll][Yy] | )
+                        echo "semiannually - only available with systemd"
+                        ;;
+                * )
+                        echo "abort"
+                        ;;
+        esac
 }
 
 

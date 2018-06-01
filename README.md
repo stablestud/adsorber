@@ -24,12 +24,13 @@ Currently we are using the following hosts lists:
 To add your own hosts sources, just add them to the `sources.list` file.
 
 ## Requirements
-* `*nix` like distribution (`Ubuntu, Debian, Mint, Gentoo, Archlinux, Fedora, etc.`)
+* `root` rights (e.g. with `sudo`)
+
+If you have a `*nix` like distribution (`Ubuntu, Debian, Mint, Gentoo, Archlinux, Fedora, etc.`)
+the following requirements should have been fulfilled by default:
 * POSIX-compliant shell (`bash, dash, fish, ksh, zsh, sh, etc.`)
 * Support for `hosts` file
-* `root` rights (e.g. with `sudo`)
 * `curl` or `wget`
-Note: If you've any of the above listed distributions you don't need to worry about the requirements, as they are fulfilled by default .
 
 ## Usage
 

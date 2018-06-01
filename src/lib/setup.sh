@@ -76,9 +76,11 @@ setup_PromptScheduler()
 
         case "${reply_to_scheduler_prompt}" in
                 [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
+                        systemdPromptFrequency
                         systemdSetup
                         ;;
-                [Cc] | [Cc]ron | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab )
+                [Cc] | [Cc][Rr][Oo][Nn] | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab )
+                        crontabPromptFrequency
                         crontabSetup
                         ;;
                 * )

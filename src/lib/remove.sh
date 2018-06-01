@@ -11,7 +11,7 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:----------  ---default value:--  ---defined in:------------------
+# ---variable:----------  ---default value:--  ---defined in:-------------------
 # backedup                Null (not set)       src/lib/setup.sh
 # hosts_file_path         /etc/hosts           src/lib/config.sh, adsorber.conf
 # hosts_file_backup_path  /etc/hosts.original  src/lib/config.sh, adsorber.conf

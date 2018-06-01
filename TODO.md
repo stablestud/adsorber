@@ -2,6 +2,7 @@
 
 ## Must:
 * README.md update
+* read scheduler frequency by option
 
 ## Should:
 * interactive ability to set the update frequency
