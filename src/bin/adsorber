@@ -109,6 +109,8 @@ showHelp()
         echo "                             has been created (dangerous)"
         echo "  -h,  --help              - show specific help of specified operations"
         echo
+        echo "Config files are located at: $(cd ${config_dir_path} && pwd)/"
+        echo
         echo "Documentation: https://github.com/stablestud/adsorber"
         echo "If you encounter any issues please report them to the Github repository."
 

@@ -68,7 +68,7 @@ crontabRemove()
 
                 echo "${prefix}Removed Adsorber's cronjob."
         else
-                echo "${prefix}Cronjob not setup. Skipping ..."
+                echo "${prefix}Cronjob not installed. Skipping ..."
         fi
 
         return 0
