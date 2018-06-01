@@ -25,7 +25,8 @@ readonly shareable_dir_path="${executable_dir_path}/../share/"
 readonly config_dir_path="${executable_dir_path}/../../"
 
 
-readonly version="0.4.0"
+readonly version="0.5.0"
+readonly command="${0}"
 readonly operation="${1}"
 
 if [ "${#}" -ne 0 ]; then
@@ -70,7 +71,7 @@ showUsage()
                 echo "Adsorber: Invalid option: '${_wrong_option}'" 1>&2
         fi
 
-        echo "Usage: adsorber <install|update|restore|revert|remove> [<options>]"
+        echo "Usage: adsorber <setup|update|restore|revert|remove> [<options>]"
         echo "Try '--help' for more information."
 
         exit 80
@@ -85,7 +86,7 @@ showHelp()
         echo "           (with the help of the hosts file)"
         echo ""
         echo "Operations (required):"
-        echo "  install - setup necessary things needed for Adsorber"
+        echo "  setup - setup necessary things needed for Adsorber"
         echo "              e.g., create backup file of hosts file,"
         echo "                    create scheduler which updates the host file once a week"
         echo "            However this should've been done automatically."
@@ -101,8 +102,8 @@ showHelp()
         echo ""
         echo "Options (optional):"
         echo "  -s,  --systemd           - use Systemd ..."
-        echo "  -c,  --cron              - use Cronjob as scheduler (use with 'install')"
-        echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'install')"
+        echo "  -c,  --cron              - use Cronjob as scheduler (use with 'setup')"
+        echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'setup')"
         echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
         echo "  -f,  --force             - force the update if no /etc/hosts backup"
         echo "                             has been created (dangerous)"
@@ -118,8 +119,8 @@ showHelp()
 showSpecificHelp()
 {
         case "${operation}" in
-                install )
-                        printf "\\033[4;37madsorber install [<options>]\\033[0m:\\n"
+                setup )
+                        printf "\\033[4;37madsorber setup [<options>]\\033[0m:\\n"
                         echo
                         echo "You should run this command first."
                         echo "  (e.g. after installation to the system)"
@@ -127,9 +128,9 @@ showSpecificHelp()
                         echo "The command will:"
                         echo " - backup your /etc/hosts file to /etc/hosts.original"
                         echo "   (if not other specified in adsorber.conf)"
-                        echo " - install a scheduler which updates your hosts file with ad-domains"
+                        echo " - setup a scheduler which updates your hosts file with ad-domains"
                         echo "   once a week. (either systemd, cronjob or none)"
-                        echo " - install the newest ad-domains in your hosts file."
+                        echo " - fetch the newest ad-domains in your hosts file."
                         echo "   (same as 'adsorber update')"
                         echo
                         echo "Note: this is not the same as the install_to_system.sh script."
@@ -165,7 +166,7 @@ showSpecificHelp()
                         echo "The command will:"
                         echo " - copy /etc/hosts.original to /etc/hosts, overwriting the modified /etc/hosts by adsorber."
                         echo
-                        echo "Important: If you have a scheduler installed it'll re-apply ad-domains to your hosts"
+                        echo "Important: If you have a scheduler setup it'll re-apply ad-domains to your hosts"
                         echo "file when triggered."
                         echo "For this reason this command is used to temporary disable Adsorber."
                         echo "(e.g. when it's blocking some sites you need access for a short period of time)"
@@ -231,8 +232,8 @@ duplicateOption()
                 echo "Adsorber: Duplicate option for scheduler: '${_option}'" 1>&2
                 echo "You may only select one:"
                 echo "  -s,  --systemd           - use Systemd ..."
-                echo "  -c,  --cron              - use Cronjob as scheduler (use with 'install')"
-                echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'install')"
+                echo "  -c,  --cron              - use Cronjob as scheduler (use with 'setup')"
+                echo "  -ns, --no-scheduler      - skip scheduler creation (use with 'setup')"
         else
                 echo "Adsorber: Duplicate option: '${_option}'" 1>&2
                 showUsage
@@ -276,8 +277,8 @@ checkPaths()
 
 sourceFiles()
 {
-        # shellcheck source=../src/lib/install.sh
-        . "${library_dir_path}/install.sh"
+        # shellcheck source=../src/lib/setup.sh
+        . "${library_dir_path}/setup.sh"
         # shellcheck source=../src/lib/remove.sh
         . "${library_dir_path}/remove.sh"
         # shellcheck source=../src/lib/update.sh
@@ -355,11 +356,11 @@ for _option in "${@}"; do
 done
 
 case "${operation}" in
-        install )
+        setup )
                 checkForWrongParameters
                 checkRoot
                 config
-                install
+                setup
                 update
                 ;;
         remove )

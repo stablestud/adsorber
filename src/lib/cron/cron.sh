@@ -27,9 +27,9 @@
 
 # shellcheck disable=SC2154
 
-crontabInstall()
+crontabSetup()
 {
-        echo "${prefix}Installing cronjob ..."
+        echo "${prefix}Setting up cronjob ..."
 
         # Check if crontabs directory variable is correctly set, if not abort and call the error clean-up function
         if [ ! -d "${crontab_dir_path}" ]; then
@@ -48,9 +48,9 @@ crontabInstall()
         chmod u=rwx,g=rx,o=rx "${crontab_dir_path}/80adsorber"
         chown root:root "${crontab_dir_path}/80adsorber"
 
-        # Make known that we have installed the crontab in this run,
+        # Make known that we have setup the crontab in this run,
         # if we fail now, crontab will be also removed (see remove_ErrorCleanUp)
-        readonly installed_scheduler="cronjob"
+        readonly setup_scheduler="cronjob"
 
         return 0
 }
@@ -68,7 +68,7 @@ crontabRemove()
 
                 echo "${prefix}Removed Adsorber's cronjob."
         else
-                echo "${prefix}Cronjob not installed. Skipping ..."
+                echo "${prefix}Cronjob not setup. Skipping ..."
         fi
 
         return 0

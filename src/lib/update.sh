@@ -11,7 +11,7 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:----------      ---default value:------------  ---declared in:----
+# ---variable:--------------  ---default value:------------  ---declared in:----
 # config_dir_path             ${executable_dir_path}/../../  src/bin/adsorber
 # hosts_file_backup_path      /etc/hosts.original            src/lib/config.sh, adsorber.conf
 # hosts_file_path             /etc/hosts                     src/lib/config.sh, adsorber.conf
@@ -28,7 +28,7 @@
 # prefix_title                \033[1;37m                     src/lib/colours.sh
 # prefix_warning              '- '                           src/lib/colours.sh
 # primary_list                blacklist                      src/lib/config.sh, adsorber.conf
-# reply_to_force_prompt       Null (not set)                 src/lib/install.sh, src/bin/adsorber
+# reply_to_force_prompt       Null (not set)                 src/lib/setup.sh, src/bin/adsorber
 # tmp_dir_path                /tmp/adsorber                  src/bin/adsorber
 # use_partial_matching        true                           src/lib/config.sh, adsorber.conf
 # version                     0.2.2 or similar               src/bin/adsorber
@@ -50,7 +50,7 @@ update_CheckBackupExist()
                 # hostname association with 127.0.0.1 and localhost will be lost.
                 # The user may interactively decide here wheter to proceed or not.
                 if [ -z "${reply_to_force_prompt}" ]; then
-                        printf "%bBackup of %s does not exist. To backup run 'adsorber install'.%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
+                        printf "%bBackup of %s does not exist. To backup run 'adsorber setup'.%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
                         printf "%bIgnore issue and continue? (May break your hostfile, not recommended) [YES/n]: %b" "${prefix_input}" "${prefix_reset}"
                         read -r reply_to_force_prompt
                 fi
@@ -94,7 +94,7 @@ update_ReadSourceList()
         if [ ! -s "${config_dir_path}/sources.list" ]; then
 
                 if [ ! -s "${config_dir_path}/blacklist" ]; then
-                        printf "%bMissing 'sources.list' and blacklist. To fix run '%s install'.%b\\n" "${prefix_fatal}" "${0}" "${prefix_reset}" 1>&2
+                        printf "%bMissing 'sources.list' and blacklist. To fix run 'adsorber setup'.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                         exit 127
                 fi
 

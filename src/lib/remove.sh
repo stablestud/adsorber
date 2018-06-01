@@ -11,19 +11,19 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:-------     ---default value:---  ---defined in:------------------
-# backedup                Null (not set)        src/lib/install.sh
-# hosts_file_path         /etc/hosts            src/lib/config.sh, adsorber.conf
-# hosts_file_backup_path  /etc/hosts.original   src/lib/config.sh, adsorber.conf
-# installed_scheduler     Null (not set)        src/lib/systemd/systemd.sh, src/lib/cron/cron.sh
-# prefix                  '  ' (two spaces)     src/lib/colours.sh
-# prefix_fatal            '\033[0;91mE '        src/lib/colours.sh
-# prefix_input            '  ' (two spaces)     src/lib/colours.sh
-# prefix_reset            \033[0m               src/lib/colours.sh
-# prefix_title            \033[1;37m            src/lib/colours.sh
-# prefix_warning          '- '                  src/lib/colours.sh
-# reply_to_prompt         Null (not set)        src/bin/adsorber
-# tmp_dir_path            /tmp/adsorber         src/bin/adsorber
+# ---variable:----------  ---default value:--  ---defined in:------------------
+# backedup                Null (not set)       src/lib/setup.sh
+# hosts_file_path         /etc/hosts           src/lib/config.sh, adsorber.conf
+# hosts_file_backup_path  /etc/hosts.original  src/lib/config.sh, adsorber.conf
+# setup_scheduler         Null (not set)       src/lib/systemd/systemd.sh, src/lib/cron/cron.sh
+# prefix                  '  ' (two spaces)    src/lib/colours.sh
+# prefix_fatal            '\033[0;91mE '       src/lib/colours.sh
+# prefix_input            '  ' (two spaces)    src/lib/colours.sh
+# prefix_reset            \033[0m              src/lib/colours.sh
+# prefix_title            \033[1;37m           src/lib/colours.sh
+# prefix_warning          '- '                 src/lib/colours.sh
+# reply_to_prompt         Null (not set)       src/bin/adsorber
+# tmp_dir_path            /tmp/adsorber        src/bin/adsorber
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
@@ -38,8 +38,8 @@ remove_ErrorCleanUp()
 {
         printf "%bCleaning up ...\\n" "${prefix_warning}"
 
-        # Remove scheduler if it was installed in the same run
-        case "${installed_scheduler}" in
+        # Remove scheduler if it was setup (created) in the same run
+        case "${setup_scheduler}" in
                 cronjob )
                         crontabRemove
                         ;;
@@ -50,7 +50,7 @@ remove_ErrorCleanUp()
 
         # Remove backup if backed-up in the same run
         if [ "${backedup}" = "true" ]; then
-                echo "${prefix}Removed backup as the installation failed."
+                echo "${prefix}Removed backup as the setup failed."
                 rm "${hosts_file_backup_path}"
         fi
 

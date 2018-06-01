@@ -1,9 +1,9 @@
 # Adsorber
-[![Latest version](https://img.shields.io/badge/latest-v0.4.0-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
+[![Latest version](https://img.shields.io/badge/latest-v0.5.0-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
 [![License](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/stargazers)
 
-(Ad)sorber blocks ads by 'absorbing' and dumbing them into void.    
+(Ad)sorber blocks ads by 'absorbing' and dumbing them into void.
 Technically speaking, it adds ad-domains to the hosts file `/etc/hosts` with a redirection to a non-existent ip `0.0.0.0`.
 
 ## Features
@@ -25,12 +25,12 @@ To add your own hosts sources, just add them to the `sources.list` file.
 
 ## Usage
 
-### First steps .. installation to system
-Adsorber can be installed into the system (recommended) for a more stable and robust usage.    
-This can be achieved through running `install_to_system.sh`, files will placed to `/usr/local/` if not other specified.    
+### First steps .. installation to system or portable mode
+Adsorber can be installed into the system (recommended) for a more stable and robust usage.
+This can be achieved through running `install_to_system.sh`, files will placed to `/usr/local/` if not other specified.
 If you don't want Adsorber to be installed into your system run `portable_adsorber.sh`.
 
-Installing Adsorber into the system has the advantage that Adsorber can run independently from the user who downloaded it.    
+Installing Adsorber into the system has the advantage that Adsorber can run independently from the user who downloaded it.
 Also it prevents broken cronjobs/services as there is no risk that the files/directory of Adsorber will be accidentally deleted or moved.
 
 To configure where it should be installed (to fit your system), edit the relevant lines in `install_to_system.sh` and `remove_from_system.sh`. For more help about the specific file run it with `--help`.
@@ -43,7 +43,7 @@ Usage: adsorber <operation> [<options>]
            (with the help of the hosts file)
 
 Operations:
-  install - setup necessary things needed for Adsorber
+  setup   - setup necessary things needed for Adsorber
               e.g., create backup file of hosts file,
                     create scheduler which updates the host file once a week
             However this should've been done automatically.
@@ -59,8 +59,8 @@ Operations:
 
 Options: (optional)
   -s,  --systemd           - use Systemd ...
-  -c,  --cron              - use Cronjob as scheduler (use with 'install')
-  -ns, --no-scheduler      - skip scheduler creation (use with 'install')
+  -c,  --cron              - use Cronjob as scheduler (use with 'setup')
+  -ns, --no-scheduler      - skip scheduler creation (use with 'setup')
   -y,  --yes, --assume-yes - answer all prompts with 'yes'
   -f,  --force             - force the update if no /etc/hosts backup
                              has been created (dangerous)
@@ -72,13 +72,13 @@ If you encounter any issues please report them to the Github repository.
 ### Operations (required):
 Note: to get further information about a operation run `adsorber <operation> --help`
 
-#### `adsorber install {options}`:
+#### `adsorber setup {options}`:
 You should run this command first.
 
 The command will:
 * backup your `/etc/hosts` file to `/etc/hosts.original` (if not other specified in `adsorber.conf`)
-* install a scheduler which updates your hosts file with ad-server domains once a week. (either systemd, cronjob or none)
-* install the newest ad-server domains in your hosts file.
+* setup a scheduler which updates your hosts file with ad-server domains once a week. (either systemd, cronjob or none)
+* fetch the newest ad-server domains in your hosts file. (same as `update`)
 
 Possible options are:
 * `-s,  --systemd`
@@ -117,8 +117,8 @@ To restore the hosts file temporary, without removing the backup.
 The command will:
 * copy `/etc/hosts.original` to `/etc/hosts`, overwriting the modified `/etc/hosts` by Adsorber.
 
-Important: If you have a scheduler installed, it'll re-apply ad-server domains to your hosts file when triggered.    
-For this reason this command is used to temporary disable Adsorber, e.g. when it's blocking some sites you need access for a short period of time.    
+Important: If Adsorber's scheduler was set-up, it'll re-apply ad-server domains to your hosts file when triggered.
+For this reason this command is used to temporary disable Adsorber, e.g. when it's blocking some sites you need access for a short period of time.
 To re-apply run `adsorber update`
 
 Possible option:
@@ -139,36 +139,36 @@ Possible options are:
 ### Options (optional):
 
 #### `-s, --systemd`:
-Use with `install`.    
-* Installs systemd scheduler, skipping the scheduler prompt. Files are placed into `/etc/systemd/system` by default.
+Use with `setup`.
+* Setup systemd scheduler, skipping the scheduler prompt. Files are placed into `/etc/systemd/system` by default.
 #### `-c, --cronjob`:
-Use with `install`.    
-* Installs the cron scheduler, skipping the scheduler prompt. File is placed into `/etc/cron.weekly/` by default.    
+Use with `setup`.
+* Setup the cron scheduler, skipping the scheduler prompt. File is placed into `/etc/cron.weekly/` by default.
 #### `-ns, --no-scheduler`:
-Use with `install`    
-* Skips the installation of a scheduler. You'll need to update Adsorber manually with `adsorber update`.
+Use with `setup`
+* Skips the setup of a scheduler. You'll need to update Adsorber manually with `adsorber update`.
 #### `-y, --yes, --assume-yes`:
 Answers all prompts with `yes` e.g.,
-* `Do you really want to install Adsorber?`
+* `Do you really want to setup Adsorber?`
 * `Do you really want to remove Adsorber?`
 
 It'll not answer prompts which may harm your system. But `--force` will do it.
 #### `-f, --force`:
-This will force the script to continue (dangerous) the update e.g.,    
+This will force the script to continue (dangerous) the update e.g.,
 * Continue if no backup has been created, overwriting the existing hosts file.
 #### `-h, --help`:
 If specified in conjunction with an operation, it'll show extended help about the operation.
 
 ## Settings:
-To add or remove ad-domain sources edit the `soures.list` file which is created after the installation of Adsorber.    
-For a general configuration of Adsorber e.g., the path of the crontab installation, edit `adsorber.conf`    
+To add or remove ad-domain sources edit the `soures.list` file which is created after the setup of Adsorber.
+For a general configuration of Adsorber e.g., the path of the crontab, edit `adsorber.conf`
 To add domains to the `whilelist` or `blacklist` edit the relevant files at the default config location.
 
-The configuration's default location is at `/usr/local/etc/adsorber/` if installed to system.    
+The configuration's default location is at `/usr/local/etc/adsorber/` if installed to system.
 If not, the config files should be placed at the scripts root directory.
 
 ## Todo for future releases
-You're free to implement things listed/not listed in [`TODO.md`](https://github.com/stablestud/adsorber/blob/master/TODO.md)  to Adsorber.    
+You're free to implement things listed/not listed in [`TODO.md`](https://github.com/stablestud/adsorber/blob/master/TODO.md)  to Adsorber.
 Any additions are appreciated. :)
 
 ## License

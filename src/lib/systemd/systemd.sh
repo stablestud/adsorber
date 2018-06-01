@@ -27,7 +27,7 @@
 
 # shellcheck disable=SC2154
 
-systemdInstall()
+systemdSetup()
 {
         # Check if the variable systemd_dir_path is valid, if not abort and call error clean-up function
         if [ ! -d "${systemd_dir_path}" ]; then
@@ -37,13 +37,13 @@ systemdInstall()
                 exit 126
         fi
 
-        # Remove systemd service if already installed
+        # Remove systemd service if already present
         if [ -f "${systemd_dir_path}/adsorber.service" ] || [ -f "${systemd_dir_path}/adsorber.timer" ]; then
-                echo "${prefix}Removing previously installed systemd services ..."
+                echo "${prefix}Removing previous systemd services ..."
                 systemdRemove
         fi
 
-        echo "${prefix}Installing systemd service ..."
+        echo "${prefix}Setting up systemd service ..."
 
         # Replace the @ place holder line with the location of adsorber and copy
         # the service to the systemd directory ( /etc/sytemd/system/adsorber.service )
@@ -68,9 +68,9 @@ systemdInstall()
                         exit 126
                 fi
 
-        # Make known that we have installed the systemd service in this run,
+        # Make known that we have setup the systemd service in this run,
         # if we fail now, systemd will be also removed (see remove_ErrorCleanUp)
-        readonly installed_scheduler="systemd"
+        readonly setup_scheduler="systemd"
 
         echo "${prefix}Initialized Systemd service ..."
 

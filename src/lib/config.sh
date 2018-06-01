@@ -295,7 +295,7 @@ config_IsVariableSet()
         # if not abort, and call error clean-up function
         if [ -z "${hosts_file_path}" ] || [ -z "${hosts_file_backup_path}" ] || [ -z "${crontab_dir_path}" ] || [ -z "${systemd_dir_path}" ] || [ -z "${hosts_file_previous_path}" ]; then
                 printf "%bMissing setting(s) in adsorber.conf.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                printf "%bPlease delete adsorber.conf in %s and run 'adsorber install' to create a new config file.\\n" "${prefix_warning}" "${config_dir_path}" 1>&2
+                printf "%bPlease delete adsorber.conf in %s and run 'adsorber setup' to create a new config file.\\n" "${prefix_warning}" "${config_dir_path}" 1>&2
                 remove_ErrorCleanUp
                 exit 127
         fi

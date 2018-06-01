@@ -23,3 +23,5 @@ if [ -f "${source_dir_path}/sources.list" ]; then
 	rm "${source_dir_path}/sources.list" -f
 	echo "Removed sources.list"
 fi
+
+echo "Done."
