@@ -20,10 +20,10 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----    ---function defined in:---
-# crontabSetup       src/lib/cron/cron.sh
+# ---function:-------  ---function defined in:---
+# crontab              src/lib/cron/cron.sh
 # remove_ErrorCleanUp  src/lib/remove.sh
-# systemdSetup       src/lib/systemd/systemd.sh
+# systemd      	       src/lib/systemd/systemd.sh
 
 # shellcheck disable=SC2154
 
@@ -51,7 +51,7 @@ setup_Prompt()
         fi
 
         case "${reply_to_prompt}" in
-                [Yy] | [Yy][Ee][Ss] )
+                [Yy] | [Yy][Ee][Ss] | "" )
                         return 0
                         ;;
                 * )
@@ -70,18 +70,16 @@ setup_PromptScheduler()
         # The user enters interactively what scheduler (Systemd, Cron or none)
         # should be used to update the hosts file periodically
         if [ -z "${reply_to_scheduler_prompt}" ]; then
-                printf "%bWhat scheduler should be used to update the host file automatically? [(S)ystemd/(C)ron/(N)one]: %b" "${prefix_input}" "${prefix_reset}"
+                printf "%bWhat scheduler should be used to update the host file automatically? [(C)ron/(s)ystemd/(n)one]: %b" "${prefix_input}" "${prefix_reset}"
                 read -r reply_to_scheduler_prompt
         fi
 
         case "${reply_to_scheduler_prompt}" in
-                [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
-                        systemdPromptFrequency
-                        systemdSetup
+                [Cc] | [Cc][Rr][Oo][Nn] | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab | [Cc]ronie | "" )
+                        crontab
                         ;;
-                [Cc] | [Cc][Rr][Oo][Nn] | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab )
-                        crontabPromptFrequency
-                        crontabSetup
+                [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
+                        systemd
                         ;;
                 * )
                         echo "${prefix}Skipping scheduler creation ..."

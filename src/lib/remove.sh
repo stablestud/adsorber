@@ -27,9 +27,9 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----  ---function defined in:---
-# systemdRemove      src/lib/systemd/systemd.sh
-# crontabRemove      src/lib/cron/cron.sh
+# ---function:-  ---function defined in:---
+# systemdRemove  src/lib/systemd/systemd.sh
+# crontabRemove  src/lib/cron/cron.sh
 
 # shellcheck disable=SC2154
 

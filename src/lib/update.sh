@@ -35,7 +35,7 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----    ---function defined in:---
+# ---function:-------  ---function defined in:---
 # remove_CleanUp       src/lib/remove.sh
 # remove_ErrorCleanUp  src/lib/remove.sh
 

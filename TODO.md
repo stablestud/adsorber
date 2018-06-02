@@ -2,7 +2,8 @@
 
 ## Must:
 * README.md update
-* read scheduler frequency by option
+* Remove all crontabs from cron.x directories
+* Update comments about weekly frequency, in `hosts_header`
 
 ## Should:
 * interactive ability to set the update frequency
