@@ -116,7 +116,7 @@ showHelp()
 	echo "  -S,  --semiannually                       ... semiannually (2x a year)"
 	echo "  -Y,  --yearly                             ... yearly"
         echo
-        echo "Config files are located at: $(cd ${config_dir_path} && pwd)/"
+        echo "Config files are located at: $(cd "${config_dir_path}" && pwd)/"
         echo
         echo "Documentation: https://github.com/stablestud/adsorber"
         echo "If you encounter any issues please report them to the Github repository."
