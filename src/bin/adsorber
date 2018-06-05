@@ -375,7 +375,7 @@ for _option in "${@}"; do
                         ;;
 		-H | --hourly )
                         if [ -z "${frequency}" ]; then
-                                readonly frequency="hourly"
+                                frequency="hourly"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
@@ -383,42 +383,42 @@ for _option in "${@}"; do
 			;;
 		-D | --daily )
                         if [ -z "${frequency}" ]; then
-                                readonly frequency="daily"
+                                frequency="daily"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
 			;;
 		-W | --weekly )
                         if [ -z "${frequency}" ]; then
-                                readonly frequency="weekly"
+                                frequency="weekly"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
 			;;
 		-M | --monthly )
                         if [ -z "${frequency}" ]; then
-                                readonly frequency="monthly"
+                                frequency="monthly"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
 			;;
 		-Q | --quarterly )
                         if [ -z "${frequency}" ]; then
-                                readonly frequency="quarterly"
+                                frequency="quarterly"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
 			;;
 		-S | --semi | --semiannually )
                         if [ -z "${frequency}" ]; then
-                                readonly frequency="semiannually"
+                                frequency="semiannually"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
 			;;
 		-Y | --yearly | --annually )
                         if [ -z "${frequency}" ]; then
-                                readonly frequency="yearly"
+                                frequency="yearly"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi

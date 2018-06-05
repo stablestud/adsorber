@@ -13,7 +13,7 @@ fi
 echo "Running shellcheck ..."
 
 (
-        cd -P -e "${script_dir_path}" || { echo "Couldn't descend to ${script_dir_path}"; exit 1; }
+       	cd -P "${script_dir_path}" -e || { echo "Couldn't descend to ${script_dir_path}"; exit 1; }
 
         shellcheck -x \
                 "${script_dir_path}/../src/bin/adsorber" \

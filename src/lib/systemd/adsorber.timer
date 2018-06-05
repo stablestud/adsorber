@@ -1,5 +1,5 @@
 [Unit]
-Description=Timer that runs the Adsorber service weekly.
+Description=Timer that runs the Adsorber service #@frequency@#.
 Documentation=https://github.com/stablestud/adsorber
 Requires=network-online.target
 

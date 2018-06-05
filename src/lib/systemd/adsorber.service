@@ -1,5 +1,5 @@
 [Unit]
-Description=Adsorber service to update the hosts file periodically.
+Description=Adsorber service to update the hosts file #@frequency@#.
 Documentation=https://github.com/stablestud/adsorber
 After=network.target
 

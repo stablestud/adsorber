@@ -13,6 +13,7 @@
 # If you run this file independently following variables need to be set:
 # ---variable:-------   ---default value:------------   ---declared in:---------
 # executable_dir_path   the root dir of the script      src/bin/adsorber
+# frequency             null (not set)                  src/bin/adsorber
 # library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber
 # prefix                '  ' (two spaces)               src/lib/colours.sh
 # prefix_input          '  ' (two spaces)               src/lib/colours.sh
@@ -35,26 +36,31 @@ systemdSetup()
                 printf "%bWrong systemd_dir_path set. Can't access: %s.%b\\n" \
 			"${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
 
-                echo "${prefix}Is Systemd installed? If not use cron instead."
+                echo "${prefix}Is Systemd installed? If not use Cron instead."
                 remove_ErrorCleanUp
                 exit 126
         fi
 
         # Remove systemd service if already present
         if [ -f "${systemd_dir_path}/adsorber.service" ] || [ -f "${systemd_dir_path}/adsorber.timer" ]; then
-                echo "${prefix}Removing previous systemd services ..."
-                systemdRemove
+                echo "${prefix}Removing previous Systemd service ..."
+                if ! systemdRemove; then
+			printf "%bSomething failed at updating the Systemd service, aborting ...%b" "${prefix_fatal}" "${prefix_reset}" 1>&2
+			remove_ErrorCleanUp;
+			exit 1;
+		fi
         fi
 
-        echo "${prefix}Setting up systemd service ..."
+        echo "${prefix}Setting up ${frequency} Systemd service ..."
 
         # Replace the @ place holder line with the location of adsorber and copy
         # the service to the systemd directory ( /etc/sytemd/system/adsorber.service )
-        sed "s|#@\\/some\\/path\\/adsorber update@#$|${executable_dir_path}\\/adsorber update|g" \
-		"${library_dir_path}/systemd/adsorber.service" > "${systemd_dir_path}/adsorber.service"
+        sed "s|#@\\/some\\/path\\/adsorber update@#$|${executable_dir_path}\\/adsorber update|g" "${library_dir_path}/systemd/adsorber.service" \
+		| sed "s/#@frequency@#/${frequency}/g" \
+		 > "${systemd_dir_path}/adsorber.service"
 
         # Copy the systemd timer to /etc/systemd/system/adsorber.timer, timer is the clock that triggers adsorber.service
-	sed "s/#@frequency@#$/${frequency}/g" "${library_dir_path}/systemd/adsorber.timer" \
+	sed "s/#@frequency@#/${frequency}/g" "${library_dir_path}/systemd/adsorber.timer" \
 		> "${systemd_dir_path}/adsorber.timer"
 
         chmod u=rwx,g=rx,o=rx "${systemd_dir_path}/adsorber.service" "${systemd_dir_path}/adsorber.timer"
@@ -111,10 +117,8 @@ systemdPromptFrequency()
 				readonly frequency="semiannually"
 				;;
 			* )
-				printf "%bFrequency '${frequency}' not understood.%b" "${prefix_warning}" "${prefix_reset}"
-				echo "${prefix_warning}Aborting ..."
-				remove_ErrorCleanUp
-				exit 1
+				echo "${prefix_warning}Frequency '${_input_frequency}' not understood.${prefix_reset}" 1>&2
+				systemdPromptFrequency
 				;;
 		esac
 		
@@ -136,9 +140,9 @@ systemdRemove()
                 systemctl disable adsorber.service 2>/dev/null 1>&2 # This service is not enabled by default
 
                 # Remove leftover service files.
-                rm "${systemd_dir_path}/adsorber.timer" "${systemd_dir_path}/adsorber.service" \
+                rm "${systemd_dir_path}/adsorber.timer" "${systemd_dir_path}/adsorber.service" 2>/dev/null 1>&2 \
                         || {
-                                printf "%bCouldn't remove systemd service files at %s%b\\n." \
+                                printf "%bCouldn't remove Systemd service files at %s%b\\n." \
 					"${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
 
                                 return 1
