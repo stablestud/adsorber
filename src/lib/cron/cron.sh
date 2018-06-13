@@ -30,7 +30,7 @@
 
 crontabSetup()
 {
-        echo "${prefix}Setting up ${frequency} Cronjob ..."
+        echo "${prefix}Setting up ${frequency_string} Cronjob ..."
 
         # Check if crontabs directory variable is correctly set, if not abort and call the error clean-up function
         if [ ! -d "${crontab_dir_path}" ]; then
@@ -46,7 +46,7 @@ crontabSetup()
         # and copy and manipulate the content to crontabs directory
         sed "s|#@version@#|${version}|g" "${library_dir_path}/cron/80adsorber" \
                 | sed "s|#@\\/some\\/path\\/adsorber update@#$|${executable_dir_path}\\/adsorber update|g" \
-		| sed "s/#@frequency@#/${frequency}/g" \
+		| sed "s/#@frequency@#/${frequency_string}/g" \
                 > "${crontab_dir_path}/80adsorber"
 
         chmod u=rwx,g=rx,o=rx "${crontab_dir_path}/80adsorber"
@@ -61,64 +61,69 @@ crontabSetup()
 crontabPromptFrequency()
 {
 	if [ -z "${frequency}" ]; then
-		_freq_input="true"
+		_used_input="true"
 		printf "%bHow often should the scheduler run? [(h)ourly/(d)aily/(W)eekly/(m)onthly]: " "${prefix_input}"
 		read -r frequency
 	fi
 
 	case "${frequency}" in
 		[Hh] | [Hh][Oo][Uu][Rr] | [Hh][Oo][Uu][Rr][Ll][Yy] )
-			frequency="hourly"
+			readonly frequency_string="hourly"
 			readonly crontab_dir_path="/etc/cron.hourly/"
 			;;
 		[Dd] | [Dd][Aa][Yy] | [Dd][Aa][Ii][Ll][Yy] )
-			frequency="daily"
+			readonly frequency_string="daily"
 			readonly crontab_dir_path="/etc/cron.daily/"
 			;;
 		[Ww] | "" | [Ww][Ee][Ee][Kk] | [Ww][Ee][Ee][Kk][Ll][Yy] )
-			frequency="weekly"
+			readonly frequency_string="weekly"
 			readonly crontab_dir_path="/etc/cron.weekly/"
 			;;
 		[Mm] | [Mm][Oo][Nn][Tt][Hh] | [Mm][Oo][Nn][Tt][Hh][Ll][Yy] )
-			frequency="monthly"
+			readonly frequency_string="monthly"
 			readonly crontab_dir_path="/etc/cron.monthly/"
 			;;
 		[Yy] | [Yy][Ee][Aa][Rr] | [Yy][Ee][Aa][Rr][Ll][Yy] | \
 		[Aa] | [Aa][Nn][Nn][Uu][Aa][Ll] | [Aa][Nn][Nn][Uu][Aa][Ll][Ll][Yy] | \
 		[Qq] | [Qq][Uu][Aa][Rr][Tt][Ee][Rr] | [Qq][Uu][Aa][Rr][Tt][Ee][Rr][Ll][Yy] | \
 		[Ss] | [Ss][Ee][Mm][Ii] | [Ss][Ee][Mm][Ii][Aa][Nn][Nn][Uu][Aa][Ll][Ll][Yy] )
-			if [ "${_freq_input}" = "true" ]; then
+			if [ "${_used_input}" = "true" ]; then
 				echo "${prefix_warning}This frequency is only available with Systemd." 1>&2
 				unset frequency
 				crontabPromptFrequency
 			else
-				printf "%bThis frequency is only available with Systemd.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+				printf "%bThis frequency is only available with Systemd.%b\\n" \
+					"${prefix_fatal}" "${prefix_reset}" 1>&2
 				remove_ErrorCleanUp
 				exit 1
 			fi
 			;;
 		* )
-			if [ "${_freq_input}" = "true" ]; then
+			if [ "${_used_input}" = "true" ]; then
 				echo "${prefix_warning}Frequency '${frequency}' not understood." 1>&2
 				unset frequency
 				crontabPromptFrequency
 			else
-				printf "%bFrequency '%s' not understood.%b\\n" "${prefix_fatal}" "${frequency}" "${prefix_reset}" 1>&2
+				printf "%bFrequency '%s' not understood.%b\\n" \
+					"${prefix_fatal}" "${frequency}" "${prefix_reset}" 1>&2
 				remove_ErrorCleanUp
 				exit 1
 			fi
 			;;
 	esac
 
-	unset _freq_input
+	unset _used_input
 }
 
 
 crontabRemove()
 {
-        if [ -f "${crontab_dir_path}/80adsorber" ]; then
-                # Remove the crontab from /etc/cron.weekly
-                rm "${crontab_dir_path}/80adsorber" \
+        if [ -f "/etc/cron.hourly/80adsorber" ] \
+	|| [ -f "/etc/cron.daily/80adsorber" ] \
+	|| [ -f "/etc/cron.weekly/80adsorber" ] \
+	|| [ -f "/etc/cron.monthly/80adsorber" ]; then
+                # Remove the crontab from /etc/cron.* or other if specified
+                rm /etc/cron.?????*/80adsorber \
                         || {
                                 printf "%bCouldn't remove Crontab %s\\n." \
 					"${prefix_warning}" "${crontab_dir_path}" 1>&2

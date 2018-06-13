@@ -91,9 +91,9 @@ systemdPromptFrequency()
 {
 	if [ -z "${frequency}" ]; then 
 		printf "%bHow often should the service run? [(h)ourly/(d)aily/(W)eekly/(m)onthly/(q)uarterly]: " "${prefix_input}"
-		read -r _input_frequency
+		read -r _freq_input
 
-		case "${_input_frequency}" in
+		case "${_freq_input}" in
 			[Hh] | [Hh][Oo][Uu][Rr] | [Hh][Oo][Uu][Rr][Ll][Yy] )
 				readonly frequency="hourly"
 				;;
@@ -117,12 +117,12 @@ systemdPromptFrequency()
 				readonly frequency="semiannually"
 				;;
 			* )
-				echo "${prefix_warning}Frequency '${_input_frequency}' not understood.${prefix_reset}" 1>&2
+				echo "${prefix_warning}Frequency '${_freq_input}' not understood.${prefix_reset}" 1>&2
 				systemdPromptFrequency
 				;;
 		esac
 		
-		unset _input_frequency
+		unset _freq_input
 	fi
 }
 
@@ -131,7 +131,7 @@ systemdRemove()
 {
         if [ -f "${systemd_dir_path}/adsorber.service" ] || [ -f "${systemd_dir_path}/adsorber.timer" ]; then
 
-                # Disable timer and add "${prefix}" to the output stream, to format it so it can fit the Adsorber 'style'
+                # Disable timer
                 systemctl stop adsorber.timer 2>/dev/null
                 systemctl disable adsorber.timer 2>/dev/null \
 
