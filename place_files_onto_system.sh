@@ -51,7 +51,7 @@ printHelp()
         echo "Usage: ${0} [option]:"
         echo
         echo "Options:"
-        echo "  -y, --yes       automatically reply the prompt with yes"
+        echo "  -y, --yes       automatically reply the confirmation prompt with yes"
         echo "  -h, --help      show this help screen"
         echo
         printLocation
@@ -93,7 +93,7 @@ fi
 echo
 
 ##[ Main exectuable ]###########################################################
-echo "Placing main executable to ${executable_path}"
+echo "Placing main executable (src/bin/adsorber) to ${executable_path}"
 
 mkdir -p "$(dirname ${executable_path})"
 
@@ -114,7 +114,7 @@ chown root:root "${executable_path}" \
 
 
 ##[ Libraries ]#################################################################
-echo "Placing other executables to ${library_dir_path}"
+echo "Placing other executables (src/lib/*) to ${library_dir_path}"
 
 mkdir -p "${library_dir_path}"
 
@@ -130,13 +130,13 @@ chown -R root:root "${library_dir_path}" \
         }
 
 ##[ Shareables ]################################################################
-echo "Placing miscellaneous to ${shareable_dir_path}"
+echo "Placing miscellaneous (src/share/*) to ${shareable_dir_path}"
 
 mkdir -p "${shareable_dir_path}"
 
 cp -r "${script_dir_path}/src/share/." "${shareable_dir_path}"
 
-chmod -R u=rwx,g=rx,o=rx "${shareable_dir_path}" \
+chmod -R u=rw,g=r,o=r "${shareable_dir_path}" \
         || {
                 printf "Couldn't set permissions for %s" "${shareable_dir_path}"
         }
@@ -146,7 +146,7 @@ chown -R root:root "${shareable_dir_path}" \
         }
 
 ##[ Config files ]##############################################################
-echo "Placing config files to ${config_dir_path}"
+echo "Copying config files (src/share/default/*) to ${config_dir_path}"
 
 mkdir -p "${config_dir_path}"
 
@@ -155,7 +155,7 @@ cp "${script_dir_path}/src/share/default/default-blacklist" "${config_dir_path}/
 cp "${script_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/whitelist"
 cp "${script_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"
 
-chmod -R u=rwx,g=rx,o=rx "${config_dir_path}" \
+chmod -R u=rw,g=r,o=r "${config_dir_path}" \
         || {
                 printf "Couldn't set permissions for %s" "${config_dir_path}"
         }
@@ -164,7 +164,7 @@ chown -R root:root "${config_dir_path}" \
                 printf "Couldn't set ownership of %s" "${config_dir_path}"
         }
 
-echo "Adsorbers files have been successfully placed onto the system."
+echo "Adsorber files have been successfully placed onto the system."
 printf "\\033[1;37mTo start going and to setup the scheduler or to backup the hosts file run 'adsorber setup'\\033[0m\\n"
 echo
 
