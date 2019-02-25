@@ -1,4 +1,5 @@
 #!/bin/sh
+# Cleans the scripts root directory of config files created by portable_adsorber.sh
 
 readonly source_dir_path="$(cd "$(dirname "${0}")"/.. && pwd)"
 
