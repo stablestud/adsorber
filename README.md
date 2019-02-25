@@ -34,15 +34,20 @@ the following requirements should have been fulfilled by default:
 
 ## Usage
 
-### First steps .. installation to system or portable mode
-Adsorber can be installed into the system (recommended) for a more stable and robust usage.
-This can be achieved through running `install_to_system.sh`, files will placed to `/usr/local/` if not other specified.
-If you don't want Adsorber to be installed into your system run `portable_adsorber.sh`.
+### First steps .. placing files to system or portable mode
+Adsorber can be placed into the system (recommended) for a more stable and robust usage.
+This can be achieved through running `place_files_onto_system.sh`, the files will placed to `/usr/local/` if not other specified.
+If you don't want Adsorber to be placed into your system run `portable_adsorber.sh`.
 
-Installing Adsorber into the system has the advantage that Adsorber can run independently from the user who downloaded it.
+Placing Adsorber into the system has the advantage that Adsorber can run independently from the user who downloaded it.
 Also it prevents broken cronjobs/services as there is no risk that the files/directory of Adsorber will be accidentally deleted or moved.
 
-To configure where it should be installed (to fit your system), edit the relevant lines in `install_to_system.sh` and `remove_from_system.sh`. For more help about the specific files run them with `--help`.
+To configure where it should be installed (to fit your system), edit the relevant lines in `place_files_onto_system.sh` and `remove_files_from_system.sh`.
+For more help about the specific scripts run them with `--help`.
+
+1. run `place_files_onto_system.sh` as `root` user
+2. run `adsorber setup` as `root` user and answer all prompts by your preference, or just hit all the time `ENTER` (default options will be used).
+3. You've made it!
 
 ### Default help screen of `adsorber help`
 ```
