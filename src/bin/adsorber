@@ -81,7 +81,7 @@ showHelp()
 {
         echo "Usage: adsorber <operation> [<options>]"
         echo ""
-        echo "(Ad)sorber blocks ads by 'absorbing' and dumbing them into void."
+        echo "(Ad)sorber blocks ads by \"absorbing\" and dumbing them into void."
         echo "           (with the help of the hosts file)"
         echo ""
         echo "Operations (required):"
@@ -92,7 +92,7 @@ showHelp()
         echo "  update  - update hosts file with newest ad servers"
         echo "  restore - restore hosts file to its original state"
         echo "           (it does not remove the scheduler, this should be used temporary)"
-        echo "  revert  - reverts the hosts file to the last applied host file."
+	echo "  revert  - reverts the hosts file to the last applied (previous) host file."
         echo "  remove  - completely remove changes made by Adsorber"
         echo "              e.g., remove scheduler (if set)"
         echo "                    restore hosts file to its original state"
@@ -104,6 +104,8 @@ showHelp()
         echo "  -f,  --force             - force the update if no /etc/hosts backup"
         echo "                             has been created (dangerous)"
         echo "  -h,  --help              - show specific help of specified operations"
+	echo "                             (e.g 'adsorber update --help)"
+	echo ""
 	echo "Scheduler specifc options (use with 'setup'):"
         echo "  -ns, --no-scheduler      - skip scheduler creation"
         echo "  -s,  --systemd           - use Systemd ..."
@@ -132,18 +134,18 @@ showSpecificHelp()
                         printf "\\033[4;37madsorber setup [<options>]\\033[0m:\\n"
                         echo
                         echo "You should run this command first."
-                        echo "  (e.g. after installation to the system)"
+                        echo "  (e.g. after files have been placed to the system)"
                         echo
                         echo "The command will:"
                         echo " - backup your /etc/hosts file to /etc/hosts.original"
                         echo "   (if not other specified in adsorber.conf)"
-                        echo " - setup a scheduler which updates your hosts file with ad-domains"
+                        echo " - setup a scheduler which updates your hosts file with ad-domains periodically"
                         echo "   (either systemd, cronjob or none)"
                         echo " - fetch the newest ad-domains to your hosts file."
-                        echo "   (same as 'adsorber update')"
+                        echo "   (it runs 'adsorber update')"
                         echo
-                        echo "Note: this is not the same as the install_to_system.sh script."
-                        echo "install_to_system.sh will place Adsorbers executable files into the system"
+                        echo "Note: this is not the same as the place_files_onto_system.sh script."
+                        echo "place_files_onto_system.sh will place Adsorbers executable files into the system"
                         echo "so it can run directory independently, but it will not take the actions"
                         echo "described here. The same goes for 'remove'"
                         echo
@@ -184,7 +186,7 @@ showSpecificHelp()
                         echo "The command will:"
                         echo " - copy /etc/hosts.original to /etc/hosts, overwriting the modified /etc/hosts by adsorber."
                         echo
-                        echo "Important: If you have a scheduler setup it'll re-apply ad-domains to your hosts"
+                        echo "Note: If you have a scheduler set it'll re-apply ad-domains to your hosts"
                         echo "file when triggered."
                         echo "For this reason this command is used to temporary disable Adsorber."
                         echo "(e.g. when it's blocking some sites you need access for a short period of time)"
@@ -198,7 +200,7 @@ showSpecificHelp()
                         printf "\\033[4;37madsorber revert [<options>]\\033[0m:\\n"
                         echo
                         echo "To revert to the last applied hosts file."
-                        echo "Good use if the current host file has been corruptea or misses some ad-domains."
+                        echo "Use it if the current host file has been corrupted or misses previously applied ad-domains."
                         echo
                         echo "The command will:"
                         echo " - copy /etc/hosts.previous to /etc/hosts, overwriting the current host file."
