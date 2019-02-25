@@ -21,15 +21,17 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-------  ---function defined in:---
-# remove_CleanUp       src/lib/remove.sh
-# remove_ErrorCleanUp  src/lib/remove.sh
+# ---function:------------  ---function defined in:---
+# remove_CleanUp            src/lib/remove.sh
+# remove_ErrorCleanUp       src/lib/remove.sh
+# update_PreviousHostsFile  src/lib/update.sh
 
 # shellcheck disable=SC2154
 
 restore_HostsFile()
 {
         if [ -f "${hosts_file_backup_path}" ]; then
+                update_PreviousHostsFile
                 # Copy /etc/hosts.original to /etc/hosts, replacing the current one
                 cp "${hosts_file_backup_path}" "${hosts_file_path}" \
                         || {

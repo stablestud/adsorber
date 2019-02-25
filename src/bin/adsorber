@@ -194,7 +194,7 @@ showSpecificHelp()
                         echo "For this reason this command is used to temporary disable Adsorber."
                         echo "(e.g. when it's blocking some sites you need access for a short period of time)"
                         echo
-                        echo "To re-apply run 'adsorber update'"
+			echo "To re-apply run 'adsorber revert' (for last version) or 'adsorber update' (for updated version)"
                         echo
                         echo "Possible option:"
                         echo " -h, --help       - show this help screen"
