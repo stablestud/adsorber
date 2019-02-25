@@ -1,10 +1,10 @@
 # Whitelist
 # Use to allow domains, even if they are blocked from some hosts sources.
-# By default, the blacklist overwrites the whitelist. This can be changed in adsorber.conf.
+# However the blacklist overwrites the whitelist by default. This can be changed in adsorber.conf.
 #
-# Note: the whitelist uses partial matching. Means if you allow adserver.tld
+# Note: the whitelist uses partial matching. Means if you allow adserver.tld,
 # all its subdomains like ad1.adserver.tld also will be allowed.
-# (Can be changed in adsorber.conf by editing 'use_partial_matching')
+# (Can be changed in adsorber.conf by changing 'use_partial_matching' to false)
 #
 # Entries must begin with either 127.0.0.1 or 0.0.0.0
 
