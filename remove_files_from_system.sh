@@ -6,15 +6,15 @@
 
 # This file can run independently, no need to download the full repository to
 # remove an existing installation.
-# Note: only run this file if Adsorber was installed into the system and not if
-# it was used with portable-mode (portable_adsorber.sh)
+# Note: only run this file if Adsorber was placed onto the system (via place_files_onto_system.sh)
+# and not if it was used with portable-mode (portable_adsorber.sh)
 
 ##########[ Edit to fit your system ]###########################################
 
 # Define where the executable 'adsorber' is.
 readonly executable_path="/usr/local/bin/adsorber"
 
-# Define where the other executable are.
+# Define where the other executables are.
 readonly library_dir_path="/usr/local/lib/adsorber/"
 
 # Define the location of adsorbers shareable data (e.g. default config files...).
@@ -87,7 +87,7 @@ echo
 
 # Prompt user if sure about to remove Adsorber from the system
 if [ -z "${prompt}" ]; then
-        printf "Are you sure you want to remove Adsorber from the system? [(Y)es/(N)o]: "
+	printf "Are you sure you want to remove Adsorber (see above) from the system? [(y)es/(N)o]: "
         read -r prompt
 fi
 
@@ -139,7 +139,7 @@ rm -r "${library_dir_path}" 2>/dev/null && echo "Cleaned ${library_dir_path}"
 rm -r "${shareable_dir_path}" 2>/dev/null && echo "Cleaned ${shareable_dir_path}"
 rm -r "${config_dir_path}" 2>/dev/null && echo "Cleaned ${config_dir_path}"
 
-# Remove the adsorber command from cache/hashtable
+# Remove the adsorber command from cache/hashtable.
 # Shells must be reloaded / reopened to have an effect
 echo "Clearing adsorber from shell cache ..."
 if command -v hash 1>/dev/null; then
