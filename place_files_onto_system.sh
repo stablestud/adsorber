@@ -44,9 +44,9 @@ printHelp()
         echo "   Will place Adsorbers executables and other"
         echo "   files relevant to Adsorber into the system."
         echo
-        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'install' command will not do the same action as\\n"
+        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'setup' command will not do the same action as\\n"
         echo "this script, as it will only setup the scheduler and backup the original hosts file."
-        echo "You may want to run 'adsorber install' afterwards"
+        echo "You may want to run 'adsorber setup' afterwards"
         echo
         echo "Usage: ${0} [option]:"
         echo
@@ -70,7 +70,7 @@ printLocation
 echo
 
 if [ -z "${prompt}" ]; then
-        printf "Are you sure you want to install Adsorber into the system? [(Y)es/(N)o]: "
+        printf "Are you sure you want to place Adsorbers files onto the system? [(y)es/(N)o]: "
         read -r prompt
 fi
 
@@ -79,14 +79,14 @@ case "${prompt}" in
                 :
                 ;;
         * )
-                echo "Installation to the system has been cancelled."
+                echo "Placing files onto the system has been cancelled."
                 exit 1
                 ;;
 esac
 
 # Check if user is root, if not exit.
 if [ "$(id -g)" -ne 0 ]; then
-        echo "You need to be root to install Adsorber into the system." 1>&2
+        echo "You need to be root to place Adsorbers files onto the system." 1>&2
         exit 126
 fi
 
@@ -164,18 +164,16 @@ chown -R root:root "${config_dir_path}" \
                 printf "Couldn't set ownership of %s" "${config_dir_path}"
         }
 
+echo "Adsorbers files have been successfully placed onto the system."
+printf "\\033[1;37mTo start going and to setup the scheduler or to backup the hosts file run 'adsorber setup'\\033[0m\\n"
 echo
 
 ## We don't run Adsorber after installation yet
-#adsorber install \
+#adsorber setup \
 #        || {
-#                printf "\033[0;93mAdsorber was installed on your system, however something went wrong at\\n"
+#                printf "\033[0;93mAdsorber has been placed onto your system, however something went wrong at\\n"
 #                printf "running it.\\n"
 #                printf "If a proxy server is in use, please change the config file\\n"
 #                printf "(${config_dir_path}/adsorber.conf) to the appropriate proxy server.\\n\033[0m"
-#                echo "Run 'adsorber install' to try again."
+#                echo "Run 'adsorber setup' to try again."
 #        }
-
-echo "Installation completed."
-printf "\\033[1;37mTo start going and to setup the scheduler or to backup the hosts file run 'adsorber install'\\033[0m\\n"
-echo "You can now delete this folder."
