@@ -33,7 +33,6 @@ readonly hosts_file_path="/etc/hosts"
 readonly hosts_file_backup_path="/etc/hosts.original"
 readonly hosts_file_previous_path="/etc/hosts.previous"
 readonly systemd_dir_path="/etc/systemd/system"
-readonly crontab_file_path="/etc/cron.weekly/80adsorber"
 readonly tmp_dir_path="/tmp/adsorber"
 
 ##########[ End of configuration ]##############################################
@@ -115,11 +114,45 @@ printf "\\nRunning 'adsorber remove -y' ...\\n"
                 printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nNo worries, I can handle it ...\\n\\033[0m"
                 echo "Maybe Adsorber has been already removed ?"
 
+		printf "Trying portable_adsorber.sh ... "
+
+		if ${script_dir_path}/portable_adsorber.sh "remove" "-y" 2>/dev/null 1>&2; then
+			printf "found"
+		else
+			${script_dir_path}/misc/clean.sh 2>/dev/null 1>&2
+		fi
+
+
+		printf "\n\n"
+
                 # Doing it the hard way .., removing everything manually
                 rm "${systemd_dir_path}/adsorber.timer" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.timer"
                 rm "${systemd_dir_path}/adsorber.service" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.service"
                 systemctl daemon-reload 2>/dev/null && echo "Reloaded systemctl daemon"
                 rm "${crontab_file_path}" 2>/dev/null && echo "Removed ${crontab_file_path}"
+
+		# Remove all crontabs
+                if [ -f "/etc/cron.hourly/80adsorber" ]; then
+			rm "/etc/cron.hourly/80adsorber" 2>/dev/null \
+				&& echo "Removed cronjob from /etc/cron.hourly/"
+		fi
+
+                if [ -f "/etc/cron.daily/80adsorber" ]; then
+			rm "/etc/cron.daily/80adsorber" 2>/dev/null \
+				&& echo "Removed cronjob from /etc/cron.daily/"
+		fi
+
+                if [ -f "/etc/cron.weekly/80adsorber" ]; then
+			rm "/etc/cron.weekly/80adsorber" 2>/dev/null \
+				&& echo "Removed cronjob from /etc/cron.weekly/"
+		fi
+
+                if [ -f "/etc/cron.monthly/80adsorber" ]; then
+			rm "/etc/cron.monthly/80adsorber" 2>/dev/null \
+				&& echo "Removed cronjob from /etc/cron.monthly/"
+		fi
+
+
                 rm -r "${tmp_dir_path}" 2>/dev/null && echo "Removed ${tmp_dir_path}"
 
                 if [ -f "${hosts_file_backup_path}" ]; then
