@@ -32,4 +32,6 @@ else
         fi
 
         echo "Adsorber in portable-mode exited with code ${exit_code}. Thats an error."
+
+	exit ${exit_code}
 fi

@@ -165,7 +165,7 @@ chown -R root:root "${config_dir_path}" \
         }
 
 echo "Adsorber files have been successfully placed onto the system."
-printf "\\033[1;37mTo start going and to setup the scheduler or to backup the hosts file run 'adsorber setup'\\033[0m\\n"
+printf "\\033[1;37mTo start going (to setup the scheduler and to backup the hosts file) run 'adsorber setup'\\033[0m\\n"
 echo
 
 ## We don't run Adsorber after installation yet
