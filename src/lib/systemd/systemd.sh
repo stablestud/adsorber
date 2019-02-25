@@ -89,7 +89,7 @@ systemdSetup()
 
 systemdPromptFrequency()
 {
-	if [ -z "${frequency}" ]; then 
+	if [ -z "${frequency}" ]; then
 		printf "%bHow often should the service run? [(h)ourly/(d)aily/(W)eekly/(m)onthly/(q)uarterly]: " "${prefix_input}"
 		read -r _freq_input
 
@@ -121,7 +121,7 @@ systemdPromptFrequency()
 				systemdPromptFrequency
 				;;
 		esac
-		
+
 		unset _freq_input
 	fi
 }

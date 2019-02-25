@@ -256,7 +256,7 @@ duplicateOption()
                 echo "  -c,  --cron          - use Cronjob as scheduler (use with 'setup')"
                 echo "  -ns, --no-scheduler  - skip scheduler creation (use with 'setup')"
         elif [ "${1}" = "frequency" ]; then
-		echo "Adsorber: Duplicate option for schedulers frequency: '${2}'" 1>&2	
+		echo "Adsorber: Duplicate option for schedulers frequency: '${2}'" 1>&2
 		echo "You may only select one:"
 		echo "  -H,  --hourly        - run scheduler once hourly"
 		echo "  -D,  --daily                          ... daily"
@@ -379,7 +379,6 @@ for _option in "${@}"; do
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
-			
 			;;
 		-D | --daily )
                         if [ -z "${frequency}" ]; then
