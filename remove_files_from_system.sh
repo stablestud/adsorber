@@ -116,10 +116,10 @@ printf "\\nRunning 'adsorber remove -y' ...\\n"
 
 		printf "Trying portable_adsorber.sh ... "
 
-		if ${script_dir_path}/portable_adsorber.sh "remove" "-y" 2>/dev/null 1>&2; then
+		if "${script_dir_path}/portable_adsorber.sh" "remove" "-y" 2>/dev/null 1>&2; then
 			printf "found"
 		else
-			${script_dir_path}/misc/clean.sh 2>/dev/null 1>&2
+			"${script_dir_path}/misc/clean.sh" 2>/dev/null 1>&2
 		fi
 
 
@@ -129,7 +129,6 @@ printf "\\nRunning 'adsorber remove -y' ...\\n"
                 rm "${systemd_dir_path}/adsorber.timer" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.timer"
                 rm "${systemd_dir_path}/adsorber.service" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.service"
                 systemctl daemon-reload 2>/dev/null && echo "Reloaded systemctl daemon"
-                rm "${crontab_file_path}" 2>/dev/null && echo "Removed ${crontab_file_path}"
 
 		# Remove all crontabs
                 if [ -f "/etc/cron.hourly/80adsorber" ]; then

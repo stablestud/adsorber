@@ -21,7 +21,7 @@ echo "Running shellcheck ..."
                 "${script_dir_path}/../src/bin/adsorber" \
                 "${script_dir_path}/../portable_adsorber.sh" \
                 "${script_dir_path}/../place_files_onto_system.sh" \
-                "${script_dir_path}/../remove_from_system.sh"
+                "${script_dir_path}/../remove_files_from_system.sh"
 
         echo "Done."
 )
