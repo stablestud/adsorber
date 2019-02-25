@@ -42,6 +42,9 @@ checkRoot()
                 exit 126
         fi
 
+        checkPaths
+	sourceFiles
+
         return 0
 }
 
@@ -334,8 +337,6 @@ sourceFiles()
         return 0
 }
 
-checkPaths
-sourceFiles
 
 for _option in "${@}"; do
 

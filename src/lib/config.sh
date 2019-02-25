@@ -52,16 +52,7 @@ config_CopySourceList()
         # Create sources.list if not found. Adsorber need sources.list to know from where to fetch hosts domains from
         if [ ! -f "${config_dir_path}/sources.list" ] || [ ! -s "${config_dir_path}/sources.list" ]; then
                 cp "${shareable_dir_path}/default/default-sources.list" "${config_dir_path}/sources.list" \
-                        && echo "${prefix_warning}Created sources.list: to add new host sources edit this file."
-
-                chown root:root -R "${config_dir_path}/sources.list" \
-                        || {
-                                printf "%bCouldn't set ownership of %s\\n" "${prefix_warning}" "${config_dir_path}"
-                        }
-                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/sources.list" \
-                        || {
-                                printf "%bCouldn't set permissions for %s\\n" "${prefix_warning}" "${config_dir_path}"
-                        }
+                        && echo "${prefix_warning}Created sources.list - to add new host sources edit this file."
         fi
 
         return 0
@@ -73,16 +64,7 @@ config_CopyWhiteList()
         # Create whitelist if not found, used to whitelist domains which should be excluded from blocking
         if [ ! -f "${config_dir_path}/whitelist" ] || [ ! -s "${config_dir_path}/whitelist" ]; then
                 cp "${shareable_dir_path}/default/default-whitelist" "${config_dir_path}/whitelist" \
-                        && echo "${prefix_warning}Created whitelist: to allow specific domains edit this file."
-
-                chown root:root -R "${config_dir_path}/whitelist" \
-                        || {
-                                printf "%bCouldn't set ownership of %s\\n" "${prefix_warning}" "${config_dir_path}"
-                        }
-                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/whitelist" \
-                        || {
-                                printf "%bCouldn't set permissions for %s\\n" "${prefix_warning}" "${config_dir_path}"
-                        }
+                        && echo "${prefix_warning}Created whitelist - to allow specific domains edit this file."
         fi
 
         return 0
@@ -94,16 +76,7 @@ config_CopyBlackList()
         # Create blacklist if not found, used to explicitly block domains
         if [ ! -f "${config_dir_path}/blacklist" ] || [ ! -s "${config_dir_path}/blacklist" ]; then
                 cp "${shareable_dir_path}/default/default-blacklist" "${config_dir_path}/blacklist" \
-                        && echo "${prefix_warning}Created blacklist: to block additional domains edit this file."
-
-                chown root:root -R "${config_dir_path}/blacklist" \
-                        || {
-                                printf "%bCouldn't set ownership of %s\\n" "${prefix_warning}" "${config_dir_path}"
-                        }
-                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/blacklist" \
-                        || {
-                                printf "%bCouldn't set permissions for %s\\n" "${prefix_warning}" "${config_dir_path}"
-                        }
+                        && echo "${prefix_warning}Created blacklist - to block additional domains edit this file."
         fi
 
         return 0
@@ -120,14 +93,6 @@ config_CopyConfig()
                 sed "s|@.*|# Config file for Adsorber v${version}|g" "${shareable_dir_path}/default/default-adsorber.conf" \
 			> "${config_dir_path}/adsorber.conf"
 
-                chown root:root -R "${config_dir_path}/adsorber.conf" \
-                        || {
-                                printf "%bCouldn't set ownership of %s\\n" "${prefix_warning}" "${config_dir_path}"
-                        }
-                chmod u=rwx,g=rx,o=r -R "${config_dir_path}/adsorber.conf" \
-                        || {
-                                printf "%bCouldn't set permissions for %s\\n" "${prefix_warning}" "${config_dir_path}"
-                        }
                 exit 126
         fi
 

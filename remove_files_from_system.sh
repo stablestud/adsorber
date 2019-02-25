@@ -114,16 +114,18 @@ printf "\\nRunning 'adsorber remove -y' ...\\n"
                 printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nNo worries, I can handle it ...\\n\\033[0m"
                 echo "Maybe Adsorber has been already removed ?"
 
-		printf "Trying portable_adsorber.sh ... "
+		printf "\\nTrying portable_adsorber.sh ... "
 
 		if "${script_dir_path}/portable_adsorber.sh" "remove" "-y" 2>/dev/null 1>&2; then
-			printf "found"
+			printf "found\\n"
+			printf "Removed successfully Adsorber"
 		else
+			printf "no luck"
 			"${script_dir_path}/misc/clean.sh" 2>/dev/null 1>&2
 		fi
 
 
-		printf "\n\n"
+		printf "\\n\\n"
 
                 # Doing it the hard way .., removing everything manually
                 rm "${systemd_dir_path}/adsorber.timer" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.timer"
