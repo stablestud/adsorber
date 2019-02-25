@@ -103,7 +103,7 @@ sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|reado
         | sed "s|^readonly config_dir_path=\"\${executable_dir_path}/\\.\\./\\.\\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" \
         > "${executable_path}"
 
-chmod u=rwx,g=rx,o=rx "${executable_path}" \
+chmod u=rwx,g=rx,o=rx "${executable_path}/*" \
         || {
                 printf "Couldn't set permissions for %s" "${executable_path}"
         }
@@ -120,7 +120,7 @@ mkdir -p "${library_dir_path}"
 
 cp -r "${script_dir_path}/src/lib/." "${library_dir_path}"
 
-chmod -R u=rwx,g=rx,o=rx "${library_dir_path}" \
+chmod -R u=rwx,g=rx,o=rx "${library_dir_path}/*" \
         || {
                 printf "Couldn't set permissions for %s" "${library_dir_path}"
         }
@@ -136,7 +136,7 @@ mkdir -p "${shareable_dir_path}"
 
 cp -r "${script_dir_path}/src/share/." "${shareable_dir_path}"
 
-chmod -R u=rw,g=r,o=r "${shareable_dir_path}" \
+chmod -R u=rw,g=r,o=r "${shareable_dir_path}/*" \
         || {
                 printf "Couldn't set permissions for %s" "${shareable_dir_path}"
         }
@@ -155,7 +155,7 @@ cp "${script_dir_path}/src/share/default/default-blacklist" "${config_dir_path}/
 cp "${script_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/whitelist"
 cp "${script_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"
 
-chmod -R u=rw,g=r,o=r "${config_dir_path}" \
+chmod -R u=rw,g=r,o=r "${config_dir_path}/*" \
         || {
                 printf "Couldn't set permissions for %s" "${config_dir_path}"
         }
