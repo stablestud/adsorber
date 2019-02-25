@@ -103,6 +103,8 @@ sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|reado
         | sed "s|^readonly config_dir_path=\"\${executable_dir_path}/\\.\\./\\.\\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" \
         > "${executable_path}"
 
+chmod a+x "${executable_path}"
+
 
 ##[ Libraries ]#################################################################
 echo "Placing other executables (src/lib/*) to ${library_dir_path}"
