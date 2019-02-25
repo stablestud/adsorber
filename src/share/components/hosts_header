@@ -5,6 +5,6 @@
 # and run 'adsorber update' to apply your changes.
 # Or else your changes will be overwritten by Adsorber once a week.
 #
-# By default, the domains will be updated once a week.
+# By default, the domains will be updated once a week if not other specified.
 # For further information please run 'adsorber --help'
 # Or visit: https://github.com/stablestud/adsorber
