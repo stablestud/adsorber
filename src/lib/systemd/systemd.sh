@@ -55,15 +55,15 @@ systemdSetup()
 
         # Replace the @ place holder line with the location of adsorber and copy
         # the service to the systemd directory ( /etc/sytemd/system/adsorber.service )
-        sed "s|#@\\/some\\/path\\/adsorber update@#|${executable_dir_path}\\/adsorber update --noformatting|g" "${library_dir_path}/systemd/adsorber.service" \
+        sed "s|#@\\/some\\/path\\/adsorber update@#|${executable_dir_path}\\/adsorber update --noformatting|g" "${library_dir_path}/systemd/default-service" \
 		| sed "s/#@frequency@#/${frequency}/g" \
 		 > "${systemd_dir_path}/adsorber.service"
 
         # Copy the systemd timer to /etc/systemd/system/adsorber.timer, timer is the clock that triggers adsorber.service
-	sed "s/#@frequency@#/${frequency}/g" "${library_dir_path}/systemd/adsorber.timer" \
+	sed "s/#@frequency@#/${frequency}/g" "${library_dir_path}/systemd/default-timer" \
 		> "${systemd_dir_path}/adsorber.timer"
 
-        chmod u=rwx,g=rx,o=rx "${systemd_dir_path}/adsorber.service" "${systemd_dir_path}/adsorber.timer"
+        chmod u=rw,g=r,o=r "${systemd_dir_path}/adsorber.service" "${systemd_dir_path}/adsorber.timer"
         chown root:root "${systemd_dir_path}/adsorber.service" "${systemd_dir_path}/adsorber.timer"
 
         # Enable the systemd service and enable it to start at boot-up
