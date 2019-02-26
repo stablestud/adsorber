@@ -25,7 +25,7 @@ readonly shareable_dir_path="${executable_dir_path}/../share/"
 readonly config_dir_path="${executable_dir_path}/../../"
 
 
-readonly version="0.5.1"
+readonly version="0.5.2"
 readonly operation="${1}"
 
 if [ "${#}" -ne 0 ]; then
@@ -73,8 +73,8 @@ showUsage()
                 echo "Adsorber: Invalid option: '${_wrong_option}'" 1>&2
         fi
 
-        echo "Usage: adsorber <setup|update|restore|revert|remove> [<options>]"
-        echo "Try '--help' for more information."
+        echo "Usage: adsorber <setup|disable|update|restore|revert> [<options>|--help]"
+        echo "Try 'help' for more information."
 
         exit 80
 }
@@ -82,7 +82,7 @@ showUsage()
 
 showHelp()
 {
-        echo "Usage: adsorber <operation> [<options>]"
+        echo "Usage: adsorber <operation> [<options>|--help]"
         echo ""
         echo "(Ad)sorber blocks ads by \"absorbing\" and dumbing them into void."
         echo "           (with the help of the hosts file)"
@@ -96,8 +96,8 @@ showHelp()
         echo "  restore - restore hosts file to its original state"
         echo "           (it does not remove the scheduler, this should be used temporary)"
 	echo "  revert  - reverts the hosts file to the last applied (previous) host file."
-        echo "  remove  - completely remove changes made by Adsorber"
-        echo "              e.g., remove scheduler (if set)"
+        echo "  disable - completely remove changes made by Adsorber"
+        echo "              e.g., disable scheduler (if set)"
         echo "                    restore hosts file to its original state"
         echo "  version - show version of this shell script"
         echo "  help    - show this help"
@@ -214,13 +214,14 @@ showSpecificHelp()
                         echo "Possible option:"
                         echo " -h, --help       - show this help screen"
                         ;;
-                remove )
-                        printf "\\033[4;37madsorber remove [<options>]\\033[0m:\\n"
+                disable )
+                        printf "\\033[4;37madsorber disable [<options>]\\033[0m:\\n"
                         echo
-                        echo "To completely remove changes made by Adsorber."
+                        echo "To completely remove changes made by Adsorber,"
+			echo "and disabling all background tasks (schedulers)."
                         echo
                         echo "The command will:"
-                        echo " - remove all schedulers (systemd, cronjob)"
+                        echo " - disable/remove all schedulers (systemd, cronjob)"
                         echo " - restore the hosts file to it's original state"
                         echo " - remove all leftovers (e.g. /tmp/adsorber)"
                         echo
@@ -320,8 +321,8 @@ sourceFiles()
 	. "${library_dir_path}/cleanup.sh"
         # shellcheck source=../src/lib/setup.sh
         . "${library_dir_path}/setup.sh"
-        # shellcheck source=../src/lib/remove.sh
-        . "${library_dir_path}/remove.sh"
+        # shellcheck source=../src/lib/disable.sh
+        . "${library_dir_path}/disable.sh"
         # shellcheck source=../src/lib/update.sh
         . "${library_dir_path}/update.sh"
         # shellcheck source=../src/lib/restore.sh
@@ -453,11 +454,11 @@ case "${operation}" in
                 setup
                 update
                 ;;
-        remove )
+        disable )
                 checkForWrongParameters
                 checkRoot
                 config
-                remove
+                disable
                 ;;
         update )
                 checkForWrongParameters

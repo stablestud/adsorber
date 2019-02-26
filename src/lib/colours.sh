@@ -11,8 +11,8 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:-  --default value:--  ---declared in:----
-# use_formatted  true                src/bin/adsorber, src/lib/cron/80adsorber, src/lib/systemd/systemd.service
+# ---variable:---  --default value:--  ----declared in:----
+# use_formatting   true                src/bin/adsorber, src/lib/cron/default-cronjob.sh, src/lib/systemd/default-service
 
 if [ "${use_formatting}" != "false" ]; then
         readonly prefix="  "

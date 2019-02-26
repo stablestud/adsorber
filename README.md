@@ -1,5 +1,5 @@
 # Adsorber
-[![Latest version](https://img.shields.io/badge/latest-v0.5.0-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
+[![Latest version](https://img.shields.io/badge/latest-v0.5.2-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
 [![License](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/stargazers)
 
@@ -14,9 +14,9 @@ Technically speaking, it adds ad-domains to the hosts file `/etc/hosts` with a r
 * Revert to the previous hosts-file if the current hosts-file contains broken ad-servers
 * White- and blacklist.
 
-Also it saves data, speeds up loading time and prevents some tracking of your browsing habits. For extensive privacy, I recommend using the script along browser add-ons like  [NoScript](https://addons.mozilla.org/en-US/firefox/addon/noscript/) (for [Firefox 56 and below](https://noscript.net/getit)), [Privacy Badger](https://addons.mozilla.org/en-US/firefox/addon/privacy-badger17/) and [HTTPS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/https-everywhere/).
+Also it saves data, speeds up loading time and prevents some tracking of your browsing habits. For extensive privacy, I recommend using the script along browser add-ons like  [NoScript](https://addons.mozilla.org/en-US/firefox/addon/noscript/) (for [Firefox 56 and below](https://noscript.net/getit)) or [uMatrix](https://addons.mozilla.org/en-US/firefox/addon/umatrix/), [Privacy Badger](https://addons.mozilla.org/en-US/firefox/addon/privacy-badger17/) and [HTTPS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/https-everywhere/).
 
-Currently we are using the following hosts lists:
+By default Adsorber uses the following curated ad-hosts sources:
 * [adaway.org](https://adaway.org/hosts.txt)
 * [yoyo.org](https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext)
 * & more to come.
@@ -51,34 +51,47 @@ For more help about the specific scripts run them with `--help`.
 
 ### Default help screen of `adsorber help`
 ```
-Usage: adsorber <operation> [<options>]
+Usage: adsorber <operation> [<options>|--help]
 
-(Ad)sorber blocks ads by 'absorbing' and dumbing them into void.
+(Ad)sorber blocks ads by "absorbing" and dumbing them into void.
            (with the help of the hosts file)
 
-Operations:
+Operations (required):
   setup   - setup necessary things needed for Adsorber
               e.g., create backup file of hosts file,
                     create scheduler which updates the host file once a week
             However this should've been done automatically.
   update  - update hosts file with newest ad servers
   restore - restore hosts file to its original state
-            (it does not remove the schedule, this should be used temporary)
-  revert  - reverts the hosts file to the last applied host file.
-  remove  - completely remove changes made by Adsorber
-              e.g., remove scheduler (if set)
+           (it does not remove the scheduler, this should be used temporary)
+  revert  - reverts the hosts file to the last applied (previous) host file.
+  disable - completely remove changes made by Adsorber
+              e.g., disable scheduler (if set)
                     restore hosts file to its original state
   version - show version of this shell script
   help    - show this help
 
-Options: (optional)
-  -s,  --systemd           - use Systemd ...
-  -c,  --cron              - use Cronjob as scheduler (use with 'setup')
-  -ns, --no-scheduler      - skip scheduler creation (use with 'setup')
+Options (optional):
   -y,  --yes, --assume-yes - answer all prompts with 'yes'
   -f,  --force             - force the update if no /etc/hosts backup
                              has been created (dangerous)
   -h,  --help              - show specific help of specified operations
+                             (e.g 'adsorber update --help)
+  --noformatting           - turn off coloured and formatted output
+
+Scheduler specifc options (use with 'setup'):
+  -ns, --no-scheduler      - skip scheduler creation
+  -s,  --systemd           - use Systemd ...
+  -c,  --cron              - use Cronjob as scheduler
+  -H,  --hourly            - run scheduler once hourly
+  -D,  --daily                              ... daily
+  -W,  --weekly                             ... weekly
+  -M,  --monthly                            ... monthly
+  -Q,  --quarterly                          ... quarterly (4x a year)
+  -S,  --semiannually                       ... semiannually (2x a year)
+  -Y,  --yearly                             ... yearly
+
+Config files are located at: /usr/local/etc/adsorber/
 
 Documentation: https://github.com/stablestud/adsorber
 If you encounter any issues please report them to the Github repository.
@@ -138,11 +151,11 @@ To re-apply run `adsorber update`
 Possible option:
 * `-h,  --help`
 
-#### `adsorber remove {options}`:
-To completely remove changes made by Adsorber.
+#### `adsorber disable {options}`:
+Completely remove changes made by Adsorber and disable all its background tasks (schedulers).
 
 The command will:
-* remove all schedulers (systemd, cronjob)
+* disable all schedulers (systemd, cronjob)
 * restore the hosts file to it's original state
 * remove all leftovers (previous hosts-file, etc)
 
@@ -169,7 +182,7 @@ Answers all prompts with `yes` e.g.,
 It'll not answer prompts which may harm your system. But `--force` will do it.
 #### `-f, --force`:
 This will force the script to continue (dangerous) the update e.g.,
-* Continue if no backup has been created, overwriting the existing hosts file.
+* Continues if no backup has been created, overwriting the existing hosts file.
 #### `-h, --help`:
 If specified in conjunction with an operation, it'll show extended help about the operation.
 

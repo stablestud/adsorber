@@ -86,7 +86,7 @@ echo
 
 # Prompt user if sure about to remove Adsorber from the system
 if [ -z "${prompt}" ]; then
-	printf "Are you sure you want to remove Adsorber (see above) from the system? [(y)es/(N)o]: "
+	printf "Are you sure you want to remove Adsorber from the system? [(y)es/(N)o]: "
         read -r prompt
 fi
 
@@ -107,9 +107,9 @@ if [ "$(id -g)" -ne 0 ]; then
 fi
 
 # Run Adsorber's own removal, if it fails do it manually
-if command -v adsorber; then
-	printf "\\nRunning 'adsorber remove -y --noformatting' ...\\n"
-	( adsorber "remove" "-y" "--noformatting" ) \
+if command -v adsorber 1>/dev/null; then
+	printf "\\nRunning 'adsorber disable -y --noformatting' ...\\n\\n"
+	( adsorber "disable" "-y" "--noformatting" ) \
 		|| {
 			echo
 			printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nNo worries, I can handle it ...\\n\\033[0m"
@@ -124,7 +124,7 @@ fi
 if [ "${_hard_way}" = "true" ]; then
 		printf "\\nTrying portable_adsorber.sh ... "
 
-		if "${script_dir_path}/portable_adsorber.sh" "remove" "-y" "--noformatting" 2>/dev/null 1>&2; then
+		if "${script_dir_path}/portable_adsorber.sh" "disable" "-y" "--noformatting" 2>/dev/null 1>&2; then
 			printf "found\\n"
 			printf "Removed successfully Adsorber\\n"
 		else

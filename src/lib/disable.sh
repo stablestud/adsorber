@@ -32,11 +32,11 @@
 
 # shellcheck disable=SC2154
 
-remove_Prompt()
+disable_Prompt()
 {
         # Ask if the user is sure about to remove Adsorber
         if [ -z "${reply_to_prompt}" ]; then
-                printf "%bDo you really want to remove Adsorber? [Y/n] %b" "${prefix_input}" "${prefix_reset}"
+                printf "%bDo you really want to disable Adsorber? [Y/n] %b" "${prefix_input}" "${prefix_reset}"
                 read -r reply_to_prompt
         fi
 
@@ -46,7 +46,7 @@ remove_Prompt()
                         ;;
                 * )
                         # If other input then Yes, abort and call error clean-up function
-                        printf "%bRemoval cancelled.\\n" "${prefix_warning}" 1>&2
+                        printf "%bDisable cancelled.\\n" "${prefix_warning}" 1>&2
                         errorCleanUp
                         exit 130
                         ;;
@@ -56,7 +56,7 @@ remove_Prompt()
 }
 
 
-remove_HostsFile()
+disable_HostsFile()
 {
         # Moves the original hosts file (backed-up at /etc/hosts.original)
         # to /etc/hosts, replacing the current one
@@ -66,7 +66,7 @@ remove_HostsFile()
         else
                 # If /etc/hosts.original was not found, abort and call the error clean-up function
                 printf "%bCan not restore hosts file. Original hosts file does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                echo "${prefix}Maybe already removed?" 1>&2
+                echo "${prefix}Maybe you've already disabled Adsorber?" 1>&2
                 errorCleanUp
                 exit 1
         fi
@@ -75,7 +75,7 @@ remove_HostsFile()
 }
 
 
-remove_PreviousHostsFile()
+disable_PreviousHostsFile()
 {
         # If found, remove /etc/hosts.previous
         if [ -f "${hosts_file_previous_path}" ]; then
@@ -89,15 +89,15 @@ remove_PreviousHostsFile()
 }
 
 
-# Main function of remove.sh
-remove()
+# Main function of disable.sh
+disable()
 {
-        printf "%bRemoving Adsorber ...%b\\n"  "${prefix_title}" "${prefix_reset}"
-        remove_Prompt
+        printf "%bDisabling Adsorber ...%b\\n"  "${prefix_title}" "${prefix_reset}"
+        disable_Prompt
         systemdRemove
         crontabRemove
-        remove_HostsFile
-        remove_PreviousHostsFile
+        disable_HostsFile
+        disable_PreviousHostsFile
         cleanUp
 
         return 0
