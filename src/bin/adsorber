@@ -25,7 +25,7 @@ readonly shareable_dir_path="${executable_dir_path}/../share/"
 readonly config_dir_path="${executable_dir_path}/../../"
 
 
-readonly version="0.5.0"
+readonly version="0.5.1"
 readonly operation="${1}"
 
 if [ "${#}" -ne 0 ]; then
@@ -108,6 +108,7 @@ showHelp()
         echo "                             has been created (dangerous)"
         echo "  -h,  --help              - show specific help of specified operations"
 	echo "                             (e.g 'adsorber update --help)"
+	echo "  --noformatting           - turn off coloured and formatted output"
 	echo ""
 	echo "Scheduler specifc options (use with 'setup'):"
         echo "  -ns, --no-scheduler      - skip scheduler creation"
@@ -258,8 +259,8 @@ duplicateOption()
                 echo "Adsorber: Duplicate option for scheduler: '${2}'" 1>&2
                 echo "You may only select one:"
                 echo "  -s,  --systemd       - use Systemd ..."
-                echo "  -c,  --cron          - use Cronjob as scheduler (use with 'setup')"
-                echo "  -ns, --no-scheduler  - skip scheduler creation (use with 'setup')"
+                echo "  -c,  --cron          - use Cronjob as scheduler"
+                echo "  -ns, --no-scheduler  - skip scheduler creation"
         elif [ "${1}" = "frequency" ]; then
 		echo "Adsorber: Duplicate option for schedulers frequency: '${2}'" 1>&2
 		echo "You may only select one:"
@@ -313,6 +314,8 @@ checkPaths()
 
 sourceFiles()
 {
+        # shellcheck source=../src/lib/colours.sh
+        . "${library_dir_path}/colours.sh"
         # shellcheck source=../src/lib/setup.sh
         . "${library_dir_path}/setup.sh"
         # shellcheck source=../src/lib/remove.sh
@@ -325,8 +328,6 @@ sourceFiles()
         . "${library_dir_path}/revert.sh"
         # shellcheck source=../src/lib/config.sh
         . "${library_dir_path}/config.sh"
-        # shellcheck source=../src/lib/colours.sh
-        . "${library_dir_path}/colours.sh"
 
         # Maybe source them only when needed?
         # shellcheck source=../src/lib/cron/cron.sh
@@ -428,6 +429,13 @@ for _option in "${@}"; do
                 -h | --help | help )
                         _option_help="true"
                         ;;
+		--noformatting )
+			if [ -z "${use_formatting}" ]; then
+				readonly use_formatting="false"
+			else
+				echo "Can't turn off colour, variable'already set." 1>&2
+			fi
+			;;
                 * )
                         _wrong_option="${_option}" 2>/dev/null
                         ;;
@@ -482,6 +490,6 @@ case "${operation}" in
                 ;;
 esac
 
-printf "\\033[1;37mFinished successfully.\\033[0m\\n"
+printf "%bFinished successfully.%b\\n" "${prefix_title}" "${prefix_reset}"
 
 exit 0

@@ -366,6 +366,7 @@ config_PrintVariables()
         echo "  - library_dir_path: ${library_dir_path}"
         echo "  - shareable_dir_path: ${shareable_dir_path}"
         echo "  - config_dir_path: ${config_dir_path}"
+	echo "  - use_formatting: ${use_formatting}"
 }
 
 

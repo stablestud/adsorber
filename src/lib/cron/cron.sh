@@ -45,7 +45,7 @@ crontabSetup()
         # Replace the @ place holder line with the location of adsorber in 80adsorber
         # and copy and manipulate the content to crontabs directory
         sed "s|#@version@#|${version}|g" "${library_dir_path}/cron/80adsorber" \
-                | sed "s|#@\\/some\\/path\\/adsorber update@#|${executable_dir_path}\\/adsorber update|g" \
+                | sed "s|#@\\/some\\/path\\/adsorber update@#|${executable_dir_path}\\/adsorber update --noformatting|g" \
 		| sed "s/#@frequency@#/${frequency_string}/g" \
                 > "${crontab_dir_path}/80adsorber"
 
