@@ -1,5 +1,5 @@
 [Unit]
-Description=Adsorber #@frequency@# service
+Description=#@frequency@# adsorber service
 Documentation=https://github.com/stablestud/adsorber
 After=network.target
 

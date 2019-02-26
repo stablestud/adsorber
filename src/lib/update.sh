@@ -210,7 +210,7 @@ update_FetchSources()
         elif [ "${ignore_download_error}" = "false" ] && [ "${_successful_count}" -ne "${_total_count}" ]; then
                 printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
 
-                remove_ErrorCleanUp
+                remove_ErrorCleanUp 
                 exit 1
         else
                 printf "%bSuccessfully fetched %d out of %d hosts sources.%b\\n" "${prefix_info}" "${_successful_count}" "${_total_count}" "${prefix_reset}"
@@ -324,7 +324,7 @@ update_IsCacheEmpty()
 {
         if [ ! -s "${tmp_dir_path}/cache" ]; then
                 printf "%bNothing to apply.\\n" "${prefix_warning}" 1>&2
-                remove_ErrorCleanUp
+                remove_CleanUp
                 exit 1
         fi
 
@@ -423,11 +423,14 @@ update()
         update_ReadWhiteList
 
         if update_ReadSourceList; then
-                update_FetchSources
-                update_FilterDomains "fetched" "fetched-filtered"
-                update_SortDomains "fetched-filtered" "fetched-sorted"
-
-                cp "${tmp_dir_path}/fetched-sorted" "${tmp_dir_path}/cache"
+                if update_FetchSources; then
+			update_FilterDomains "fetched" "fetched-filtered"
+			update_SortDomains "fetched-filtered" "fetched-sorted"
+			cp "${tmp_dir_path}/fetched-sorted" "${tmp_dir_path}/cache"
+		else
+			# Create empty cache file for the ad-domains.
+			touch "${tmp_dir_path}/cache"
+		fi
         else
                 # Create empty cache file for the ad-domains.
                 touch "${tmp_dir_path}/cache"
