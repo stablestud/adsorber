@@ -55,7 +55,7 @@ systemdSetup()
 
         # Replace the @ place holder line with the location of adsorber and copy
         # the service to the systemd directory ( /etc/sytemd/system/adsorber.service )
-        sed "s|#@\\/some\\/path\\/adsorber update@#$|${executable_dir_path}\\/adsorber update|g" "${library_dir_path}/systemd/adsorber.service" \
+        sed "s|#@\\/some\\/path\\/adsorber update@#|${executable_dir_path}\\/adsorber update --noformatting|g" "${library_dir_path}/systemd/adsorber.service" \
 		| sed "s/#@frequency@#/${frequency}/g" \
 		 > "${systemd_dir_path}/adsorber.service"
 
