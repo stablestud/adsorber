@@ -107,27 +107,32 @@ if [ "$(id -g)" -ne 0 ]; then
 fi
 
 # Run Adsorber's own removal, if it fails do it manually
-printf "\\nRunning 'adsorber remove -y' ...\\n"
-( adsorber remove -y ) \
-        || {
-                echo
-                printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nNo worries, I can handle it ...\\n\\033[0m"
-                echo "Maybe Adsorber has been already removed ?"
+if [ command -v adsorber ]; then
+	printf "\\nRunning 'adsorber remove -y --noformatting' ...\\n"
+	( adsorber "remove" "-y" "--noformatting" ) \
+		|| {
+			echo
+			printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nNo worries, I can handle it ...\\n\\033[0m"
+			echo "Maybe Adsorber has been already removed ?"
+			readonly _hard_way="true"
+		}
+else
+	readonly _hard_way="true"
+fi
 
+# Doing it the hard way .., removing everything manually
+if [ "${_hard_way}" = "true" ]; then
 		printf "\\nTrying portable_adsorber.sh ... "
 
-		if "${script_dir_path}/portable_adsorber.sh" "remove" "-y" 2>/dev/null 1>&2; then
+		if "${script_dir_path}/portable_adsorber.sh" "remove" "-y" "--noformatting" 2>/dev/null 1>&2; then
 			printf "found\\n"
-			printf "Removed successfully Adsorber"
+			printf "Removed successfully Adsorber\\n"
 		else
-			printf "no luck"
+			printf "no luck\\n"
 			"${script_dir_path}/misc/clean.sh" 2>/dev/null 1>&2
 		fi
 
 
-		printf "\\n\\n"
-
-                # Doing it the hard way .., removing everything manually
                 rm "${systemd_dir_path}/adsorber.timer" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.timer"
                 rm "${systemd_dir_path}/adsorber.service" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.service"
                 systemctl daemon-reload 2>/dev/null && echo "Reloaded systemctl daemon"
@@ -163,7 +168,7 @@ printf "\\nRunning 'adsorber remove -y' ...\\n"
                 fi
 
                 rm "${hosts_file_previous_path}" 2>/dev/null && echo "Removed ${hosts_file_previous_path}"
-        }
+fi
 
 echo
 
