@@ -133,14 +133,14 @@ cp "${script_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/
 cp "${script_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"
 
 
+echo
 echo "Adsorber files have been successfully placed onto the system."
 printf "\\033[1;37mTo start going (to setup the scheduler and to backup the hosts file) run 'adsorber setup'\\033[0m\\n"
-echo
 
 ## We don't run Adsorber after installation yet
 #adsorber setup \
 #        || {
-#                printf "\033[0;93mAdsorber has been placed onto your system, however something went wrong at\\n"
+#                printf "\\n\033[0;93mAdsorber has been placed onto your system, however something went wrong at\\n"
 #                printf "running it.\\n"
 #                printf "If a proxy server is in use, please change the config file\\n"
 #                printf "(${config_dir_path}/adsorber.conf) to the appropriate proxy server.\\n\033[0m"
