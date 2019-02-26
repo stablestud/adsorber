@@ -24,8 +24,8 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-------  ---function defined in:---
-# remove_ErrorCleanUp  src/lib/remove.sh
+# --function:--  ---function defined in:---
+# errorCleanUp   src/lib/remove.sh
 
 # shellcheck disable=SC2154
 
@@ -37,7 +37,7 @@ systemdSetup()
 			"${prefix_fatal}" "${systemd_dir_path}" "${prefix_reset}" 1>&2
 
                 echo "${prefix}Is Systemd installed? If not use Cron instead."
-                remove_ErrorCleanUp
+                errorCleanUp
                 exit 126
         fi
 
@@ -46,7 +46,7 @@ systemdSetup()
                 echo "${prefix}Removing previous Systemd service ..."
                 if ! systemdRemove; then
 			printf "%bSomething failed at updating the Systemd service, aborting ...%b" "${prefix_fatal}" "${prefix_reset}" 1>&2
-			remove_ErrorCleanUp;
+			errorCleanUp;
 			exit 1;
 		fi
         fi
@@ -75,12 +75,12 @@ systemdSetup()
 		printf "%bCouldn't start systemd service.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
 		echo "${prefix}Is Systemd installed? If not use Cron instead."
 		systemdRemove
-		remove_ErrorCleanUp
+		errorCleanUp
 		exit 126
 	fi
 
 	# Make known that we have setup the systemd service in this run,
-	# if we fail now, systemd will be also removed (see remove_ErrorCleanUp)
+	# if we fail now, systemd will be also removed (see errorCleanUp)
 	readonly setup_scheduler="systemd"
 
         echo "${prefix}Initialized Systemd service ..."

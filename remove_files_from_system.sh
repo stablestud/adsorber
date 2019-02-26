@@ -107,7 +107,7 @@ if [ "$(id -g)" -ne 0 ]; then
 fi
 
 # Run Adsorber's own removal, if it fails do it manually
-if [ command -v adsorber ]; then
+if command -v adsorber; then
 	printf "\\nRunning 'adsorber remove -y --noformatting' ...\\n"
 	( adsorber "remove" "-y" "--noformatting" ) \
 		|| {

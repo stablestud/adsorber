@@ -23,8 +23,8 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-------  ---function defined in:---
-# remove_ErrorCleanUp  src/lib/remove.sh
+# --function:--  ---function defined in:---
+# errorCleanUp   src/lib/cleanup.sh
 
 # shellcheck disable=SC2154
 
@@ -38,7 +38,7 @@ crontabSetup()
 			"${prefix_fatal}" "${crontab_dir_path}" "${prefix_reset}" 1>&2
 
                 echo "${prefix}Is a Cron service installed? If not use Systemd if possible."
-                remove_ErrorCleanUp
+                errorCleanUp
                 exit 126
         fi
 
@@ -53,7 +53,7 @@ crontabSetup()
         chown root:root "${crontab_dir_path}/80adsorber"
 
         # Make known that we have setup the Crontab in this run,
-        # if we fail now, Crontab will be also removed (see remove_ErrorCleanUp)
+        # if we fail now, Crontab will be also removed (see errorCleanUp)
         readonly setup_scheduler="cronjob"
 }
 
@@ -94,7 +94,7 @@ crontabPromptFrequency()
 			else
 				printf "%bThis frequency is only available with Systemd.%b\\n" \
 					"${prefix_fatal}" "${prefix_reset}" 1>&2
-				remove_ErrorCleanUp
+				errorCleanUp
 				exit 1
 			fi
 			;;
@@ -106,7 +106,7 @@ crontabPromptFrequency()
 			else
 				printf "%bFrequency '%s' not understood.%b\\n" \
 					"${prefix_fatal}" "${frequency}" "${prefix_reset}" 1>&2
-				remove_ErrorCleanUp
+				errorCleanUp
 				exit 1
 			fi
 			;;

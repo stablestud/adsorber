@@ -26,8 +26,8 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-------   ---function defined in:---
-# remove_ErrorCleanUp   src/lib/remove.sh
+# --function:--  --function defined in:--
+# errorCleanUp   src/lib/cleanup.sh
 
 # shellcheck disable=SC2154
 
@@ -106,7 +106,7 @@ config_FilterConfig()
         cp "${config_dir_path}/adsorber.conf" "${tmp_dir_path}/config" \
                 || {
                         printf "%bCouldn't process config file.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                        remove_ErrorCleanUp
+                        errorCleanUp
                         exit 126
                 }
 
@@ -215,7 +215,7 @@ config_ReadConfig()
 					"${prefix_fatal}" "${_line}" "${prefix_reset}"
 
                                 echo "Please report this error with your config file to https://github.com/stablestud/adsorber"
-                                remove_ErrorCleanUp
+                                errorCleanUp
                                 exit 1
                                 ;;
                 esac
@@ -267,7 +267,7 @@ config_IsVariableSet()
                 printf "%bPlease delete adsorber.conf in %s and run 'adsorber setup' to create a new config file.\\n" \
 			"${prefix_warning}" "${config_dir_path}" 1>&2
 
-                remove_ErrorCleanUp
+                errorCleanUp
                 exit 127
         fi
 
@@ -341,7 +341,7 @@ config_IsVariableValid()
 
         # If one or more values were invalid exit with error message
         if [ "${wrongVariable}" = "true" ]; then
-                remove_ErrorCleanUp
+                errorCleanUp
                 exit 126
         fi
 }

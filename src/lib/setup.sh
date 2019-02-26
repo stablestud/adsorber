@@ -20,10 +20,10 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-------  ---function defined in:---
-# crontab              src/lib/cron/cron.sh
-# remove_ErrorCleanUp  src/lib/remove.sh
-# systemd      	       src/lib/systemd/systemd.sh
+# --function:--  ---function defined in:---
+# crontab        src/lib/cron/cron.sh
+# errorCleanUp   src/lib/cleanup.sh
+# systemd      	 src/lib/systemd/systemd.sh
 
 # shellcheck disable=SC2154
 
@@ -56,7 +56,7 @@ setup_Prompt()
                         ;;
                 * )
                         printf "%bSetup cancelled.\\n" "${prefix_warning}" 1>&2
-                        remove_ErrorCleanUp
+                        errorCleanUp
                         exit 130
                         ;;
         esac

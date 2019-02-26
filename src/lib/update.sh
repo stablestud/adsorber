@@ -35,9 +35,9 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-------  ---function defined in:---
-# remove_CleanUp       src/lib/remove.sh
-# remove_ErrorCleanUp  src/lib/remove.sh
+# --function:--  ---function defined in:---
+# cleanUp        src/lib/cleanup.sh
+# errorCleanUp   src/lib/cleanup.sh
 
 # shellcheck disable=SC2154
 
@@ -61,7 +61,7 @@ update_CheckBackupExist()
                                 ;;
                         * )
                                 printf "%bAborted.\\n" "${prefix_warning}" 1>&2
-                                remove_ErrorCleanUp
+                                errorCleanUp
                                 exit 130
                                 ;;
                 esac
@@ -195,7 +195,7 @@ update_FetchSources()
                 else
                         printf "%bNeither curl nor wget installed. Can't continue.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
 
-                        remove_ErrorCleanUp
+                        errorCleanUp
                         exit 2
                 fi
 
@@ -210,7 +210,7 @@ update_FetchSources()
         elif [ "${ignore_download_error}" = "false" ] && [ "${_successful_count}" -ne "${_total_count}" ]; then
                 printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
 
-                remove_ErrorCleanUp 
+                errorCleanUp 
                 exit 1
         else
                 printf "%bSuccessfully fetched %d out of %d hosts sources.%b\\n" "${prefix_info}" "${_successful_count}" "${_total_count}" "${prefix_reset}"
@@ -324,7 +324,7 @@ update_IsCacheEmpty()
 {
         if [ ! -s "${tmp_dir_path}/cache" ]; then
                 printf "%bNothing to apply.\\n" "${prefix_warning}" 1>&2
-                remove_CleanUp
+                cleanUp
                 exit 1
         fi
 
@@ -381,7 +381,7 @@ update_PreviousHostsFile()
                 cp "${hosts_file_path}" "${hosts_file_previous_path}" \
                         || {
                                 printf "%bCouldn't create previous hosts file at %s%b\\n" "${prefix_fatal}" "${hosts_file_previous_path}" "${prefix_reset}"
-                                remove_ErrorCleanUp
+                                errorCleanUp
                                 exit 1
                         }
 
@@ -401,7 +401,7 @@ update_ApplyHostsFile()
         cp "${tmp_dir_path}/hosts" "${hosts_file_path}" \
                 || {
                         printf "%b" "${prefix_fatal}Couldn't apply hosts file. Aborting.${prefix_reset}\\n" 1>&2
-                        remove_ErrorCleanUp
+                        errorCleanUp
                         exit 126
                 }
 
@@ -447,7 +447,7 @@ update()
                         ;;
                 * )
                         printf "%bWrong primary_list set in adsorber.conf. Choose either 'whitelist' or 'blacklist'%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                        remove_ErrorCleanUp
+                        errorCleanUp
                         exit 127
                         ;;
         esac
@@ -456,7 +456,7 @@ update()
         update_BuildHostsFile
         update_PreviousHostsFile
         update_ApplyHostsFile
-        remove_CleanUp
+        cleanUp
 
         return 0
 }

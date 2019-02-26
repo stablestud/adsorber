@@ -12,10 +12,8 @@
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
 # ---variable:----------  ---default value:--  ---defined in:-------------------
-# backedup                Null (not set)       src/lib/setup.sh
 # hosts_file_path         /etc/hosts           src/lib/config.sh, adsorber.conf
 # hosts_file_backup_path  /etc/hosts.original  src/lib/config.sh, adsorber.conf
-# setup_scheduler         Null (not set)       src/lib/systemd/systemd.sh, src/lib/cron/cron.sh
 # prefix                  '  ' (two spaces)    src/lib/colours.sh
 # prefix_fatal            '\033[0;91mE '       src/lib/colours.sh
 # prefix_input            '  ' (two spaces)    src/lib/colours.sh
@@ -23,57 +21,16 @@
 # prefix_title            \033[1;37m           src/lib/colours.sh
 # prefix_warning          '- '                 src/lib/colours.sh
 # reply_to_prompt         Null (not set)       src/bin/adsorber
-# tmp_dir_path            /tmp/adsorber        src/bin/adsorber
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-  ---function defined in:---
+# --function:--  ---function defined in:---
+# cleanUp        src/lib/cleanup.sh
+# errorCleanUp   src/lib/cleanup.sh
 # systemdRemove  src/lib/systemd/systemd.sh
 # crontabRemove  src/lib/cron/cron.sh
 
 # shellcheck disable=SC2154
-
-# This function cleans-up all changed files if Adsorber runs into a problem
-remove_ErrorCleanUp()
-{
-        printf "%bCleaning up ...\\n" "${prefix_warning}"
-
-        # Remove scheduler if it was setup (created) in the same run
-        case "${setup_scheduler}" in
-                cronjob )
-                        crontabRemove
-                        ;;
-                systemd )
-                        systemdRemove
-                        ;;
-        esac
-
-        # Remove backup if backed-up in the same run
-        if [ "${backedup}" = "true" ]; then
-                echo "${prefix}Removed backup as the setup failed."
-                rm "${hosts_file_backup_path}"
-        fi
-
-        # Remove /tmp/adsorber directory
-        if [ -d "${tmp_dir_path}" ]; then
-                rm -r "${tmp_dir_path}"
-        fi
-
-        return 0
-}
-
-
-# Normal clean-up function
-remove_CleanUp()
-{
-        echo "${prefix}Cleaning up ..."
-
-        # Remove the /tmp/adsorber directory
-        rm -r "${tmp_dir_path}"
-
-        return 0
-}
-
 
 remove_Prompt()
 {
@@ -90,7 +47,7 @@ remove_Prompt()
                 * )
                         # If other input then Yes, abort and call error clean-up function
                         printf "%bRemoval cancelled.\\n" "${prefix_warning}" 1>&2
-                        remove_ErrorCleanUp
+                        errorCleanUp
                         exit 130
                         ;;
         esac
@@ -110,7 +67,7 @@ remove_HostsFile()
                 # If /etc/hosts.original was not found, abort and call the error clean-up function
                 printf "%bCan not restore hosts file. Original hosts file does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 echo "${prefix}Maybe already removed?" 1>&2
-                remove_ErrorCleanUp
+                errorCleanUp
                 exit 1
         fi
 
@@ -141,7 +98,7 @@ remove()
         crontabRemove
         remove_HostsFile
         remove_PreviousHostsFile
-        remove_CleanUp
+        cleanUp
 
         return 0
 }

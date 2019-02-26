@@ -22,8 +22,8 @@
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
 # ---function:------------  ---function defined in:---
-# remove_CleanUp            src/lib/remove.sh
-# remove_ErrorCleanUp       src/lib/remove.sh
+# cleanUp                   src/lib/cleanup.sh
+# errorCleanUp              src/lib/cleanup.sh
 # update_PreviousHostsFile  src/lib/update.sh
 
 # shellcheck disable=SC2154
@@ -36,7 +36,7 @@ restore_HostsFile()
                 cp "${hosts_file_backup_path}" "${hosts_file_path}" \
                         || {
                                 printf "%bCouldn't restore %s.%b" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}"
-                                remove_ErrorCleanUp
+                                errorCleanUp
                                 exit 1
                         }
 
@@ -45,7 +45,7 @@ restore_HostsFile()
         else
                 # If /etc/hosts.previous was not found, abort and call error clean-up function
                 printf "%bCan't restore original hosts file. Original hosts file does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                remove_ErrorCleanUp
+                errorCleanUp
                 exit 1
         fi
 
@@ -58,7 +58,7 @@ restore()
 {
         printf "%bRestoring %s ...%b\\n" "${prefix_title}" "${hosts_file_path}" "${prefix_reset}"
         restore_HostsFile
-        remove_CleanUp
+        cleanUp
 
         return 0
 }

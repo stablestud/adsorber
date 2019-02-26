@@ -316,6 +316,8 @@ sourceFiles()
 {
         # shellcheck source=../src/lib/colours.sh
         . "${library_dir_path}/colours.sh"
+	# shellcheck source=../src/lib/cleanup.sh
+	. "${library_dir_path}/cleanup.sh"
         # shellcheck source=../src/lib/setup.sh
         . "${library_dir_path}/setup.sh"
         # shellcheck source=../src/lib/remove.sh
