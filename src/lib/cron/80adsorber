@@ -10,4 +10,4 @@
 # By default this file is going to be copied into /etc/cron.weekly/ if not
 # other specified.
 
-#@/some/path/adsorber update@#
+#@/some/path/adsorber update@# 2>&1 | logger -i -e -t Adsorber
