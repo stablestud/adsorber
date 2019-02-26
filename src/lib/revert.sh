@@ -44,7 +44,7 @@ revert_HostsFile()
                 printf "%bSuccessfully reverted %s.\\n" "${prefix}" "${hosts_file_path}"
         else
                 # If /etc/hosts.previous was not found, abort and call error clean-up function
-                printf "%bCan't revert hosts file. Previous hosts file does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bCan't revert to previous hosts file. Previous hosts file does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 remove_ErrorCleanUp
                 exit 1
         fi
