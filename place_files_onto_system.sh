@@ -65,9 +65,7 @@ if [ "${prompt}" = "help" ] || [ "${prompt}" = "h" ] || [ "${prompt}" = "-h" ] |
         printHelp
 fi
 
-echo "Current script location: ${script_dir_path}"
-printLocation
-echo
+printf "Adsorber will be placed into /usr/local/*, which is the default path for external scripts.\\n\\n"
 
 if [ -z "${prompt}" ]; then
         printf "Are you sure you want to place Adsorbers files onto the system? [(y)es/(N)o]: "
@@ -76,8 +74,8 @@ fi
 
 case "${prompt}" in
         -[Yy] | --[Yy][Ee][Ss] | [Yy] | [Yy][Ee][Ss] )
-                :
-                ;;
+                echo
+		;;
         * )
                 echo "Placing files onto the system has been cancelled."
                 exit 1
@@ -89,8 +87,6 @@ if [ "$(id -g)" -ne 0 ]; then
         echo "You need to be root to place Adsorbers files onto the system." 1>&2
         exit 126
 fi
-
-echo
 
 ##[ Main exectuable ]###########################################################
 echo "Placing main executable (src/bin/adsorber) to ${executable_path}"
@@ -107,7 +103,7 @@ chmod a+x "${executable_path}"
 
 
 ##[ Libraries ]#################################################################
-echo "Placing other executables (src/lib/*) to ${library_dir_path}"
+echo "Placing other executables (src/lib/*)      to ${library_dir_path}"
 
 mkdir -p "${library_dir_path}"
 
@@ -115,7 +111,7 @@ cp -r "${script_dir_path}/src/lib/." "${library_dir_path}"
 
 
 ##[ Shareables ]################################################################
-echo "Placing miscellaneous (src/share/*) to ${shareable_dir_path}"
+echo "Placing miscellaneous (src/share/*)        to ${shareable_dir_path}"
 
 mkdir -p "${shareable_dir_path}"
 

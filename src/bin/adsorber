@@ -25,7 +25,7 @@ readonly shareable_dir_path="${executable_dir_path}/../share/"
 readonly config_dir_path="${executable_dir_path}/../../"
 
 
-readonly version="0.5.2"
+readonly version="0.5.0"
 readonly operation="${1}"
 
 if [ "${#}" -ne 0 ]; then

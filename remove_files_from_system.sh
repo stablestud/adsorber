@@ -23,11 +23,8 @@ readonly shareable_dir_path="/usr/local/share/adsorber/"
 # Define the location of the config files for adsorber.
 readonly config_dir_path="/usr/local/etc/adsorber/"
 
-# Define the location of the log file. Not in use (yet).
-#readonly log_file_path="/var/log/adsorber.log"
-
 ## Following variables are only used when Adsorber's own removal activity failed
-## and are used to remove Adsorber in the 'hard' way. Please change according to
+## and are used to remove Adsorber manually. Please change according to
 ## your system configuration
 readonly hosts_file_path="/etc/hosts"
 readonly hosts_file_backup_path="/etc/hosts.original"
@@ -42,7 +39,7 @@ readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
 printLocation()
 {
-        echo "Going to remove files from:"
+	echo "Going to remove files from:"
         echo " - main exectuable:   ${executable_path}"
         echo " - other executables: ${library_dir_path}"
         echo " - configuration:     ${config_dir_path}"
@@ -80,9 +77,11 @@ if [ "${prompt}" = "help" ] || [ "${prompt}" = "h" ] || [ "${prompt}" = "-h" ] |
 	printHelp
 fi
 
+
 echo "Current script location: ${script_dir_path}"
 printLocation
 echo
+
 
 # Prompt user if sure about to remove Adsorber from the system
 if [ -z "${prompt}" ]; then
@@ -100,11 +99,13 @@ case "${prompt}" in
                 ;;
 esac
 
+
 # Check if user is root, if not exit.
 if [ "$(id -g)" -ne 0 ]; then
         echo "You need to be root to remove Adsorber from the system." 1>&2
         exit 126
 fi
+
 
 # Run Adsorber's own removal, if it fails do it manually
 if command -v adsorber 1>/dev/null; then
@@ -119,6 +120,7 @@ if command -v adsorber 1>/dev/null; then
 else
 	readonly _hard_way="true"
 fi
+
 
 # Doing it the hard way .., removing everything manually
 if [ "${_hard_way}" = "true" ]; then
@@ -172,15 +174,18 @@ fi
 
 echo
 
+
 # Remove placed files from the specified locations
 rm -r "${executable_path}" 2>/dev/null && echo "Removed ${executable_path}"
 rm -r "${library_dir_path}" 2>/dev/null && echo "Cleaned ${library_dir_path}"
 rm -r "${shareable_dir_path}" 2>/dev/null && echo "Cleaned ${shareable_dir_path}"
 rm -r "${config_dir_path}" 2>/dev/null && echo "Cleaned ${config_dir_path}"
 
+
 # Remove the adsorber command from cache/hashtable.
 # Shells must be reloaded / reopened to have an effect
 echo "Clearing adsorber from shell cache ..."
+
 if command -v hash 1>/dev/null; then
         # Works in bash
         hash -d adsorber 2>/dev/null
@@ -192,6 +197,6 @@ else
         export PATH="${PATH}"
 fi
 
-echo
 
+echo
 echo "Done. Adsorber has been removed from the system."
