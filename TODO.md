@@ -1,13 +1,11 @@
 ## Things considered for a future release/next release, ordered by priority
 
 ## Must:
-* README.md update
 
 ## Should:
-* save statistics to var/ and read from Adsorber
 
 ## Could:
-* log-file
+* save statistics to var/ and read from Adsorber
 * bash completion
 * proper unittest
 
