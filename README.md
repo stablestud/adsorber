@@ -1,53 +1,61 @@
 # Adsorber
-[![Latest version](https://img.shields.io/badge/latest-v0.5.2-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
+[![Latest version](https://img.shields.io/badge/latest-v0.5.0-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
 [![License](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/stargazers)
 
 (Ad)sorber blocks ads by 'absorbing' and dumbing them into void.
 Technically speaking, it adds ad-domains to the hosts file `/etc/hosts` with a redirection to a non-existent ip `0.0.0.0`.
+You can consider it as [Adaway](https://github.com/AdAway/AdAway) for Linux.
 
 ## Features
 * Block advertisements system-wide, not only in the browser.
 * Prevents annoying anti-adblockers from triggering.
-* Update your blocked ad-domain list from external hosts-servers (like https://adaway.org/hosts.txt).
+* Update your ad-domain list with domains from external external sources (like https://adaway.org/hosts.txt).
 * Automatically update the hosts file per cronjob or systemd service.
-* Revert to the previous hosts-file if the current hosts-file contains broken ad-servers
+* Revert to the previous hosts file if the current hosts file contains broken ad-domains.
 * White- and blacklist.
 
-Also it saves data, speeds up loading time and prevents some tracking of your browsing habits. For extensive privacy, I recommend using the script along browser add-ons like  [NoScript](https://addons.mozilla.org/en-US/firefox/addon/noscript/) (for [Firefox 56 and below](https://noscript.net/getit)) or [uMatrix](https://addons.mozilla.org/en-US/firefox/addon/umatrix/), [Privacy Badger](https://addons.mozilla.org/en-US/firefox/addon/privacy-badger17/) and [HTTPS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/https-everywhere/).
-
-By default Adsorber uses the following curated ad-hosts sources:
-* [adaway.org](https://adaway.org/hosts.txt)
-* [yoyo.org](https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext)
-* & more to come.
-
-To add your own hosts sources, just add them to the `sources.list` file.
 
 ## Requirements
+* `Linux` based distro
 * `root` rights (e.g. with `sudo`)
-
-If you have a `*nix` like distribution (`Ubuntu, Debian, Mint, Gentoo, Archlinux, Fedora, etc.`)
-the following requirements should have been fulfilled by default:
-* POSIX-compliant shell (`bash, dash, fish, ksh, zsh, sh, etc.`)
-* Support for `hosts` file
+Should be available with all distros:
+* POSIX-compliant shell (`/bin/sh`)
+* Support for `/etc/hosts` file
 * `curl` or `wget`
 
+## Installation
+Download Adsorber from `[releases](https://github.com/stablestud/adsorber/releases)` or clone it.
+
+Two possibilites:
+1. [Place files onto system (recommended)](#Place-files-onto-system-\(recommended\)) OR
+2. [Run it portable](#Run-portable)
+
+### Place files onto system (recommended)
+Adsorber will be placed onto your system (at `/usr/local/`).
+
+1. Execute the script `./place_files_onto_system.sh`
+2. Execute the command `adsorber setup` and answer the prompts to configure Adsorber.
+3. You're done!
+
+Placing Adsorber has the advantage to run it independently from the user who downloaded it and
+it prevents broken cronjobs/services as there is no risk that the files/directories of Adsorber will be accidentally deleted or moved.
+
+To configure where it should be placed (to fit your custom system), edit the relevant lines in `place_files_onto_system.sh` and `remove_files_from_system.sh`. However the default path (`/usr/local/`) is the default for external scripts on Linux (see [here](http://refspecs.linuxfoundation.org/FHS_2.3/fhs-2.3.html#USRLOCALLOCALHIERARCHY)).
+
+### Run portable
+
+1. Execute the script `./portable_adsorber.sh`
+2. You're done!
+
+### Some other title
+
+By default Adsorber uses the following external sources:
+* [adaway.org](https://adaway.org/hosts.txt) (also used by AdAway)
+* [yoyo.org](https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext) (also used by AdAway)
+To add your own ad-domain sources, just add them to the `sources.list` config file. You can find it at `/usr/local/etc/adsorber/`.
+
 ## Usage
-
-### First steps .. placing files to system or portable mode
-Adsorber can be placed into the system (recommended) for a more stable and robust usage.
-This can be achieved through running `place_files_onto_system.sh`, the files will placed to `/usr/local/` if not other specified.
-If you don't want Adsorber to be placed into your system run `portable_adsorber.sh`.
-
-Placing Adsorber into the system has the advantage that Adsorber can run independently from the user who downloaded it.
-Also it prevents broken cronjobs/services as there is no risk that the files/directory of Adsorber will be accidentally deleted or moved.
-
-To configure where it should be installed (to fit your system), edit the relevant lines in `place_files_onto_system.sh` and `remove_files_from_system.sh`.
-For more help about the specific scripts run them with `--help`.
-
-1. run `place_files_onto_system.sh` as `root` user
-2. run `adsorber setup` as `root` user and answer all prompts by your preference, or just hit all the time `ENTER` (default options will be used).
-3. You've made it!
 
 ### Default help screen of `adsorber help`
 ```
@@ -56,7 +64,7 @@ Usage: adsorber <operation> [<options>|--help]
 (Ad)sorber blocks ads by "absorbing" and dumbing them into void.
            (with the help of the hosts file)
 
-Operations (required):
+Operation (required):
   setup   - setup necessary things needed for Adsorber
               e.g., create backup file of hosts file,
                     create scheduler which updates the host file once a week
@@ -113,6 +121,13 @@ Possible options are:
 * `-ns, --no-scheduler`
 * `-y,  --yes, --assume-yes`
 * `-h,  --help`
+* `-H,  --hourly`
+* `-D,  --daily`
+* `-W,  --weekly`
+* `-M,  --monthly`
+* `-Q,  --quarterly`
+* `-S,  --semiannually`
+* `-Y,  --yearly`
 
 #### `adsorber update {options}`:
 To keep the hosts file up-to-date.
@@ -152,7 +167,7 @@ Possible option:
 * `-h,  --help`
 
 #### `adsorber disable {options}`:
-Completely remove changes made by Adsorber and disable all its background tasks (schedulers).
+Completely disable all background tasks (schedulers) and remove changes made by Adsorber.
 
 The command will:
 * disable all schedulers (systemd, cronjob)
@@ -177,21 +192,23 @@ Use with `setup`
 #### `-y, --yes, --assume-yes`:
 Answers all prompts with `yes` e.g.,
 * `Do you really want to setup Adsorber?`
-* `Do you really want to remove Adsorber?`
+* `Do you really want to disable Adsorber?`
 
-It'll not answer prompts which may harm your system. But `--force` will do it.
+It'll not answer prompts which may harm your system. But `--force` will.
 #### `-f, --force`:
 This will force the script to continue (dangerous) the update e.g.,
 * Continues if no backup has been created, overwriting the existing hosts file.
 #### `-h, --help`:
-If specified in conjunction with an operation, it'll show extended help about the operation.
+If specified with an operation, it'll show extended help about it.
+#### `--noformatting`:
+Disables coloured and formatted output by Adsorber. Useful for logging to files and output processing by other scripts.
 
 ## Settings:
 To add or remove ad-domain sources edit the `soures.list` file which is created after the setup of Adsorber.
 For a general configuration of Adsorber e.g., the path of the crontab, edit `adsorber.conf`
 To add domains to the `whilelist` or `blacklist` edit the relevant files at the default config location.
 
-The configuration's default location is at `/usr/local/etc/adsorber/` if installed to system.
+The configuration's default location is at `/usr/local/etc/adsorber/` if placed onto the system.
 If not, the config files should be placed at the scripts root directory.
 
 ## Todo for future releases
