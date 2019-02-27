@@ -78,9 +78,9 @@ if [ "${prompt}" = "help" ] || [ "${prompt}" = "h" ] || [ "${prompt}" = "-h" ] |
 fi
 
 
-echo "Current script location: ${script_dir_path}"
-printLocation
-echo
+#echo "Current script location: ${script_dir_path}"
+#printLocation
+#echo
 
 
 # Prompt user if sure about to remove Adsorber from the system
@@ -113,7 +113,7 @@ if command -v adsorber 1>/dev/null; then
 	( adsorber "disable" "-y" "--noformatting" ) \
 		|| {
 			echo
-			printf "\\033[0;93mSomething went wrong at running Adsorber's own removal action.\\nNo worries, I can handle it ...\\n\\033[0m"
+			printf "\\033[0;93mSomething went wrong at running Adsorber's own disable operation.\\nNo worries, I can handle it ...\\n\\033[0m"
 			echo "Maybe Adsorber has been already removed ?"
 			readonly _hard_way="true"
 		}

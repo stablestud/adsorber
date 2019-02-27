@@ -36,7 +36,7 @@ disable_Prompt()
 {
         # Ask if the user is sure about to remove Adsorber
         if [ -z "${reply_to_prompt}" ]; then
-                printf "%bDo you really want to disable Adsorber? [Y/n] %b" "${prefix_input}" "${prefix_reset}"
+                printf "%bDo you really want to disable Adsorber? [y/N] %b" "${prefix_input}" "${prefix_reset}"
                 read -r reply_to_prompt
         fi
 

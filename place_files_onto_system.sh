@@ -103,7 +103,7 @@ chmod a+x "${executable_path}"
 
 
 ##[ Libraries ]#################################################################
-echo "Placing other executables (src/lib/*)      to ${library_dir_path}"
+echo "Placing other executables (src/lib/)       to ${library_dir_path}"
 
 mkdir -p "${library_dir_path}"
 
@@ -111,7 +111,7 @@ cp -r "${script_dir_path}/src/lib/." "${library_dir_path}"
 
 
 ##[ Shareables ]################################################################
-echo "Placing miscellaneous (src/share/*)        to ${shareable_dir_path}"
+echo "Placing miscellaneous (src/share/)         to ${shareable_dir_path}"
 
 mkdir -p "${shareable_dir_path}"
 
@@ -119,7 +119,7 @@ cp -r "${script_dir_path}/src/share/." "${shareable_dir_path}"
 
 
 ##[ Config files ]##############################################################
-echo "Copying config files (src/share/default/*) to ${config_dir_path}"
+echo "Copying config files (src/share/default/)  to ${config_dir_path}"
 
 mkdir -p "${config_dir_path}"
 
