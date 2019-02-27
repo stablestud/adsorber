@@ -16,7 +16,7 @@ runAdsorber()
 {
         echo ""
         # shellcheck disable=SC2086
-        ( "${source_dir_path}/src/bin/adsorber" ${parameters} )
+        ( "${source_dir_path}/src/bin/adsorber" "${parameters}" "--no-scheduler" )
         exit_code="${?}"
         echo ""
         return "${exit_code}"
