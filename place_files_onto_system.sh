@@ -44,14 +44,14 @@ printHelp()
         echo "   Will place Adsorbers executables and other"
         echo "   files relevant to Adsorber into the system."
         echo
-        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'install' command will not do the same action as\\n"
+        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'setup' command will not do the same action as\\n"
         echo "this script, as it will only setup the scheduler and backup the original hosts file."
-        echo "You may want to run 'adsorber install' afterwards"
+        echo "You may want to run 'adsorber setup' afterwards"
         echo
         echo "Usage: ${0} [option]:"
         echo
         echo "Options:"
-        echo "  -y, --yes       automatically reply the prompt with yes"
+        echo "  -y, --yes       automatically reply the confirmation prompt with yes"
         echo "  -h, --help      show this help screen"
         echo
         printLocation
@@ -65,35 +65,31 @@ if [ "${prompt}" = "help" ] || [ "${prompt}" = "h" ] || [ "${prompt}" = "-h" ] |
         printHelp
 fi
 
-echo "Current script location: ${script_dir_path}"
-printLocation
-echo
+printf "Adsorber will be placed into /usr/local/*, which is the default path for external scripts.\\n\\n"
 
 if [ -z "${prompt}" ]; then
-        printf "Are you sure you want to install Adsorber into the system? [(Y)es/(N)o]: "
+        printf "Are you sure you want to place Adsorbers files onto the system? [(y)es/(N)o]: "
         read -r prompt
 fi
 
 case "${prompt}" in
         -[Yy] | --[Yy][Ee][Ss] | [Yy] | [Yy][Ee][Ss] )
-                :
-                ;;
+                echo
+		;;
         * )
-                echo "Installation to the system has been cancelled."
+                echo "Placing files onto the system has been cancelled."
                 exit 1
                 ;;
 esac
 
 # Check if user is root, if not exit.
 if [ "$(id -g)" -ne 0 ]; then
-        echo "You need to be root to install Adsorber into the system." 1>&2
+        echo "You need to be root to place Adsorbers files onto the system." 1>&2
         exit 126
 fi
 
-echo
-
 ##[ Main exectuable ]###########################################################
-echo "Placing main executable to ${executable_path}"
+echo "Placing main executable (src/bin/adsorber) to ${executable_path}"
 
 mkdir -p "$(dirname ${executable_path})"
 
@@ -103,50 +99,27 @@ sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|reado
         | sed "s|^readonly config_dir_path=\"\${executable_dir_path}/\\.\\./\\.\\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" \
         > "${executable_path}"
 
-chmod u=rwx,g=rx,o=rx "${executable_path}" \
-        || {
-                printf "Couldn't set permissions for %s" "${executable_path}"
-        }
-chown root:root "${executable_path}" \
-        || {
-                printf "Couldn't set ownership of %s" "${executable_path}"
-        }
+chmod a+x "${executable_path}"
 
 
 ##[ Libraries ]#################################################################
-echo "Placing other executables to ${library_dir_path}"
+echo "Placing other executables (src/lib/)       to ${library_dir_path}"
 
 mkdir -p "${library_dir_path}"
 
 cp -r "${script_dir_path}/src/lib/." "${library_dir_path}"
 
-chmod -R u=rwx,g=rx,o=rx "${library_dir_path}" \
-        || {
-                printf "Couldn't set permissions for %s" "${library_dir_path}"
-        }
-chown -R root:root "${library_dir_path}" \
-        || {
-                printf "Couldn't set ownership of %s" "${library_dir_path}"
-        }
 
 ##[ Shareables ]################################################################
-echo "Placing miscellaneous to ${shareable_dir_path}"
+echo "Placing miscellaneous (src/share/)         to ${shareable_dir_path}"
 
 mkdir -p "${shareable_dir_path}"
 
 cp -r "${script_dir_path}/src/share/." "${shareable_dir_path}"
 
-chmod -R u=rwx,g=rx,o=rx "${shareable_dir_path}" \
-        || {
-                printf "Couldn't set permissions for %s" "${shareable_dir_path}"
-        }
-chown -R root:root "${shareable_dir_path}" \
-        || {
-                printf "Couldn't set ownership of %s" "${shareable_dir_path}"
-        }
 
 ##[ Config files ]##############################################################
-echo "Placing config files to ${config_dir_path}"
+echo "Copying config files (src/share/default/)  to ${config_dir_path}"
 
 mkdir -p "${config_dir_path}"
 
@@ -155,27 +128,17 @@ cp "${script_dir_path}/src/share/default/default-blacklist" "${config_dir_path}/
 cp "${script_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/whitelist"
 cp "${script_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"
 
-chmod -R u=rwx,g=rx,o=rx "${config_dir_path}" \
-        || {
-                printf "Couldn't set permissions for %s" "${config_dir_path}"
-        }
-chown -R root:root "${config_dir_path}" \
-        || {
-                printf "Couldn't set ownership of %s" "${config_dir_path}"
-        }
 
 echo
+echo "Adsorber files have been successfully placed onto the system."
+printf "\\033[1;37mTo start going (to setup the scheduler and to backup the hosts file) run 'adsorber setup'\\033[0m\\n"
 
 ## We don't run Adsorber after installation yet
-#adsorber install \
+#adsorber setup --noformatting \
 #        || {
-#                printf "\033[0;93mAdsorber was installed on your system, however something went wrong at\\n"
+#                printf "\\n\033[0;93mAdsorber has been placed onto your system, however something went wrong at\\n"
 #                printf "running it.\\n"
 #                printf "If a proxy server is in use, please change the config file\\n"
 #                printf "(${config_dir_path}/adsorber.conf) to the appropriate proxy server.\\n\033[0m"
-#                echo "Run 'adsorber install' to try again."
+#                echo "Run 'adsorber setup' to try again."
 #        }
-
-echo "Installation completed."
-printf "\\033[1;37mTo start going and to setup the scheduler or to backup the hosts file run 'adsorber install'\\033[0m\\n"
-echo "You can now delete this folder."

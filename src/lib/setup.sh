@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# TODO: Maybe rename install to init (initialize) because there's already an
-# installation into the system (install-to-system.sh) however with a different goal
-
 # Author:     stablestud <adsorber@stablestud.org>
 # Repository: https://github.com/stablestud/adsorber
 # License:    MIT, https://opensource.org/licenses/MIT
@@ -23,14 +20,14 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----    ---function defined in:---
-# crontabInstall       src/lib/cron/cron.sh
-# remove_ErrorCleanUp  src/lib/remove.sh
-# systemdInstall       src/lib/systemd/systemd.sh
+# --function:--  ---function defined in:---
+# crontab        src/lib/cron/cron.sh
+# errorCleanUp   src/lib/cleanup.sh
+# systemd      	 src/lib/systemd/systemd.sh
 
 # shellcheck disable=SC2154
 
-install_BackupHostsFile()
+setup_BackupHostsFile()
 {
         # Create a backup, to be able to restore to it later if neccessary
         if [ ! -f "${hosts_file_backup_path}" ]; then
@@ -45,21 +42,21 @@ install_BackupHostsFile()
 }
 
 
-install_Prompt()
+setup_Prompt()
 {
-        # Ask the user if he/she is sure about to install Adsorber
+        # Ask the user if he/she is sure about to setup Adsorber
         if [ -z "${reply_to_prompt}" ]; then
-                printf "%bDo you really want to install Adsorber? [Y/n]: %b" "${prefix_input}" "${prefix_reset}"
+                printf "%bDo you really want to setup Adsorber? [Y/n]: %b" "${prefix_input}" "${prefix_reset}"
                 read -r reply_to_prompt
         fi
 
         case "${reply_to_prompt}" in
-                [Yy] | [Yy][Ee][Ss] )
+                [Yy] | [Yy][Ee][Ss] | "" )
                         return 0
                         ;;
                 * )
-                        printf "%bInstallation cancelled.\\n" "${prefix_warning}" 1>&2
-                        remove_ErrorCleanUp
+                        printf "%bSetup cancelled.\\n" "${prefix_warning}" 1>&2
+                        errorCleanUp
                         exit 130
                         ;;
         esac
@@ -68,21 +65,21 @@ install_Prompt()
 }
 
 
-install_PromptScheduler()
+setup_PromptScheduler()
 {
         # The user enters interactively what scheduler (Systemd, Cron or none)
         # should be used to update the hosts file periodically
         if [ -z "${reply_to_scheduler_prompt}" ]; then
-                printf "%bWhat scheduler should be used to update the host file automatically? [(S)ystemd/(C)ron/(N)one]: %b" "${prefix_input}" "${prefix_reset}"
+                printf "%bWhat scheduler should be used to update the host file automatically? [(C)ron/(s)ystemd/(n)one]: %b" "${prefix_input}" "${prefix_reset}"
                 read -r reply_to_scheduler_prompt
         fi
 
         case "${reply_to_scheduler_prompt}" in
-                [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
-                        systemdInstall
+                [Cc] | [Cc][Rr][Oo][Nn] | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab | [Cc]ronie | "" )
+                        crontab
                         ;;
-                [Cc] | [Cc]ron | [Cc]ron[Jj]ob | [Cc]ron[Tt]ab )
-                        crontabInstall
+                [Ss] | [Ss]ystemd | [Ss][Yy][Ss] )
+                        systemd
                         ;;
                 * )
                         echo "${prefix}Skipping scheduler creation ..."
@@ -93,13 +90,13 @@ install_PromptScheduler()
 }
 
 
-# Main function when calling installation related tasks
-install()
+# Main function when calling setup related tasks
+setup()
 {
-        printf "%bInstalling Adsorber ...%b\\n" "${prefix_title}" "${prefix_reset}"
-        install_Prompt
-        install_BackupHostsFile
-        install_PromptScheduler
+        printf "%bSetting up Adsorber ...%b\\n" "${prefix_title}" "${prefix_reset}"
+        setup_Prompt
+        setup_BackupHostsFile
+        setup_PromptScheduler
 
         return 0
 }

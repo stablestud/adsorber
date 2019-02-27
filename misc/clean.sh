@@ -1,4 +1,5 @@
 #!/bin/sh
+# Cleans the scripts root directory of config files created by portable_adsorber.sh
 
 readonly source_dir_path="$(cd "$(dirname "${0}")"/.. && pwd)"
 
@@ -23,3 +24,5 @@ if [ -f "${source_dir_path}/sources.list" ]; then
 	rm "${source_dir_path}/sources.list" -f
 	echo "Removed sources.list"
 fi
+
+echo "Done."

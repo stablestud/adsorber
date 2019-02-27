@@ -1,0 +1,16 @@
+[Unit]
+Description=#@frequency@# Adsorber service
+Documentation=https://github.com/stablestud/adsorber
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=#@/some/path/adsorber update@#
+StandardInput=null
+StandardOutput=syslog+console
+StandardError=syslog+console
+SyslogIdentifier=Adsorber
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true

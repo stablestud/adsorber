@@ -11,7 +11,7 @@
 
 # The following variables are declared globally.
 # If you run this file independently following variables need to be set:
-# ---variable:----------      ---default value:------------  ---declared in:----
+# ---variable:--------------  ---default value:------------  ---declared in:----
 # config_dir_path             ${executable_dir_path}/../../  src/bin/adsorber
 # hosts_file_backup_path      /etc/hosts.original            src/lib/config.sh, adsorber.conf
 # hosts_file_path             /etc/hosts                     src/lib/config.sh, adsorber.conf
@@ -28,16 +28,16 @@
 # prefix_title                \033[1;37m                     src/lib/colours.sh
 # prefix_warning              '- '                           src/lib/colours.sh
 # primary_list                blacklist                      src/lib/config.sh, adsorber.conf
-# reply_to_force_prompt       Null (not set)                 src/lib/install.sh, src/bin/adsorber
+# reply_to_force_prompt       Null (not set)                 src/lib/setup.sh, src/bin/adsorber
 # tmp_dir_path                /tmp/adsorber                  src/bin/adsorber
 # use_partial_matching        true                           src/lib/config.sh, adsorber.conf
 # version                     0.2.2 or similar               src/bin/adsorber
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# ---function:-----    ---function defined in:---
-# remove_CleanUp       src/lib/remove.sh
-# remove_ErrorCleanUp  src/lib/remove.sh
+# --function:--  ---function defined in:---
+# cleanUp        src/lib/cleanup.sh
+# errorCleanUp   src/lib/cleanup.sh
 
 # shellcheck disable=SC2154
 
@@ -50,7 +50,7 @@ update_CheckBackupExist()
                 # hostname association with 127.0.0.1 and localhost will be lost.
                 # The user may interactively decide here wheter to proceed or not.
                 if [ -z "${reply_to_force_prompt}" ]; then
-                        printf "%bBackup of %s does not exist. To backup run 'adsorber install'.%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
+                        printf "%bBackup of %s does not exist. To backup run 'adsorber setup'.%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
                         printf "%bIgnore issue and continue? (May break your hostfile, not recommended) [YES/n]: %b" "${prefix_input}" "${prefix_reset}"
                         read -r reply_to_force_prompt
                 fi
@@ -61,7 +61,7 @@ update_CheckBackupExist()
                                 ;;
                         * )
                                 printf "%bAborted.\\n" "${prefix_warning}" 1>&2
-                                remove_ErrorCleanUp
+                                errorCleanUp
                                 exit 130
                                 ;;
                 esac
@@ -94,7 +94,7 @@ update_ReadSourceList()
         if [ ! -s "${config_dir_path}/sources.list" ]; then
 
                 if [ ! -s "${config_dir_path}/blacklist" ]; then
-                        printf "%bMissing 'sources.list' and blacklist. To fix run '%s install'.%b\\n" "${prefix_fatal}" "${0}" "${prefix_reset}" 1>&2
+                        printf "%bMissing 'sources.list' and blacklist. To fix run 'adsorber setup'.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                         exit 127
                 fi
 
@@ -195,7 +195,7 @@ update_FetchSources()
                 else
                         printf "%bNeither curl nor wget installed. Can't continue.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
 
-                        remove_ErrorCleanUp
+                        errorCleanUp
                         exit 2
                 fi
 
@@ -210,7 +210,7 @@ update_FetchSources()
         elif [ "${ignore_download_error}" = "false" ] && [ "${_successful_count}" -ne "${_total_count}" ]; then
                 printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
 
-                remove_ErrorCleanUp
+                errorCleanUp 
                 exit 1
         else
                 printf "%bSuccessfully fetched %d out of %d hosts sources.%b\\n" "${prefix_info}" "${_successful_count}" "${_total_count}" "${prefix_reset}"
@@ -324,7 +324,7 @@ update_IsCacheEmpty()
 {
         if [ ! -s "${tmp_dir_path}/cache" ]; then
                 printf "%bNothing to apply.\\n" "${prefix_warning}" 1>&2
-                remove_ErrorCleanUp
+                cleanUp
                 exit 1
         fi
 
@@ -381,7 +381,7 @@ update_PreviousHostsFile()
                 cp "${hosts_file_path}" "${hosts_file_previous_path}" \
                         || {
                                 printf "%bCouldn't create previous hosts file at %s%b\\n" "${prefix_fatal}" "${hosts_file_previous_path}" "${prefix_reset}"
-                                remove_ErrorCleanUp
+                                errorCleanUp
                                 exit 1
                         }
 
@@ -401,7 +401,7 @@ update_ApplyHostsFile()
         cp "${tmp_dir_path}/hosts" "${hosts_file_path}" \
                 || {
                         printf "%b" "${prefix_fatal}Couldn't apply hosts file. Aborting.${prefix_reset}\\n" 1>&2
-                        remove_ErrorCleanUp
+                        errorCleanUp
                         exit 126
                 }
 
@@ -423,11 +423,14 @@ update()
         update_ReadWhiteList
 
         if update_ReadSourceList; then
-                update_FetchSources
-                update_FilterDomains "fetched" "fetched-filtered"
-                update_SortDomains "fetched-filtered" "fetched-sorted"
-
-                cp "${tmp_dir_path}/fetched-sorted" "${tmp_dir_path}/cache"
+                if update_FetchSources; then
+			update_FilterDomains "fetched" "fetched-filtered"
+			update_SortDomains "fetched-filtered" "fetched-sorted"
+			cp "${tmp_dir_path}/fetched-sorted" "${tmp_dir_path}/cache"
+		else
+			# Create empty cache file for the ad-domains.
+			touch "${tmp_dir_path}/cache"
+		fi
         else
                 # Create empty cache file for the ad-domains.
                 touch "${tmp_dir_path}/cache"
@@ -444,7 +447,7 @@ update()
                         ;;
                 * )
                         printf "%bWrong primary_list set in adsorber.conf. Choose either 'whitelist' or 'blacklist'%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                        remove_ErrorCleanUp
+                        errorCleanUp
                         exit 127
                         ;;
         esac
@@ -453,7 +456,7 @@ update()
         update_BuildHostsFile
         update_PreviousHostsFile
         update_ApplyHostsFile
-        remove_CleanUp
+        cleanUp
 
         return 0
 }

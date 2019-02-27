@@ -16,7 +16,7 @@ runAdsorber()
 {
         echo ""
         # shellcheck disable=SC2086
-        ( "${source_dir_path}/src/bin/adsorber" ${parameters} )
+        ( "${source_dir_path}/src/bin/adsorber" "${parameters}" "--no-scheduler" )
         exit_code="${?}"
         echo ""
         return "${exit_code}"
@@ -25,10 +25,13 @@ runAdsorber()
 if runAdsorber; then
         echo "Adsorber in portable-mode exited with code ${exit_code}."
 else
-        # I defined exit code 80 as an error code if wrong or no input has been made
+        # I defined exit code 80 as an error code in the adsorber main executable
+        # if wrong or no input has been made
         if [ "${exit_code}" -eq 80 ]; then
                 echo "You've supplied no or wrong parameters."
         fi
 
         echo "Adsorber in portable-mode exited with code ${exit_code}. Thats an error."
+
+	exit ${exit_code}
 fi

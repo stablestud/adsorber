@@ -1,11 +1,11 @@
 [Unit]
-Description=Timer that runs the Adsorber service weekly.
+Description=Timer that runs the Adsorber service #@frequency@#
 Documentation=https://github.com/stablestud/adsorber
 Requires=network-online.target
 
 [Timer]
-OnCalendar=weekly
-RandomizedDelaySec=3600
+OnCalendar=#@frequency@#
+RandomizedDelaySec=600
 Persistent=true
 Unit=adsorber.service
 
