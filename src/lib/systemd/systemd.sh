@@ -15,6 +15,7 @@
 # executable_dir_path   the root dir of the script      src/bin/adsorber
 # frequency             null (not set)                  src/bin/adsorber
 # library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber
+# log_file_path         /var/log/adsorber.log           src/bin/adsorber
 # prefix                '  ' (two spaces)               src/lib/colours.sh
 # prefix_input          '  ' (two spaces)               src/lib/colours.sh
 # prefix_fatal          '\033[0;91mE '                  src/lib/colours.sh
@@ -58,7 +59,7 @@ systemdSetup()
         # the service to the systemd directory ( /etc/sytemd/system/adsorber.service )
         sed "s|#@/some/path/adsorber update@#|\"${executable_dir_path}/adsorber\" update --noformatting|g" "${library_dir_path}/systemd/default-service" \
 		| sed "s|#@frequency@#|${frequency}|g" \
-		| sed "s|#@/some/path/to/logfile@#|/var/log/adsorber.log|g" \
+		| sed "s|#@/some/path/to/logfile@#|${log_file_path}|g" \
 		| sed "s|#@version@#|${version}|g" \
 		 > "${systemd_dir_path}/adsorber.service"
 

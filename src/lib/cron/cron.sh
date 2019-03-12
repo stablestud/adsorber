@@ -15,6 +15,7 @@
 # executable_dir_path   the root dir of the script      src/bin/adsorber
 # frequency             null (not set)                  src/bin/adsorber
 # library_dir_path      ${executable_dir_path}/../lib   src/bin/adsorber
+# log_file_path         /var/log/adsorber.log           src/bin/adsorber
 # prefix                '  ' (two spaces)               src/lib/colours.sh
 # prefix_input          '  ' (two spaces)               src/lib/colours.sh
 # prefix_fatal          '\033[0;91mE '                  src/lib/colours.sh
@@ -48,7 +49,7 @@ crontabSetup()
         sed "s|#@version@#|${version}|g" "${library_dir_path}/cron/default-cronjob.sh" \
                 | sed "s|#@/some/path/adsorber update@#|\"${executable_dir_path}/adsorber\" update --noformatting|g" \
 		| sed "s|#@frequency@#|${frequency_string}|g" \
-		| sed "s|#@/some/path/to/logfile@#|/var/log/adsorber.log|g" \
+		| sed "s|#@/some/path/to/logfile@#|${log_file_path}|g" \
                 > "${crontab_dir_path}/80adsorber"
 
         chmod u=rwx,g=rx,o=rx "${crontab_dir_path}/80adsorber"
