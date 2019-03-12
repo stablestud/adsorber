@@ -19,12 +19,14 @@ readonly debug="false"
 ############[ DO NOT EDIT ]#####################################################
 
 # NOTE: following values will be changed when installed with
-# 'install_to_system.sh', if you want to change them, change them there
+# 'place_files_onto_system.sh', if you want to change them, change them there
 
 readonly executable_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 readonly library_dir_path="${executable_dir_path}/../lib/"
 readonly shareable_dir_path="${executable_dir_path}/../share/"
 readonly config_dir_path="${executable_dir_path}/../../"
+readonly log_file_path="/var/log/adsorber.log"
+
 
 
 readonly version="0.5.0"

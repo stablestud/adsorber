@@ -31,6 +31,7 @@ readonly hosts_file_backup_path="/etc/hosts.original"
 readonly hosts_file_previous_path="/etc/hosts.previous"
 readonly systemd_dir_path="/etc/systemd/system"
 readonly tmp_dir_path="/tmp/adsorber"
+readonly log_file_path="/var/log/adsorber.log"	# Log file won't be removed
 
 ##########[ End of configuration ]##############################################
 

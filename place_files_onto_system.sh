@@ -19,8 +19,8 @@ readonly shareable_dir_path="/usr/local/share/adsorber/"
 # Define the location of the config files for adsorber.
 readonly config_dir_path="/usr/local/etc/adsorber/"
 
-# Define the location of the log file. Not in use (yet).
-#readonly log_file_path="/var/log/adsorber.log"
+# Define the location of the log file.
+readonly log_file_path="/var/log/adsorber.log"
 
 ##########[ End of configuration ]##############################################
 
@@ -34,6 +34,7 @@ printLocation()
         echo " - other executables: ${library_dir_path}"
         echo " - configuration:     ${config_dir_path}"
         echo " - miscellaneous:     ${shareable_dir_path}"
+	echo " - log files:         ${log_file_path}"
 
         return 0
 }
@@ -94,9 +95,10 @@ echo "Placing main executable (src/bin/adsorber) to ${executable_path}"
 mkdir -p "$(dirname ${executable_path})"
 
 # Replacing the path to the libraries with the ones defined above.
-sed "s|^readonly library_dir_path=\"\${executable_dir_path}/\\.\\./lib/\"$|readonly library_dir_path=\"${library_dir_path}\"|g" "${script_dir_path}/src/bin/adsorber" \
-        | sed "s|^readonly shareable_dir_path=\"\${executable_dir_path}/\\.\\./share/\"$|readonly shareable_dir_path=\"${shareable_dir_path}\"|g" \
-        | sed "s|^readonly config_dir_path=\"\${executable_dir_path}/\\.\\./\\.\\./\"$|readonly config_dir_path=\"${config_dir_path}\"|g" \
+sed "s|^readonly library_dir_path=.*$|readonly library_dir_path=\"${library_dir_path}\"|g" "${script_dir_path}/src/bin/adsorber" \
+        | sed "s|^readonly shareable_dir_path=.*$|readonly shareable_dir_path=\"${shareable_dir_path}\"|g" \
+        | sed "s|^readonly config_dir_path=.*$|readonly config_dir_path=\"${config_dir_path}\"|g" \
+	| sed "s|^readonly log_file_path=.*$|readonly log_file_path=\"${log_file_path}\"|g" \
         > "${executable_path}"
 
 chmod a+x "${executable_path}"
