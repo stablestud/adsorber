@@ -1,15 +1,16 @@
 [Unit]
 Description=#@frequency@# Adsorber service
 Documentation=https://github.com/stablestud/adsorber
-After=network.target
+After=network-online.target
+Requisite=network-online.target
 
 [Service]
 Type=oneshot
 User=root
-ExecStart=#@/some/path/adsorber update@#
+ExecStart=/bin/sh -c 'echo "\\nAdsorber v#@version@# #@frequency@# Systemd service @ `date`" >> "#@/some/path/to/logfile@#"; #@/some/path/adsorber update@# 2>&1 | tee -a "#@/some/path/to/logfile@#"'
 StandardInput=null
-StandardOutput=syslog+console
-StandardError=syslog+console
+StandardOutput=syslog
+StandardError=syslog
 SyslogIdentifier=Adsorber
 ProtectKernelTunables=true
 ProtectKernelModules=true

@@ -1,7 +1,8 @@
 [Unit]
 Description=Timer that runs the Adsorber service #@frequency@#
 Documentation=https://github.com/stablestud/adsorber
-Requires=network-online.target
+After=network-online.target
+Requisite=network-online.target
 
 [Timer]
 OnCalendar=#@frequency@#

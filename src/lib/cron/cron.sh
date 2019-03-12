@@ -20,6 +20,7 @@
 # prefix_fatal          '\033[0;91mE '                  src/lib/colours.sh
 # prefix_reset          \033[0m                         src/lib/colours.sh
 # prefix_warning        '- '                            src/lib/colours.sh
+# version		0.5.0 or similiar		src/bin/adsorber
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
@@ -45,8 +46,9 @@ crontabSetup()
         # Replace the @ place holder line with the location of adsorber in 80adsorber
         # and copy and manipulate the content to crontabs directory
         sed "s|#@version@#|${version}|g" "${library_dir_path}/cron/default-cronjob.sh" \
-                | sed "s|#@\\/some\\/path\\/adsorber update@#|${executable_dir_path}\\/adsorber update --noformatting|g" \
-		| sed "s/#@frequency@#/${frequency_string}/g" \
+                | sed "s|#@/some/path/adsorber update@#|\"${executable_dir_path}/adsorber\" update --noformatting|g" \
+		| sed "s|#@frequency@#|${frequency_string}|g" \
+		| sed "s|#@/some/path/to/logfile@#|/var/log/adsorber.log|g" \
                 > "${crontab_dir_path}/80adsorber"
 
         chmod u=rwx,g=rx,o=rx "${crontab_dir_path}/80adsorber"
