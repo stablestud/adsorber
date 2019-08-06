@@ -1,7 +1,7 @@
 [Unit]
 Description=#@frequency@# Adsorber service
 Documentation=https://github.com/stablestud/adsorber
-After=network-online.target
+After=network.target network-online.target
 Requisite=network-online.target
 
 [Service]
