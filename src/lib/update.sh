@@ -203,15 +203,15 @@ update_FetchSources()
 
 	unset _domain
 
-        if [ "${_successful_count}" -eq 0 ]; then
-                printf "%bNothing to apply [%d/%d].\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
-                echo "${prefix}Perhaps a proxy server must be set?" 1>&2
-                return 1
-        elif [ "${ignore_download_error}" = "false" ] && [ "${_successful_count}" -ne "${_total_count}" ]; then
+        if [ "${ignore_download_error}" = "false" ] && [ "${_successful_count}" -ne "${_total_count}" ]; then
                 printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
 
                 errorCleanUp 
                 exit 1
+        elif [ "${_successful_count}" -eq 0 ]; then
+                printf "%bNothing to apply [%d/%d].\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
+                echo "${prefix}Perhaps a proxy server must be set?" 1>&2
+                return 1
         else
                 printf "%bSuccessfully fetched %d out of %d hosts sources.%b\\n" "${prefix_info}" "${_successful_count}" "${_total_count}" "${prefix_reset}"
         fi
