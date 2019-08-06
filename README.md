@@ -1,5 +1,5 @@
 # Adsorber
-[![Latest version](https://img.shields.io/badge/latest-v0.5.0-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
+[![Latest version](https://img.shields.io/badge/latest-v0.1.0-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
 [![License](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/stargazers)
 
@@ -14,7 +14,6 @@ You can consider it as [AdAway](https://github.com/AdAway/AdAway) for Linux mach
 * Automatically update the hosts file with schedulers (cronjob or systemd service).
 * Revert to the previous hosts file if the current hosts file contains broken ad-domains.
 * White- and blacklist.
-
 
 ## Requirements
 * `root` rights (e.g. with `sudo`)
@@ -256,7 +255,7 @@ To add your own ad-domain sources, just add them to the `sources.list` config fi
 
 ## Logging:
 
-The schedulers (systemd service, cronjob) will pass their output to the Syslog process.      
+The schedulers (systemd service, cronjob) will pass their output to the Syslog process and to `/var/log/adsorber.log`.      
 The syslog can be examined at `/var/log/syslog`.
 
 ## Todo for future releases
