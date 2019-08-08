@@ -90,7 +90,7 @@ config_CopyConfig()
                 printf "%bNo config file found. Creating default.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 echo "${prefix_warning}Please re-run the command to continue."
 
-                sed "s|@.*|# Config file for Adsorber v${version}|g" "${shareable_dir_path}/default/default-adsorber.conf" \
+                sed "s|^#@ Config file for Adsorber v.*@#$|## Config file for Adsorber v${version}|g" "${shareable_dir_path}/default/default-adsorber.conf" \
 			> "${config_dir_path}/adsorber.conf"
 
                 exit 126
@@ -139,21 +139,21 @@ config_ReadConfig()
                                 if [ -z "${primary_list}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${primary_list}"
+                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', using the first value: ${primary_list}"
                                 fi
                                 ;;
                         use_partial_matching=* )
                                 if [ -z "${use_partial_matching}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'use_partial_matching', keeping the first value: ${use_partial_matching}"
+                                        echo "${prefix_warning}Duplicate configuration for 'use_partial_matching', using the first value: ${use_partial_matching}"
                                 fi
                                 ;;
                         ignore_download_error=* )
                                 if [ -z "${ignore_download_error}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'ignore_download_error', keeping the first value: ${ignore_download_error}"
+                                        echo "${prefix_warning}Duplicate configuration for 'ignore_download_error', using the first value: ${ignore_download_error}"
                                 fi
                                 ;;
                         http_proxy=* )
@@ -176,35 +176,35 @@ config_ReadConfig()
                                 if [ -z "${hosts_file_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_path', keeping the first value: ${hosts_file_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_path', using the first value: ${hosts_file_path}"
                                 fi
                                 ;;
                         hosts_file_backup_path=* )
                                 if [ -z "${hosts_file_backup_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_backup_path', keeping the first value: ${hosts_file_backup_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_backup_path', using the first value: ${hosts_file_backup_path}"
                                 fi
                                 ;;
                         hosts_file_previous_enable=* )
                                 if [ -z "${hosts_file_previous_enable}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_enable', keeping the first value: ${hosts_file_previous_enable}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_enable', using the first value: ${hosts_file_previous_enable}"
                                 fi
                                 ;;
                         hosts_file_previous_path=* )
                                 if [ -z "${hosts_file_previous_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_path', keeping the first value: ${hosts_file_previous_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_path', using the first value: ${hosts_file_previous_path}"
                                 fi
                                 ;;
                         systemd_dir_path=* )
                                 if [ -z "${systemd_dir_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'systemd_dir_path', keeping the first value: ${systemd_dir_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'systemd_dir_path', using the first value: ${systemd_dir_path}"
                                 fi
                                 ;;
                         * )
