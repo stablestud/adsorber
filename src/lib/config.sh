@@ -259,7 +259,7 @@ config_IsVariableSet()
         # Check if essential configurations were set in the config file
         # if not abort, and call error clean-up function
         if [ -z "${hosts_file_path}" ] || [ -z "${hosts_file_backup_path}" ] \
-	|| [ -z "${systemd_dir_path}" ] || [ -z "${hosts_file_previous_path}" ]; then
+	|| [ -z "${systemd_dir_path}" ]; then
                 printf "%bMissing setting(s) in adsorber.conf%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 printf "%bPlease delete adsorber.conf in %s and run 'adsorber setup' to create a new config file.\\n" \
 			"${prefix_warning}" "${config_dir_path}" 1>&2
@@ -279,56 +279,56 @@ config_IsVariableValid()
         # and abort with the error clean-up function
 
         if [ "${primary_list}" != "blacklist" ] && [ "${primary_list}" != "whitelist" ]; then
-                printf "%Invalid 'primary_list' set in adsorber.conf. Choose either 'blacklist' or 'whitelist'%b\\n" \
+                printf "%bInvalid 'primary_list' set in adsorber.conf. Choose either 'blacklist' or 'whitelist'%b\\n" \
 			"${prefix_fatal}" "${prefix_reset}" 1>&2
 
                 invalidVariable="true"
         fi
 
         if [ "${use_partial_matching}" != "true" ] && [ "${use_partial_matching}" != "false" ]; then
-                printf "%Invalid 'use_partial_matching' set in adsorber.conf. Possible values: 'true' or 'false'%b\\n" \
+                printf "%bInvalid 'use_partial_matching' set in adsorber.conf. Possible values: 'true' or 'false'%b\\n" \
 			"${prefix_fatal}" "${prefix_reset}" 1>&2
 
                 invalidVariable="true"
         fi
 
         if [ "${ignore_download_error}" != "true" ] && [ "${ignore_download_error}" != "false" ]; then
-                printf "%Invalid 'ignore_download_error' set in adsorber.conf. Possible values: 'true' or 'false'%b\\n" \
+                printf "%bInvalid 'ignore_download_error' set in adsorber.conf. Possible values: 'true' or 'false'%b\\n" \
 			"${prefix_fatal}" "${prefix_reset}" 1>&2
 
                 invalidVariable="true"
         fi
 
         if [ ! -f "${hosts_file_path}" ]; then
-                printf "%Invalid 'hosts_file_path' set in adsorber.conf. Can't access: %s%b\\n" \
+                printf "%bInvalid 'hosts_file_path' set in adsorber.conf. Can't access: %s%b\\n" \
 			"${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
 
                 invalidVariable="true"
         fi
 
         if [ ! -d "$(dirname "${hosts_file_backup_path}")" ]; then
-                printf "%Invalid 'hosts_file_backup_path' set in adsorber.conf. Can't access: %s%b\\n" \
+                printf "%bInvalid 'hosts_file_backup_path' set in adsorber.conf. Can't access: %s%b\\n" \
 			"${prefix_fatal}" "$(dirname "${hosts_file_backup_path}")" "${prefix_reset}" 1>&2
 
                 invalidVariable="true"
         fi
 
         if [ "${hosts_file_previous_enable}" != "true" ] && [ "${hosts_file_previous_enable}" != "false" ]; then
-                printf "%Invalid 'hosts_file_previous_enable' set in adsorber.conf. Possible values: 'true' or 'false'%b\\n" \
+                printf "%bInvalid 'hosts_file_previous_enable' set in adsorber.conf. Possible values: 'true' or 'false'%b\\n" \
 			"${prefix_fatal}" "${prefix_reset}" 1>&2
 
                 invalidVariable="true"
         fi
 
         if [ ! -d "$(dirname "${hosts_file_previous_path}")" ]; then
-                printf "%Invalid 'hosts_file_previous_path' set in adsorber.conf. Can't access: %s%b\\n" \
+                printf "%bInvalid 'hosts_file_previous_path' set in adsorber.conf. Can't access: %s%b\\n" \
 			"${prefix_fatal}" "$(dirname "${hosts_file_previous_path}")" "${prefix_reset}" 1>&2
 
                 invalidVariable="true"
         fi
 
         if [ ! -d "$(dirname "${tmp_dir_path}")" ]; then
-                printf "%Invalid 'tmp_dir_path' set in adsorber.conf. Can't access: %s%b\\n" \
+                printf "%bInvalid 'tmp_dir_path' set in adsorber.conf. Can't access: %s%b\\n" \
 			"${prefix_fatal}" "$(dirname "${tmp_dir_path}")" "${prefix_reset}" 1>&2
 
                 invalidVariable="true"
