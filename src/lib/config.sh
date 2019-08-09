@@ -157,19 +157,35 @@ config_ReadConfig()
                                 fi
                                 ;;
                         http_proxy=* )
-                                if [ -z "${http_proxy}" ]; then
+                                if [ -z "${http_proxy_env}" ]; then
                                         # shellcheck disable=SC2163
                                         export "${_line}"
-                                else
-                                        echo "${prefix_warning}'http_proxy' already defined, using: ${http_proxy}"
+					export HTTP_PROXY="${http_proxy}"
+				elif [ -n "${http_proxy_env}" ]; then
+                                        export "${_line}"
+					if [ -z "${http_proxy}" ]; then
+						export http_proxy="${http_proxy_env}"
+						export HTTP_PROXY="${http_proxy_env}"
+					else
+						export HTTP_PROXY="${http_proxy}"
+						echo "${prefix}Config HTTP proxy '${http_proxy}' overwrites environmental HTTP proxy '${http_proxy_env}'"
+					fi
                                 fi
                                 ;;
                         https_proxy=* )
-                                if [ -z "${https_proxy}" ]; then
+                                if [ -z "${https_proxy_env}" ]; then
                                         # shellcheck disable=SC2163
                                         export "${_line}"
-                                else
-                                        echo "${prefix_warning}'https_proxy' already defined, using: ${https_proxy}"
+					export HTTPS_PROXY="${https_proxy}"
+				elif [ -n "${https_proxy_env}" ]; then
+                                        export "${_line}"
+					if [ -z "${https_proxy}" ]; then
+						export https_proxy="${https_proxy_env}"
+						export HTTPS_PROXY="${https_proxy_env}"
+					else
+						export HTTPS_PROXY="${https_proxy}"
+						echo "${prefix}Config HTTPS proxy '${https_proxy}' overwrites environmental HTTPS proxy '${https_proxy_env}'"
+					fi
                                 fi
                                 ;;
                         hosts_file_path=* )
@@ -224,6 +240,22 @@ config_ReadConfig()
         unset _line
 
         return 0
+}
+
+
+config_CheckEnvVariables()
+{
+	if [ -n "${HTTP_PROXY}" ]; then
+		http_proxy_env="${HTTP_PROXY}"
+	elif [ -n "${http_proxy}" ]; then
+		http_proxy_env="${http_proxy}"
+	fi
+
+	if [ -n "${HTTPS_PROXY}" ]; then
+		https_proxy_env="${HTTPS_PROXY}"
+	elif [ -n "${https_proxy}" ]; then
+		https_proxy_env="${https_proxy}"
+	fi
 }
 
 
@@ -375,6 +407,7 @@ config()
         config_CopyBlackList
         config_CopyConfig
         config_FilterConfig
+	config_CheckEnvVariables
         config_ReadConfig
         config_IsVariableSet
         config_IsVariableValid
