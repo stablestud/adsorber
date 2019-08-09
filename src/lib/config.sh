@@ -331,14 +331,14 @@ config_IsVariableValid()
                 invalidVariable="true"
         fi
 
-        if [ ! -f "${hosts_file_path}" ]; then
-                printf "%bInvalid 'hosts_file_path' set in adsorber.conf. Can't access: %s%b\\n" \
+        if [ ! -f "${hosts_file_path}" ] || [ ! -w "${hosts_file_path}" ]; then
+                printf "%bInvalid 'hosts_file_path' set in adsorber.conf. Can't write/access: %s%b\\n" \
 			"${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
 
                 invalidVariable="true"
         fi
 
-        if [ ! -d "$(dirname "${hosts_file_backup_path}")" ]; then
+        if [ ! -d "$(dirname "${hosts_file_backup_path}")" ] || [ ! -w "$(dirname "${hosts_file_backup_path}")" ]; then
                 printf "%bInvalid 'hosts_file_backup_path' set in adsorber.conf. Can't access: %s%b\\n" \
 			"${prefix_fatal}" "$(dirname "${hosts_file_backup_path}")" "${prefix_reset}" 1>&2
 
@@ -352,14 +352,16 @@ config_IsVariableValid()
                 invalidVariable="true"
         fi
 
-        if [ ! -d "$(dirname "${hosts_file_previous_path}")" ]; then
-                printf "%bInvalid 'hosts_file_previous_path' set in adsorber.conf. Can't access: %s%b\\n" \
-			"${prefix_fatal}" "$(dirname "${hosts_file_previous_path}")" "${prefix_reset}" 1>&2
+	if [ "${hosts_file_previous_enable}" = "true" ]; then
+		if [ ! -d "$(dirname "${hosts_file_previous_path}")" ] || [ ! -w "$(dirname "${hosts_file_previous_path}")" ]; then
+			printf "%bInvalid 'hosts_file_previous_path' set in adsorber.conf. Can't access: %s%b\\n" \
+				"${prefix_fatal}" "$(dirname "${hosts_file_previous_path}")" "${prefix_reset}" 1>&2
 
-                invalidVariable="true"
-        fi
+			invalidVariable="true"
+		fi
+	fi
 
-        if [ ! -d "$(dirname "${tmp_dir_path}")" ]; then
+        if [ ! -d "$(dirname "${tmp_dir_path}")" ] || [ ! -w "$(dirname "${tmp_dir_path}")" ]; then
                 printf "%bInvalid 'tmp_dir_path' set in adsorber.conf. Can't access: %s%b\\n" \
 			"${prefix_fatal}" "$(dirname "${tmp_dir_path}")" "${prefix_reset}" 1>&2
 
