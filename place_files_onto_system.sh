@@ -26,6 +26,7 @@ readonly log_file_path="/var/log/adsorber.log"
 
 # Resolve script directory.
 readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
+readonly version="0.5.2"
 
 printLocation()
 {
@@ -125,7 +126,8 @@ echo "Copying config files (src/share/default/)  to ${config_dir_path}"
 
 mkdir -p "${config_dir_path}"
 
-cp "${script_dir_path}/src/share/default/default-adsorber.conf" "${config_dir_path}/adsorber.conf"
+sed "s|^#@ Config file for Adsorber v.*@#$|## Config file for Adsorber v${version}|g" "${script_dir_path}/src/share/default/default-adsorber.conf" \
+	> "${config_dir_path}/adsorber.conf"
 cp "${script_dir_path}/src/share/default/default-blacklist" "${config_dir_path}/blacklist"
 cp "${script_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/whitelist"
 cp "${script_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"

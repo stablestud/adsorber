@@ -90,7 +90,7 @@ config_CopyConfig()
                 printf "%bNo config file found. Creating default.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 echo "${prefix_warning}Please re-run the command to continue."
 
-                sed "s|@.*|# Config file for Adsorber v${version}|g" "${shareable_dir_path}/default/default-adsorber.conf" \
+                sed "s|^#@ Config file for Adsorber v.*@#$|## Config file for Adsorber v${version}|g" "${shareable_dir_path}/default/default-adsorber.conf" \
 			> "${config_dir_path}/adsorber.conf"
 
                 exit 126
@@ -139,72 +139,88 @@ config_ReadConfig()
                                 if [ -z "${primary_list}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', keeping the first value: ${primary_list}"
+                                        echo "${prefix_warning}Duplicate configuration for 'primary_list', using the first value: ${primary_list}"
                                 fi
                                 ;;
                         use_partial_matching=* )
                                 if [ -z "${use_partial_matching}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'use_partial_matching', keeping the first value: ${use_partial_matching}"
+                                        echo "${prefix_warning}Duplicate configuration for 'use_partial_matching', using the first value: ${use_partial_matching}"
                                 fi
                                 ;;
                         ignore_download_error=* )
                                 if [ -z "${ignore_download_error}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'ignore_download_error', keeping the first value: ${ignore_download_error}"
+                                        echo "${prefix_warning}Duplicate configuration for 'ignore_download_error', using the first value: ${ignore_download_error}"
                                 fi
                                 ;;
                         http_proxy=* )
-                                if [ -z "${http_proxy}" ]; then
+                                if [ -z "${http_proxy_env}" ]; then
                                         # shellcheck disable=SC2163
                                         export "${_line}"
-                                else
-                                        echo "${prefix_warning}'http_proxy' already defined, using: ${http_proxy}"
+					export HTTP_PROXY="${http_proxy}"
+				elif [ -n "${http_proxy_env}" ]; then
+                                        export "${_line}"
+					if [ -z "${http_proxy}" ]; then
+						export http_proxy="${http_proxy_env}"
+						export HTTP_PROXY="${http_proxy_env}"
+					else
+						export HTTP_PROXY="${http_proxy}"
+						echo "${prefix}Config HTTP proxy '${http_proxy}' overwrites environmental HTTP proxy '${http_proxy_env}'"
+					fi
                                 fi
                                 ;;
                         https_proxy=* )
-                                if [ -z "${https_proxy}" ]; then
+                                if [ -z "${https_proxy_env}" ]; then
                                         # shellcheck disable=SC2163
                                         export "${_line}"
-                                else
-                                        echo "${prefix_warning}'https_proxy' already defined, using: ${https_proxy}"
+					export HTTPS_PROXY="${https_proxy}"
+				elif [ -n "${https_proxy_env}" ]; then
+                                        export "${_line}"
+					if [ -z "${https_proxy}" ]; then
+						export https_proxy="${https_proxy_env}"
+						export HTTPS_PROXY="${https_proxy_env}"
+					else
+						export HTTPS_PROXY="${https_proxy}"
+						echo "${prefix}Config HTTPS proxy '${https_proxy}' overwrites environmental HTTPS proxy '${https_proxy_env}'"
+					fi
                                 fi
                                 ;;
                         hosts_file_path=* )
                                 if [ -z "${hosts_file_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_path', keeping the first value: ${hosts_file_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_path', using the first value: ${hosts_file_path}"
                                 fi
                                 ;;
                         hosts_file_backup_path=* )
                                 if [ -z "${hosts_file_backup_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_backup_path', keeping the first value: ${hosts_file_backup_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_backup_path', using the first value: ${hosts_file_backup_path}"
                                 fi
                                 ;;
                         hosts_file_previous_enable=* )
                                 if [ -z "${hosts_file_previous_enable}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_enable', keeping the first value: ${hosts_file_previous_enable}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_enable', using the first value: ${hosts_file_previous_enable}"
                                 fi
                                 ;;
                         hosts_file_previous_path=* )
                                 if [ -z "${hosts_file_previous_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_path', keeping the first value: ${hosts_file_previous_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_path', using the first value: ${hosts_file_previous_path}"
                                 fi
                                 ;;
                         systemd_dir_path=* )
                                 if [ -z "${systemd_dir_path}" ]; then
                                         readonly "${_line}"
                                 else
-                                        echo "${prefix_warning}Duplicate configuration for 'systemd_dir_path', keeping the first value: ${systemd_dir_path}"
+                                        echo "${prefix_warning}Duplicate configuration for 'systemd_dir_path', using the first value: ${systemd_dir_path}"
                                 fi
                                 ;;
                         * )
@@ -227,43 +243,56 @@ config_ReadConfig()
 }
 
 
+config_CheckEnvVariables()
+{
+	if [ -n "${HTTP_PROXY}" ]; then
+		http_proxy_env="${HTTP_PROXY}"
+	elif [ -n "${http_proxy}" ]; then
+		http_proxy_env="${http_proxy}"
+	fi
+
+	if [ -n "${HTTPS_PROXY}" ]; then
+		https_proxy_env="${HTTPS_PROXY}"
+	elif [ -n "${https_proxy}" ]; then
+		https_proxy_env="${https_proxy}"
+	fi
+}
+
+
 config_IsVariableSet()
 {
         # These configurations are not mandatory needed by Adsorber, thus
         # if any of them were not defined, Adsorber will use the default value
         if [ -z "${primary_list}" ]; then
-                printf "%bprimary_list not set in adsorber.conf. Using default value: blacklist\\n" \
+                readonly primary_list="blacklist"
+                printf "%bprimary_list not set in adsorber.conf. Using default value: ${primary_list}\\n" \
 			"${prefix_warning}" 1>&2
 
-                readonly primary_list="blacklist"
         fi
 
         if [ -z "${use_partial_matching}" ]; then
-                printf "%buse_partial_matching not set in adsorber.conf. Using default value: true\\n" \
-			"${prefix_warning}" 1>&2
-
                 readonly use_partial_matching="true"
+                printf "%buse_partial_matching not set in adsorber.conf. Using default value: ${use_partial_matching}\\n" \
+			"${prefix_warning}" 1>&2
         fi
 
         if [ -z "${ignore_download_error}" ]; then
-                printf "%bignore_download_error not set in adsorber.conf. Using default value: false\\n" \
+                readonly ignore_download_error="false"
+                printf "%bignore_download_error not set in adsorber.conf. Using default value: ${ignore_download_error}\\n" \
 			"${prefix_warning}" 1>&2
-
-                readonly ignore_download_error="true"
         fi
 
         if [ -z "${hosts_file_previous_enable}" ]; then
-                printf "%bhosts_file_previous_enable not set in adsorber.conf. Using default value: true\\n" \
-			"${prefix_warning}" 1>&2
-
                 readonly hosts_file_previous_enable="true"
+                printf "%bhosts_file_previous_enable not set in adsorber.conf. Using default value: ${hosts_file_previous_enable}\\n" \
+			"${prefix_warning}" 1>&2
         fi
 
         # Check if essential configurations were set in the config file
         # if not abort, and call error clean-up function
         if [ -z "${hosts_file_path}" ] || [ -z "${hosts_file_backup_path}" ] \
-	|| [ -z "${systemd_dir_path}" ] || [ -z "${hosts_file_previous_path}" ]; then
-                printf "%bMissing setting(s) in adsorber.conf.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+	|| [ -z "${systemd_dir_path}" ]; then
+                printf "%bMissing setting(s) in adsorber.conf%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 printf "%bPlease delete adsorber.conf in %s and run 'adsorber setup' to create a new config file.\\n" \
 			"${prefix_warning}" "${config_dir_path}" 1>&2
 
@@ -282,65 +311,65 @@ config_IsVariableValid()
         # and abort with the error clean-up function
 
         if [ "${primary_list}" != "blacklist" ] && [ "${primary_list}" != "whitelist" ]; then
-                printf "%bWrong 'primary_list' set in adsorber.conf. Choose either 'blacklist' or 'whitelist'%b\\n" \
+                printf "%bInvalid 'primary_list' set in adsorber.conf. Choose either 'blacklist' or 'whitelist'%b\\n" \
 			"${prefix_fatal}" "${prefix_reset}" 1>&2
 
-                wrongVariable="true"
+                invalidVariable="true"
         fi
 
         if [ "${use_partial_matching}" != "true" ] && [ "${use_partial_matching}" != "false" ]; then
-                printf "%bWrong 'use_partial_matching' set in adsorber.conf. Possible option: 'true' or 'false'%b\\n" \
+                printf "%bInvalid 'use_partial_matching' set in adsorber.conf. Possible values: 'true' or 'false'%b\\n" \
 			"${prefix_fatal}" "${prefix_reset}" 1>&2
 
-                wrongVariable="true"
+                invalidVariable="true"
         fi
 
         if [ "${ignore_download_error}" != "true" ] && [ "${ignore_download_error}" != "false" ]; then
-                printf "%bWrong 'ignore_download_error' set in adsorber.conf. Possible option: 'true' or 'false'%b\\n" \
+                printf "%bInvalid 'ignore_download_error' set in adsorber.conf. Possible values: 'true' or 'false'%b\\n" \
 			"${prefix_fatal}" "${prefix_reset}" 1>&2
 
-                wrongVariable="true"
+                invalidVariable="true"
         fi
 
-        if [ ! -f "${hosts_file_path}" ]; then
-                printf "%bWrong 'hosts_file_path' set in adsorber.conf. Can't access: %s%b\\n" \
+        if [ ! -f "${hosts_file_path}" ] || [ ! -w "${hosts_file_path}" ]; then
+                printf "%bInvalid 'hosts_file_path' set in adsorber.conf. Can't write/access: %s%b\\n" \
 			"${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
 
-                wrongVariable="true"
+                invalidVariable="true"
         fi
 
-        if [ ! -d "$(dirname "${hosts_file_backup_path}")" ]; then
-                printf "%bWrong 'hosts_file_backup_path' set in adsorber.conf. Can't access: %s%b\\n" \
+        if [ ! -d "$(dirname "${hosts_file_backup_path}")" ] || [ ! -w "$(dirname "${hosts_file_backup_path}")" ]; then
+                printf "%bInvalid 'hosts_file_backup_path' set in adsorber.conf. Can't access: %s%b\\n" \
 			"${prefix_fatal}" "$(dirname "${hosts_file_backup_path}")" "${prefix_reset}" 1>&2
 
-                wrongVariable="true"
+                invalidVariable="true"
         fi
 
         if [ "${hosts_file_previous_enable}" != "true" ] && [ "${hosts_file_previous_enable}" != "false" ]; then
-                printf "%bWrong 'hosts_file_previous_enable' set in adsorber.conf. Possible options: 'true' or 'false'%b\\n" \
+                printf "%bInvalid 'hosts_file_previous_enable' set in adsorber.conf. Possible values: 'true' or 'false'%b\\n" \
 			"${prefix_fatal}" "${prefix_reset}" 1>&2
 
-                wrongVariable="true"
+                invalidVariable="true"
         fi
 
-        if [ ! -d "$(dirname "${hosts_file_previous_path}")" ]; then
-                printf "%bWrong 'hosts_file_previous_path' set in adsorber.conf. Can't access: %s%b\\n" \
-			"${prefix_fatal}" "$(dirname "${hosts_file_previous_path}")" "${prefix_reset}" 1>&2
+	if [ "${hosts_file_previous_enable}" = "true" ]; then
+		if [ ! -d "$(dirname "${hosts_file_previous_path}")" ] || [ ! -w "$(dirname "${hosts_file_previous_path}")" ]; then
+			printf "%bInvalid 'hosts_file_previous_path' set in adsorber.conf. Can't access: %s%b\\n" \
+				"${prefix_fatal}" "$(dirname "${hosts_file_previous_path}")" "${prefix_reset}" 1>&2
 
-                wrongVariable="true"
-        fi
+			invalidVariable="true"
+		fi
+	fi
 
-        if [ ! -d "$(dirname "${tmp_dir_path}")" ]; then
-                printf "%bWrong 'tmp_dir_path' set in adsorber.conf. Can't access: %s%b\\n" \
+        if [ ! -d "$(dirname "${tmp_dir_path}")" ] || [ ! -w "$(dirname "${tmp_dir_path}")" ]; then
+                printf "%bInvalid 'tmp_dir_path' set in adsorber.conf. Can't access: %s%b\\n" \
 			"${prefix_fatal}" "$(dirname "${tmp_dir_path}")" "${prefix_reset}" 1>&2
 
-                wrongVariable="true"
+                invalidVariable="true"
         fi
 
-        # TODO: Check if proxy is valid ( with ping or similar )
-
         # If one or more values were invalid exit with error message
-        if [ "${wrongVariable}" = "true" ]; then
+        if [ "${invalidVariable}" = "true" ]; then
                 errorCleanUp
                 exit 126
         fi
@@ -380,11 +409,8 @@ config()
         config_CopyBlackList
         config_CopyConfig
         config_FilterConfig
+	config_CheckEnvVariables
         config_ReadConfig
         config_IsVariableSet
         config_IsVariableValid
-
-        if [ "${debug}" = "true" ]; then
-                config_PrintVariables # used for debugging
-        fi
 }
