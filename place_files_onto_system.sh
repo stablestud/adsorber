@@ -46,9 +46,7 @@ printHelp()
         echo "   Will place Adsorbers executables and other"
         echo "   files relevant to Adsorber into the system."
         echo
-        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'setup' command will not do the same action as\\n"
-        echo "this script, as it will only setup the scheduler and backup the original hosts file."
-        echo "You may want to run 'adsorber setup' afterwards"
+        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'setup' command will not do the same action as this script.\\n"
         echo
         echo "Usage: ${0} [option]:"
         echo
@@ -135,7 +133,7 @@ cp "${script_dir_path}/src/share/default/default-sources.list" "${config_dir_pat
 
 echo
 echo "Adsorber files have been successfully placed onto the system."
-printf "\\033[1;37mTo start going (to setup the scheduler and to backup the hosts file) run 'adsorber setup'\\033[0m\\n"
+printf "\\033[1;37mTo start (setup the scheduler and backup the hosts file) run 'adsorber setup'\\033[0m\\n"
 
 ## We don't run Adsorber after installation yet
 #adsorber setup --noformatting \

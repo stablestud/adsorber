@@ -56,9 +56,7 @@ printHelp()
         echo "   Will remove Adsorbers executables and other"
         echo "   files relevant to Adsorber from the system."
         echo
-        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'remove' command will not do the same action as\\n"
-        echo "this script, as it will only remove the scheduler and restore the original hosts"
-        echo "file but Adsorber will still be present on the system. "
+        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'disable' command will not do the same action as this script\\n"
         echo
         echo "Usage: ${0} [option]:"
         echo
@@ -77,11 +75,6 @@ prompt="${1}"
 if [ "${prompt}" = "help" ] || [ "${prompt}" = "h" ] || [ "${prompt}" = "-h" ] || [ "${prompt}" = "--help" ]; then
 	printHelp
 fi
-
-
-#echo "Current script location: ${script_dir_path}"
-#printLocation
-#echo
 
 
 # Prompt user if sure about to remove Adsorber from the system
@@ -129,7 +122,7 @@ if [ "${_hard_way}" = "true" ]; then
 
 		if "${script_dir_path}/portable_adsorber.sh" "disable" "-y" "--noformatting" 2>/dev/null 1>&2; then
 			printf "found\\n"
-			printf "Removed successfully Adsorber\\n"
+			printf "Removed Adsorber successfully\\n"
 		else
 			printf "no luck\\n"
 			"${script_dir_path}/misc/clean.sh" 2>/dev/null 1>&2
@@ -166,7 +159,7 @@ if [ "${_hard_way}" = "true" ]; then
 
                 if [ -f "${hosts_file_backup_path}" ]; then
                         echo "Backup of hosts file found at ${hosts_file_backup_path}"
-                        echo "Relacing current hosts file with backup ..."
+                        echo "Replacing current hosts file with backup ..."
                         mv "${hosts_file_backup_path}" "${hosts_file_path}"
                 fi
 
@@ -185,7 +178,7 @@ rm -r "${config_dir_path}" 2>/dev/null && echo "Cleaned ${config_dir_path}"
 
 # Remove the adsorber command from cache/hashtable.
 # Shells must be reloaded / reopened to have an effect
-echo "Clearing adsorber from shell cache ..."
+echo "Clearing 'adsorber' from shell cache ..."
 
 if command -v hash 1>/dev/null; then
         # Works in bash
