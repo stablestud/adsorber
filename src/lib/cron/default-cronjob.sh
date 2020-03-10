@@ -10,5 +10,5 @@
 # By default this file is going to be copied into /etc/cron.weekly/ if not
 # other specified.
 
-echo "\\nAdsorber v#@version@# #@frequency@# Cronjob @ `date`" >> "#@/some/path/to/logfile@#"
+printf "\\nAdsorber v#@version@# #@frequency@# Cronjob @ %s\\n" "$(date)" >> "#@/some/path/to/logfile@#"
 #@/some/path/adsorber update@# 2>&1 | tee -a "#@/some/path/to/logfile@#" | logger -i -e -t Adsorber

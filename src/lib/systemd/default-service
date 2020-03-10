@@ -7,7 +7,7 @@ Requisite=network-online.target
 [Service]
 Type=oneshot
 User=root
-ExecStart=/bin/sh -c 'echo "\\nAdsorber v#@version@# #@frequency@# Systemd service @ `date`" >> "#@/some/path/to/logfile@#"; #@/some/path/adsorber update@# 2>&1 | tee -a "#@/some/path/to/logfile@#"'
+ExecStart=/bin/sh -c 'printf "\\nAdsorber v#@version@# #@frequency@# Systemd service @ %s\\n" "$(date)" >> "#@/some/path/to/logfile@#"; #@/some/path/adsorber update@# 2>&1 | tee -a "#@/some/path/to/logfile@#"'
 StandardInput=null
 StandardOutput=syslog
 StandardError=syslog
