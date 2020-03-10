@@ -5,8 +5,8 @@
 
 (Ad)sorber blocks ads by 'absorbing' and dumbing them into the void.    
 
-Technically speaking, it adds ad-domains to the hostname/DNS lookup file `/etc/hosts`,    
-with a redirection to a non-existent ip `0.0.0.0`, which prevents ads from being loaded systemwide.
+Technically speaking, it adds ad-domains to the hostname / DNS lookup file `/etc/hosts`,    
+with a redirection to a non-existent ip `0.0.0.0`, which prevents ads from being loaded system-wide.
 
 You can consider it as [AdAway](https://github.com/AdAway/AdAway) for non Android systems running on Linux.
 
@@ -25,13 +25,15 @@ You can consider it as [AdAway](https://github.com/AdAway/AdAway) for non Androi
 * Prevents annoying anti-adblockers from triggering
 * Update your ad-domain list with domains from external external sources (like https://adaway.org/hosts.txt)
 * Revert to the previous hosts file if the current hosts file contains broken ad-domains
-* Automatically update the hosts file with schedulers (cronjob or systemd service)
+* Automatically update the hosts file with *schedulers* (cronjob or systemd service)
 * White- and blacklist specific domains
 
 ### Confirmed working on:
-* `debian` on `jessie` `buster`
+* `debian` on `jessie` and `buster`
 * `ubuntu` on `bionic`
 * `gentoo`
+
+Adsorber will very likely work on every distribution, as it runs on POSIX shell.
 
 ## Requirements
 * `root` rights (e.g. with `sudo`)
@@ -65,7 +67,7 @@ To reverse the steps (complete uninstall) see [removal](#removal)
 
 ### Portable mode
 This mode will only download the recent ad-domains and merges them into your hosts file.     
-You won't be able to set a scheduler.
+Note: You won't be able to set a scheduler.
 
 1. Execute `./portable_adsorber.sh setup` to generate the config files
 2. Execute `./portable_adsorber.sh setup` again to continue
@@ -77,7 +79,8 @@ Portable-mode won't touch the system except for `/etc/hosts` which is required t
 
 ## Removal
 #### Automatic removal
-To completely remove Adsorber and all its changes run the script [`./remove_files_from_system.sh`](https://github.com/stablestud/adsorber/blob/master/remove_files_from_system.sh). The script also works on [portable mode](#portable-mode) setups.    
+To completely remove Adsorber and all its changes run the script [`./remove_files_from_system.sh`](https://github.com/stablestud/adsorber/blob/master/remove_files_from_system.sh) as `root`.    
+The script also works on [portable mode](#portable-mode) setups. However running `./portable_adsorber.sh disable` instead should suffice.
 
 #### Manual removal
 If you prefer manual removal, here you go:
@@ -96,7 +99,7 @@ If you prefer manual removal, here you go:
 * `/etc/cron.daily/80adsorber`
 * `/etc/cron.weekly/80adsorber`
 * `/etc/cron.monthly/80adsorber`
-* `/var/log/adsorber.log`
+* **`/var/log/adsorber.log`**
 * `/tmp/adsorber/`
   
 Not all files of the above will exist, so dont worry if they are not found.
@@ -104,9 +107,7 @@ Not all files of the above will exist, so dont worry if they are not found.
 ## Usage
 
 ### `adsorber <operation> [<options>]`
-More info on the arguments:
-* [Operations](#operations-required) (required)
-* [Options](#options-optional) (optional)
+Quick link to all [operations](#operations-required) or [options](#options-optional).
 
 Note: if you use portable mode, use `./portable_adsorber.sh` instead of `adsorber`
 
@@ -220,18 +221,19 @@ Restores the hosts file to its original state, without removing its backup and s
 The command will:
 * copy `/etc/hosts.original` to `/etc/hosts`, overwriting the modified `/etc/hosts` by Adsorber.
 
-Important: If Adsorber's scheduler was set-up, it'll re-apply ad-server domains to your hosts file when triggered.     
+Note: If Adsorber's scheduler was set-up, it'll re-apply ad-server domains to your hosts file when triggered.     
 For this reason this command is used to temporary disable Adsorber,    
 e.g. when it's blocking some sites you need to access for a short period of time.     
-To re-apply run `adsorber revert` (for previous host file) or `adsorber update` (for updated version).
+
+To re-apply run [`adsorber revert`](#adsorber-revert-options) (for previous host file) or [`adsorber update`](#adsorber-update-options) (for updated version).
 
 Possible option:
 * [`-h`, `--help`](#-h---help)
 
 ### `adsorber` `disable {options}`:
 Completely disable all background tasks (schedulers) and remove all changes made by Adsorber.    
-However it will not remove Adsorber from the system. The command will be still available.
-To completely uninstall see [removal](#removal)
+However it will not remove Adsorber from the system. The `adsorber` command will be still available.    
+To completely uninstall see [removal](#removal).
 
 The command will:
 * disable all schedulers (systemd, cronjob)
@@ -253,7 +255,7 @@ Possible options are:
 
 #### `-s`, `--systemd`:
 
-Option is only available with operation `setup`.     
+Option is only available with operation [`setup`](#adsorber-setup-options).     
 Adsorber uses Systemd as a scheduler to update your hosts file periodically.
 
 * Setup systemd scheduler, skipping the scheduler prompt.      
@@ -262,7 +264,7 @@ Files are placed into `/etc/systemd/system` by default.
 
 #### `-c`, `--cronjob`:
 
-Option is only available with operation `setup`.     
+Option is only available with operation [`setup`](#adsorber-setup-options).     
 Adsorber uses Cronjob as a default scheduler to update your hosts file periodically.
 
 * Setup the cron scheduler, skipping the scheduler prompt. 
@@ -270,7 +272,7 @@ Adsorber uses Cronjob as a default scheduler to update your hosts file periodica
 File is placed into `/etc/cron.weekly/` by default.
 
 #### `-ns`, `--no-scheduler`:
-Option is only available with operation `setup`.     
+Option is only available with operation [`setup`](#adsorber-setup-options).     
 Tells Adsorber to not install a scheduler.
 
 * Skips the setup of a scheduler, therefore skipping the scheduler prompt. 
@@ -288,7 +290,7 @@ Note: it'll not answer prompts which may harm your system. But `--force` will.
 
 #### `-f`, `--force`:
 
-Option is only available with operation `update`.
+Option is only available with operation [`update`](#adsorber-update-options).
 
 This will force the script to continue (dangerous!) the update e.g.,
 * Continues if no backup has been created, overwriting the existing hosts file.
