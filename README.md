@@ -14,6 +14,7 @@ You can consider it as [AdAway](https://github.com/AdAway/AdAway) for non Androi
 * [Features](#features)
 * [Requirements](#requirements)
 * [Installation](#installation)
+* [Removal](#removal)
 * [Usage](#usage)
 * [Configuration](#configuration)
 * [Logging](#logging)
@@ -28,8 +29,8 @@ You can consider it as [AdAway](https://github.com/AdAway/AdAway) for non Androi
 * White- and blacklist specific domains
 
 ### Confirmed working on:
-* `debian` - `jessie` `buster`
-* `ubuntu` - `bionic`
+* `debian` on `jessie` `buster`
+* `ubuntu` on `bionic`
 * `gentoo`
 
 ## Requirements
@@ -60,7 +61,7 @@ However the default path (`/usr/local/`) is the default for external scripts on 
 Placing Adsorber has the advantage to run it independently from the user who downloaded it,
 preventing broken cronjobs/services as there is no risk that the files/directories of Adsorber will be accidentally deleted or moved.
 
-To reverse the steps (complete uninstall) run the script `./remove_files_from_system`.
+To reverse the steps (complete uninstall) see [removal](#removal)
 
 ### Portable mode
 This mode will only download the recent ad-domains and merges them into your hosts file.     
@@ -74,10 +75,36 @@ If you want to update your hosts file you need to do it yourself by running `./p
 
 Portable-mode won't touch the system except for `/etc/hosts` which is required to block ad-domains. A backup will be created at `/etc/hosts.original`.
 
+## Removal
+#### Automatic removal
+To completely remove Adsorber and all its changes run the script [`./remove_files_from_system.sh`](https://github.com/stablestud/adsorber/blob/master/remove_files_from_system.sh). The script also works on [portable mode](#portable-mode) setups.    
+
+#### Manual removal
+If you prefer manual removal, here you go:
+1. copy:
+* `/etc/hosts.original` to `/etc/hosts`, overwriting it
+2. remove:
+* `/etc/hosts.original`
+* `/etc/hosts.previous`
+* `/usr/local/bin/adsorber`
+* `/usr/local/etc/adsorber/`
+* `/usr/local/lib/adsorber/`
+* `/usr/local/share/adsorber/`
+* `/etc/systemd/system/adsorber.service`
+* `/etc/systemd/system/adsorber.time`
+* `/etc/cron.hourly/80adsorber`
+* `/etc/cron.daily/80adsorber`
+* `/etc/cron.weekly/80adsorber`
+* `/etc/cron.monthly/80adsorber`
+* `/var/log/adsorber.log`
+* `/tmp/adsorber/`
+  
+Not all files of the above will exist, so dont worry if they are not found.
+
 ## Usage
 
 ### `adsorber <operation> [<options>]`
-To see help on the arguments:
+More info on the arguments:
 * [Operations](#operations-required) (required)
 * [Options](#options-optional) (optional)
 
@@ -138,10 +165,11 @@ To run Adsorber one of the following operations must be given:
 * [`restore`](#adsorber-restore-options)
 * [`disable`](#adsorber-disable-options)
 
-Note: to get further information about a operation run `adsorber <operation> --help`
+**Note:** to get further information about a operation run it with `--help`,    
+e.g.: `adsorber update --help`
 
 ### `adsorber` `setup {options}`:
-You should run this command first.    
+You should run this command first. It is required to make Adsorber functional.    
 
 The command will:
 * backup your `/etc/hosts` file to `/etc/hosts.original` (if not other specified in `adsorber.conf`)
@@ -149,11 +177,11 @@ The command will:
 * fetch the newest ad-server domains in your hosts file. (same as `update`)
 
 Possible options are:
-* `-s`,  `--systemd`
-* `-c`,  `--cronjob`
-* `-ns`, `--no-scheduler`
-* `-y`,  `--yes`, `--assume-yes`
-* `-h`,  `--help`
+* [`-s`, `--systemd`](#-s---systemd)
+* [`-c`, `--cronjon`](#-c---cronjob)
+* [`-ns`, `--no-scheduler`](#-ns---no-scheduler)
+* [`-y`, `--yes`, `--assume-yes`](#-y---yes---assume-yes)
+* [`-h`, `--help`](#-h---help)
 * `-H`,  `--hourly`
 * `-D`,  `--daily`
 * `-W`,  `--weekly`
@@ -171,8 +199,8 @@ The command will:
 * filter those and apply them to the systems hosts file `/etc/hosts`
 
 Possible options are:
-* `-f`, `--force`
-* `-h`, `--help`
+* [`-f`, `--force`](#-f---force)
+* [`-h`, `--help`](#-h---help)
 
 ### `adsorber` `revert {options}`:
 Reverts the last applied hosts-file by Adsorber.
@@ -184,7 +212,7 @@ This is useful if the newest hosts file contains less or no ad-domains, because 
 was unreachable and you don't want to loose the ad-servers supplied previously from this source.
 
 Possible option:
-* `-h`, `--help`
+* [`-h`, `--help`](#-h---help)
 
 ### `adsorber` `restore {options}`:
 Restores the hosts file to its original state, without removing its backup and scheduler.
@@ -193,14 +221,17 @@ The command will:
 * copy `/etc/hosts.original` to `/etc/hosts`, overwriting the modified `/etc/hosts` by Adsorber.
 
 Important: If Adsorber's scheduler was set-up, it'll re-apply ad-server domains to your hosts file when triggered.     
-For this reason this command is used to temporary disable Adsorber, e.g. when it's blocking some sites you need to access for a short period of time.     
+For this reason this command is used to temporary disable Adsorber,    
+e.g. when it's blocking some sites you need to access for a short period of time.     
 To re-apply run `adsorber revert` (for previous host file) or `adsorber update` (for updated version).
 
 Possible option:
-* `-h`, `--help`
+* [`-h`, `--help`](#-h---help)
 
 ### `adsorber` `disable {options}`:
-Completely disable all background tasks (schedulers) and remove all changes made by Adsorber.
+Completely disable all background tasks (schedulers) and remove all changes made by Adsorber.    
+However it will not remove Adsorber from the system. The command will be still available.
+To completely uninstall see [removal](#removal)
 
 The command will:
 * disable all schedulers (systemd, cronjob)
@@ -208,16 +239,16 @@ The command will:
 * remove all leftovers (previous hosts file, etc)
 
 Possible options are:
-* `-y`, `--yes`, `--assume-yes`
-* `-h`, `--help`
+* [`-y`, `--yes`, `--assume-yes`](#-y---yes---assume-yes)
+* [`-h`, `--help`](#-h---help)
 
 ### Options (optional):
-* [`-s`, `--systemd`](#-s--systemd)
-* [`-c`, `--cronjon`](#-c--cronjob)
-* [`-ns`, `--no-scheduler`](#-ns--no-scheduler)
-* [`-y`, `--yes`, `--assume-yes`](#-y--yes--assume-yes)
-* [`-f`, `--force`](#-f--force)
-* [`-h`, `--help`](#-h--help)
+* [`-s`, `--systemd`](#-s---systemd)
+* [`-c`, `--cronjon`](#-c---cronjob)
+* [`-ns`, `--no-scheduler`](#-ns---no-scheduler)
+* [`-y`, `--yes`, `--assume-yes`](#-y---yes---assume-yes)
+* [`-f`, `--force`](#-f---force)
+* [`-h`, `--help`](#-h---help)
 * [`--noformatting`](#--noformatting)
 
 #### `-s`, `--systemd`:
@@ -264,12 +295,13 @@ This will force the script to continue (dangerous!) the update e.g.,
 
 #### `-h`, `--help`:
 
-Show general help or ff specified with an operation,    
-it'll show specific help about it e.g.,    
+Show general help or if specified with an operation,    
+show specific help about operation e.g.,    
 `adsorber setup --help`
 
 #### `--noformatting`:
 Disables coloured and formatted output by Adsorber.     
+Can be used with every operation or option.    
 Useful for logging to files and output processing by other scripts.
 
 ## Configuration:
