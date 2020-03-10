@@ -87,16 +87,16 @@ showUsage()
 showHelp()
 {
         echo "Usage: adsorber <operation> [<options>|--help]"
-        echo ""
+        echo
         echo "(Ad)sorber blocks ads by \"absorbing\" and dumbing them into void."
         echo "           (with the help of the hosts file)"
-        echo ""
+        echo
         echo "Operation (required):"
         echo "  setup   - setup necessary things needed for Adsorber"
         echo "              e.g., create backup file of hosts file,"
         echo "                    create scheduler which updates the host file once a week"
 #       echo "            However this should've been done automatically."
-        echo "  update  - update hosts file with newest ad servers"
+        echo "  update  - update hosts file with newest ad-domains"
         echo "  restore - restore hosts file to its original state"
         echo "           (it does not remove the scheduler, this should be used temporary)"
 	echo "  revert  - reverts the hosts file to the last applied (previous) host file."
@@ -105,15 +105,15 @@ showHelp()
         echo "                    restore hosts file to its original state"
         echo "  version - show version of this shell script"
         echo "  help    - show this help"
-        echo ""
+        echo
         echo "Options (optional):"
         echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
         echo "  -f,  --force             - force the update if no /etc/hosts backup"
-        echo "                             has been created (dangerous)"
+        echo "                             has been created (dangerous!)"
         echo "  -h,  --help              - show specific help of specified operations"
 	echo "                             (e.g 'adsorber update --help)"
 	echo "  --noformatting           - turn off coloured and formatted output"
-	echo ""
+	echo
 	echo "Scheduler options (use with 'setup'):"
         echo "  -ns, --no-scheduler      - skip scheduler creation"
         echo "  -s,  --systemd           - setup Systemd as scheduler"
@@ -128,7 +128,7 @@ showHelp()
         echo
         echo "Config files are located at: $(cd "${config_dir_path}" && pwd)/"
         echo
-        echo "Documentation: https://github.com/stablestud/adsorber"
+        echo "Documentation: https://github.com/stablestud/adsorber/README.md"
         echo "If you encounter any issues please report them to the Github repository."
 
         exit 0
@@ -263,13 +263,13 @@ duplicateOption()
 {
         if [ "${1}" = "scheduler" ]; then
                 echo "Adsorber: Duplicate option for scheduler: '${2}'" 1>&2
-                echo "You may only select one:"
-                echo "  -s,  --systemd       - use Systemd ..."
-                echo "  -c,  --cron          - use Cronjob as scheduler"
+                echo "You may select only one:"
+                echo "  -s,  --systemd       - use Systemd as scheduler"
+                echo "  -c,  --cron          - use Cronjob ..."
                 echo "  -ns, --no-scheduler  - skip scheduler creation"
         elif [ "${1}" = "frequency" ]; then
 		echo "Adsorber: Duplicate option for schedulers frequency: '${2}'" 1>&2
-		echo "You may only select one:"
+		echo "You may select only one:"
 		echo "  -H,  --hourly        - run scheduler once hourly"
 		echo "  -D,  --daily                          ... daily"
 		echo "  -W,  --weekly                         ... weekly"
@@ -440,8 +440,6 @@ for _option in "${@}"; do
 		--noformatting )
 			if [ -z "${use_formatting}" ]; then
 				readonly use_formatting="false"
-			else
-				echo "Can't turn off colour, variable'already set." 1>&2
 			fi
 			;;
                 * )
