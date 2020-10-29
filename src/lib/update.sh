@@ -66,8 +66,6 @@ update_CheckBackupExist()
                                 ;;
                 esac
         fi
-
-        return 0
 }
 
 
@@ -82,8 +80,6 @@ update_CreateTmpDir()
                 rm -rf "${tmp_dir_path}"
                 mkdir "${tmp_dir_path}"
         fi
-
-        return 0
 }
 
 
@@ -113,8 +109,6 @@ update_ReadSourceList()
                 fi
 
         fi
-
-        return 0
 }
 
 
@@ -132,8 +126,6 @@ update_ReadWhiteList()
                 update_FilterDomains "whitelist" "whitelist-filtered"
                 update_SortDomains "whitelist-filtered" "whitelist-sorted"
         fi
-
-        return 0
 }
 
 
@@ -151,8 +143,6 @@ update_ReadBlackList()
                 update_FilterDomains "blacklist" "blacklist-filtered"
                 update_SortDomains "blacklist-filtered" "blacklist-sorted"
         fi
-
-        return 0
 }
 
 
@@ -219,8 +209,6 @@ update_FetchSources()
         # Unset temporary function variables.
         unset _total_count
         unset _successful_count
-
-        return 0
 }
 
 
@@ -247,8 +235,6 @@ update_FilterDomains()
 
         unset _input_file
         unset _output_file
-
-        return 0
 }
 
 
@@ -262,8 +248,6 @@ update_SortDomains()
 
         unset _input_file
         unset _output_file
-
-        return 0
 }
 
 
@@ -295,8 +279,6 @@ update_ApplyWhiteList()
                 cp "${tmp_dir_path}/applied-whitelist" "${tmp_dir_path}/cache"
         fi
 
-
-        return 0
 }
 
 
@@ -315,8 +297,6 @@ update_MergeBlackList()
 
                 cp "${tmp_dir_path}/merged-blacklist-sorted" "${tmp_dir_path}/cache"
         fi
-
-        return 0
 }
 
 
@@ -327,8 +307,6 @@ update_IsCacheEmpty()
                 cleanUp
                 exit 1
         fi
-
-        return 0
 }
 
 
@@ -366,8 +344,6 @@ update_BuildHostsFile()
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
 
         } > "${tmp_dir_path}/hosts"
-
-        return 0
 }
 
 
@@ -388,8 +364,6 @@ update_PreviousHostsFile()
                 echo >> "${hosts_file_previous_path}"
                 echo "## This was the hosts file before $(date +'%b %e %X')" >> "${hosts_file_previous_path}"
         fi
-
-        return 0;
 }
 
 
@@ -406,8 +380,6 @@ update_ApplyHostsFile()
                 }
 
         printf "%bSuccessfully applied new hosts file with %d blocked domains.%b\\n" "${prefix_info}" "$(wc -l < "${tmp_dir_path}/cache")" "${prefix_reset}"
-
-        return 0
 }
 
 
@@ -457,6 +429,4 @@ update()
         update_PreviousHostsFile
         update_ApplyHostsFile
         cleanUp
-
-        return 0
 }

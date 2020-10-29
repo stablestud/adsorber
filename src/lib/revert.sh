@@ -48,8 +48,6 @@ revert_HostsFile()
                 errorCleanUp
                 exit 1
         fi
-
-        return 0;
 }
 
 
@@ -59,6 +57,4 @@ revert()
         printf "%bReverting %s with %s ...%b\\n" "${prefix_title}" "${hosts_file_path}" "${hosts_file_previous_path}" "${prefix_reset}"
         revert_HostsFile
         cleanUp
-
-        return 0;
 }

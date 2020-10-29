@@ -37,8 +37,6 @@ setup_BackupHostsFile()
         else
                 echo "${prefix}Backup already exist, no need to backup."
         fi
-
-        return 0
 }
 
 
@@ -60,8 +58,6 @@ setup_Prompt()
                         exit 130
                         ;;
         esac
-
-        return 0
 }
 
 
@@ -85,8 +81,6 @@ setup_PromptScheduler()
                         echo "${prefix}Skipping scheduler creation ..."
                         ;;
         esac
-
-        return 0
 }
 
 
@@ -97,6 +91,4 @@ setup()
         setup_Prompt
         setup_BackupHostsFile
         setup_PromptScheduler
-
-        return 0
 }

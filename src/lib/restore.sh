@@ -48,8 +48,6 @@ restore_HostsFile()
                 errorCleanUp
                 exit 1
         fi
-
-        return 0
 }
 
 
@@ -59,6 +57,4 @@ restore()
         printf "%bRestoring %s ...%b\\n" "${prefix_title}" "${hosts_file_path}" "${prefix_reset}"
         restore_HostsFile
         cleanUp
-
-        return 0
 }

@@ -42,8 +42,6 @@ config_CreateTmpDir()
                 rm -rf "${tmp_dir_path}"
                 mkdir "${tmp_dir_path}"
         fi
-
-        return 0
 }
 
 
@@ -54,8 +52,6 @@ config_CopySourceList()
                 cp "${shareable_dir_path}/default/default-sources.list" "${config_dir_path}/sources.list" \
                         && echo "${prefix_warning}Created sources.list - to add new host sources edit this file."
         fi
-
-        return 0
 }
 
 
@@ -66,8 +62,6 @@ config_CopyWhiteList()
                 cp "${shareable_dir_path}/default/default-whitelist" "${config_dir_path}/whitelist" \
                         && echo "${prefix_warning}Created whitelist - to allow specific domains edit this file."
         fi
-
-        return 0
 }
 
 
@@ -78,8 +72,6 @@ config_CopyBlackList()
                 cp "${shareable_dir_path}/default/default-blacklist" "${config_dir_path}/blacklist" \
                         && echo "${prefix_warning}Created blacklist - to block additional domains edit this file."
         fi
-
-        return 0
 }
 
 
@@ -95,8 +87,6 @@ config_CopyConfig()
 
                 exit 126
         fi
-
-        return 0
 }
 
 
@@ -123,8 +113,6 @@ config_FilterConfig()
                 sed -n "/^hosts_file_previous_path=/p" "${tmp_dir_path}/config"
                 sed -n "/^systemd_dir_path=/p" "${tmp_dir_path}/config"
         } > "${tmp_dir_path}/config-filtered"
-
-        return 0
 }
 
 
@@ -238,8 +226,6 @@ config_ReadConfig()
         done < "${tmp_dir_path}/config-filtered"
 
         unset _line
-
-        return 0
 }
 
 
@@ -299,8 +285,6 @@ config_IsVariableSet()
                 errorCleanUp
                 exit 127
         fi
-
-        return 0
 }
 
 

@@ -51,8 +51,6 @@ disable_Prompt()
                         exit 130
                         ;;
         esac
-
-        return 0
 }
 
 
@@ -70,8 +68,6 @@ disable_HostsFile()
                 errorCleanUp
                 exit 1
         fi
-
-        return 0
 }
 
 
@@ -84,8 +80,6 @@ disable_PreviousHostsFile()
         else
                 echo "${prefix}Previous hosts file does not exist. Ignoring ..."
         fi
-
-        return 0
 }
 
 
@@ -99,6 +93,4 @@ disable()
         disable_HostsFile
         disable_PreviousHostsFile
         cleanUp
-
-        return 0
 }

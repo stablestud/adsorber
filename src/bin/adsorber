@@ -48,8 +48,6 @@ checkRoot()
 
         checkPaths
 	sourceFiles
-
-        return 0
 }
 
 
@@ -62,8 +60,6 @@ checkForWrongParameters()
         if [ -n "${_wrong_operation}" ] || [ -n "${_wrong_option}" ]; then
                 showUsage
         fi
-
-        return 0
 }
 
 
@@ -313,8 +309,6 @@ checkPaths()
         fi
 
         unset _not_found
-
-        return 0
 }
 
 
@@ -342,8 +336,6 @@ sourceFiles()
         . "${library_dir_path}/cron/cron.sh"
         # shellcheck source=../src/lib/systemd/systemd.sh
         . "${library_dir_path}/systemd/systemd.sh"
-
-        return 0
 }
 
 

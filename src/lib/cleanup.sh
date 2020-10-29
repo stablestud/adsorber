@@ -51,8 +51,6 @@ errorCleanUp()
         if [ -d "${tmp_dir_path}" ]; then
                 rm -r "${tmp_dir_path}"
         fi
-
-        return 0
 }
 
 
@@ -63,6 +61,4 @@ cleanUp()
 
         # Remove the /tmp/adsorber directory
         rm -r "${tmp_dir_path}"
-
-        return 0
 }
