@@ -44,19 +44,18 @@
 update_CheckBackupExist()
 {
         if [ ! -f "${hosts_file_backup_path}" ]; then
-
                 # The user may proceed without having a backup of the original
                 # hosts file, however it's not recommended to proceed as the
                 # hostname association with 127.0.0.1 and localhost will be lost.
                 # The user may interactively decide here wheter to proceed or not.
                 if [ -z "${reply_to_force_prompt}" ]; then
                         printf "%bBackup of %s does not exist. To backup run 'adsorber setup'.%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
-                        printf "%bIgnore issue and continue? (May break your hostfile, not recommended) [YES/n]: %b" "${prefix_input}" "${prefix_reset}"
+                        printf "%bIgnore issue and continue? (May break your hostfile, not recommended) [y/N]: %b" "${prefix_input}" "${prefix_reset}"
                         read -r reply_to_force_prompt
                 fi
 
                 case "${reply_to_force_prompt}" in
-                        [Yy][Ee][Ss] )
+                        [Yy] | [Yy][Ee][Ss] )
                                 return 0
                                 ;;
                         * )
