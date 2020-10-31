@@ -31,7 +31,8 @@ readonly hosts_file_backup_path="/etc/hosts.original"
 readonly hosts_file_previous_path="/etc/hosts.previous"
 readonly systemd_dir_path="/etc/systemd/system"
 readonly tmp_dir_path="/tmp/adsorber"
-readonly log_file_path="/var/log/adsorber.log"	# Log file won't be removed
+readonly cache_dir_path="/var/cache/adsorber"
+readonly log_file_path="/var/log/adsorber.log"        # Log file won't be removed
 
 ##########[ End of configuration ]##############################################
 
@@ -40,7 +41,7 @@ readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
 
 printLocation()
 {
-	echo "Going to remove files from:"
+        echo "Going to remove files from:"
         echo " - main exectuable:   ${executable_path}"
         echo " - other executables: ${library_dir_path}"
         echo " - configuration:     ${config_dir_path}"
@@ -66,20 +67,20 @@ printHelp()
         echo
         printLocation
 
-	exit 0
+        exit 0
 }
 
 
 prompt="${1}"
 
 if [ "${prompt}" = "help" ] || [ "${prompt}" = "h" ] || [ "${prompt}" = "-h" ] || [ "${prompt}" = "--help" ]; then
-	printHelp
+        printHelp
 fi
 
 
 # Prompt user if sure about to remove Adsorber from the system
 if [ -z "${prompt}" ]; then
-	printf "Are you sure you want to remove Adsorber from the system? [(y)es/(N)o]: "
+        printf "Are you sure you want to remove Adsorber from the system? [(y)es/(N)o]: "
         read -r prompt
 fi
 
@@ -103,59 +104,59 @@ fi
 
 # Run Adsorber's own removal, if it fails do it manually
 if command -v adsorber 1>/dev/null; then
-	printf "\\nRunning 'adsorber disable -y --noformatting' ...\\n\\n"
-	( adsorber "disable" "-y" "--noformatting" ) \
-		|| {
-			echo
-			printf "\\033[0;93mSomething went wrong at running Adsorber's own disable operation.\\nNo worries, I can handle it ...\\n\\033[0m"
-			echo "Maybe Adsorber has been already removed ?"
-			readonly _hard_way="true"
-		}
+        printf "\\nRunning 'adsorber disable -y --noformatting' ...\\n\\n"
+        ( adsorber "disable" "-y" "--noformatting" ) \
+                || {
+                        echo
+                        printf "\\033[0;93mSomething went wrong at running Adsorber's own disable operation.\\nNo worries, I can handle it ...\\n\\033[0m"
+                        echo "Maybe Adsorber has been already removed ?"
+                        readonly _hard_way="true"
+                }
 else
-	readonly _hard_way="true"
+        readonly _hard_way="true"
 fi
 
 
 # Doing it the hard way .., removing everything manually
 if [ "${_hard_way}" = "true" ]; then
-		printf "\\nTrying portable_adsorber.sh ... "
+                printf "\\nTrying portable_adsorber.sh ... "
 
-		if "${script_dir_path}/portable_adsorber.sh" "disable" "-y" "--noformatting" 2>/dev/null 1>&2; then
-			printf "found\\n"
-			printf "Removed Adsorber successfully\\n"
-		else
-			printf "no luck\\n"
-			"${script_dir_path}/misc/clean.sh" 2>/dev/null 1>&2
-		fi
-
+                if "${script_dir_path}/portable_adsorber.sh" "disable" "-y" "--noformatting" 2>/dev/null 1>&2; then
+                        printf "found\\n"
+                        printf "Removed Adsorber successfully\\n"
+                else
+                        printf "no luck\\n"
+                        "${script_dir_path}/misc/clean.sh" 2>/dev/null 1>&2
+                fi
 
                 rm "${systemd_dir_path}/adsorber.timer" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.timer"
                 rm "${systemd_dir_path}/adsorber.service" 2>/dev/null && echo "Removed ${systemd_dir_path}/adsorber.service"
                 systemctl daemon-reload 2>/dev/null && echo "Reloaded systemctl daemon"
 
-		# Remove all crontabs
+                # Remove all crontabs
                 if [ -f "/etc/cron.hourly/80adsorber" ]; then
-			rm "/etc/cron.hourly/80adsorber" 2>/dev/null \
-				&& echo "Removed cronjob from /etc/cron.hourly/"
-		fi
+                        rm "/etc/cron.hourly/80adsorber" 2>/dev/null \
+                                && echo "Removed cronjob from /etc/cron.hourly/"
+                fi
 
                 if [ -f "/etc/cron.daily/80adsorber" ]; then
-			rm "/etc/cron.daily/80adsorber" 2>/dev/null \
-				&& echo "Removed cronjob from /etc/cron.daily/"
-		fi
+                        rm "/etc/cron.daily/80adsorber" 2>/dev/null \
+                                && echo "Removed cronjob from /etc/cron.daily/"
+                fi
 
                 if [ -f "/etc/cron.weekly/80adsorber" ]; then
-			rm "/etc/cron.weekly/80adsorber" 2>/dev/null \
-				&& echo "Removed cronjob from /etc/cron.weekly/"
-		fi
+                        rm "/etc/cron.weekly/80adsorber" 2>/dev/null \
+                                && echo "Removed cronjob from /etc/cron.weekly/"
+                fi
 
                 if [ -f "/etc/cron.monthly/80adsorber" ]; then
-			rm "/etc/cron.monthly/80adsorber" 2>/dev/null \
-				&& echo "Removed cronjob from /etc/cron.monthly/"
-		fi
+                        rm "/etc/cron.monthly/80adsorber" 2>/dev/null \
+                                && echo "Removed cronjob from /etc/cron.monthly/"
+                fi
 
 
                 rm -r "${tmp_dir_path}" 2>/dev/null && echo "Removed ${tmp_dir_path}"
+                rm -r "${cache_dir_path}" 2>/dev/null && echo "Removed ${cache_dir_path}"
 
                 if [ -f "${hosts_file_backup_path}" ]; then
                         echo "Backup of hosts file found at ${hosts_file_backup_path}"
