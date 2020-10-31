@@ -76,7 +76,11 @@ update_CreateTmpDir()
         # Create a temporary folder in which Adsorber can manipulate files
         # without distracting the environment
         if [ ! -d "${tmp_dir_path}" ]; then
-                mkdir "${tmp_dir_path}"
+                mkdir "${tmp_dir_path}" \
+                        || {
+                                printf "%bCannot create tmp dir '${tmp_dir_path}'%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                                exit 1
+                        }
         elif [ ! -s "${tmp_dir_path}/config-filtered" ]; then
                 echo "${prefix}Removing previous tmp folder ..."
                 rm -rf "${tmp_dir_path}"
@@ -84,6 +88,19 @@ update_CreateTmpDir()
         fi
 }
 
+
+update_CreateCacheDir()
+{
+        # Cache dir is used to save the previous host domains
+        if [ ! -d "${cache_dir_path}" ]; then
+                mkdir "${cache_dir_path}" \
+                        || {
+                                printf "%bCannot create cache dir '${cache_dir_path}'%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                                errorCleanUp
+                                exit 130
+                        }
+        fi
+}
 
 update_ReadSourceList()
 {
@@ -334,7 +351,7 @@ update_CreateAdsorberLines()
                         | sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
 
-        } > "${tmp_dir_path}/adsorber.lines"
+        } > "${tmp_dir_path}/adsorber.hosts"
 }
 
 
@@ -342,18 +359,17 @@ update_PreviousHostsFile()
 {
         # Check if we should backup the previous hosts file
         if [ "${hosts_file_previous_enable}" = "true" ]; then
-                echo "${prefix}Creating previous hosts file ..."
+                echo "${prefix}Creating backup of current ad-domains"
 
-                # Copy current hosts file to /etc/hosts.previous before the new hosts file will be applied
-                cp "${hosts_file_path}" "${hosts_file_previous_path}" \
+                if [ -f "${cache_dir_path}/adsorber.hosts" ]; then
+                        cp "${cache_dir_path}/adsorber.hosts" "${cache_dir_path}/adsorber.hosts.old"
+                fi
+                cp "${tmp_dir_path}/adsorber.hosts" "${cache_dir_path}" \
                         || {
-                                printf "%bCouldn't create previous hosts file to %s%b\\n" "${prefix_fatal}" "${hosts_file_previous_path}" "${prefix_reset}"
+                                printf "%bCouldn't create previous hosts file to %s%b\\n" "${prefix_fatal}" "${cache_path}/adsorber.lines" "${prefix_reset}" 1>&2
                                 errorCleanUp
                                 exit 1
                         }
-
-                echo >> "${hosts_file_previous_path}"
-                echo "## This was the hosts file before $(date +'%b %e %X')" >> "${hosts_file_previous_path}"
         fi
 }
 
@@ -371,7 +387,7 @@ update_AddAdsorberLines()
         {
                 cat "${tmp_dir_path}/hosts.clean"
                 echo "${begin_section}"
-                cat "${tmp_dir_path}/adsorber.lines"
+                cat "${tmp_dir_path}/adsorber.hosts"
                 echo "${end_section}"
         } >> "${tmp_dir_path}/hosts.new"
 }
@@ -405,6 +421,7 @@ update()
 
         update_CheckBackupExist
         update_CreateTmpDir
+        update_CreateCacheDir
         update_ReadBlackList
         update_ReadWhiteList
 
@@ -442,5 +459,5 @@ update()
         update_CreateAdsorberLines
         update_PreviousHostsFile
         update_ApplyHostsFile
-        #cleanUp
+        cleanUp
 }

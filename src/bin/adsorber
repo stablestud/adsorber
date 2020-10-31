@@ -12,6 +12,7 @@
 # shellcheck disable=SC2154
 
 readonly tmp_dir_path="/tmp/adsorber"
+readonly cache_dir_path="/var/cache/adsorber"
 readonly debug="false"
 
 

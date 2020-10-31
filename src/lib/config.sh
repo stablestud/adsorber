@@ -110,7 +110,6 @@ config_FilterConfig()
                 sed -n "/^hosts_file_path=/p" "${tmp_dir_path}/config"
                 sed -n "/^hosts_file_backup_path=/p" "${tmp_dir_path}/config"
                 sed -n "/^hosts_file_previous_enable=/p" "${tmp_dir_path}/config"
-                sed -n "/^hosts_file_previous_path=/p" "${tmp_dir_path}/config"
                 sed -n "/^systemd_dir_path=/p" "${tmp_dir_path}/config"
         } > "${tmp_dir_path}/config-filtered"
 }
@@ -195,13 +194,6 @@ config_ReadConfig()
                                         readonly "${_line}"
                                 else
                                         echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_enable', using the first value: ${hosts_file_previous_enable}"
-                                fi
-                                ;;
-                        hosts_file_previous_path=* )
-                                if [ -z "${hosts_file_previous_path}" ]; then
-                                        readonly "${_line}"
-                                else
-                                        echo "${prefix_warning}Duplicate configuration for 'hosts_file_previous_path', using the first value: ${hosts_file_previous_path}"
                                 fi
                                 ;;
                         systemd_dir_path=* )
@@ -336,15 +328,6 @@ config_IsVariableValid()
                 invalidVariable="true"
         fi
 
-        if [ "${hosts_file_previous_enable}" = "true" ]; then
-                if [ ! -d "$(dirname "${hosts_file_previous_path}")" ] || [ ! -w "$(dirname "${hosts_file_previous_path}")" ]; then
-                        printf "%bInvalid 'hosts_file_previous_path' set in adsorber.conf. Can't access: %s%b\\n" \
-                                "${prefix_fatal}" "$(dirname "${hosts_file_previous_path}")" "${prefix_reset}" 1>&2
-
-                        invalidVariable="true"
-                fi
-        fi
-
         if [ ! -d "$(dirname "${tmp_dir_path}")" ] || [ ! -w "$(dirname "${tmp_dir_path}")" ]; then
                 printf "%bInvalid 'tmp_dir_path' set in adsorber.conf. Can't access: %s%b\\n" \
                         "${prefix_fatal}" "$(dirname "${tmp_dir_path}")" "${prefix_reset}" 1>&2
@@ -372,9 +355,9 @@ config_PrintVariables()
         echo "  - hosts_file_path: ${hosts_file_path}"
         echo "  - hosts_file_backup_path: ${hosts_file_backup_path}"
         echo "  - hosts_file_previous_enable: ${hosts_file_previous_enable}"
-        echo "  - hosts_file_previous_path: ${hosts_file_previous_path}"
         echo "  - systemd_dir_path: ${systemd_dir_path}"
         echo "  - tmp_dir_path: ${tmp_dir_path}"
+        echo "  - cache_dir_path: ${cache_dir_path}"
         echo "  - executable_dir_path: ${executable_dir_path}"
         echo "  - library_dir_path: ${library_dir_path}"
         echo "  - shareable_dir_path: ${shareable_dir_path}"
