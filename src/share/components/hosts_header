@@ -1,10 +1,9 @@
-# This file has been edited by Adsorber v#@version@# at #@date@#
+# This section has been edited by Adsorber v#@version@# at #@date@#
 # and is blocking #@blocked@# domain(s).
 #
-# To make any changes to this file please edit #@hosts_file_backup_path@#
-# and run 'adsorber update' to apply your changes.
-# Or else your changes will be overwritten by Adsorber once a week.
+# Do not make changes in this section as they will be overwritten by Adsorber.
 #
 # By default, the domains will be updated once a week if not other specified.
+# Or you can manually trigger a run with 'adsorber update'
 # For further information please run 'adsorber --help'
 # Or visit: https://github.com/stablestud/adsorber

@@ -23,7 +23,7 @@
 # --function:--  ---function defined in:---
 # crontab        src/lib/cron/cron.sh
 # errorCleanUp   src/lib/cleanup.sh
-# systemd      	 src/lib/systemd/systemd.sh
+# systemd        src/lib/systemd/systemd.sh
 
 # shellcheck disable=SC2154
 

@@ -41,6 +41,9 @@
 
 # shellcheck disable=SC2154
 
+begin_section="# BEGIN OF ADSORBER SECTION"
+end_section="# END OF ADSORBER SECTION"
+
 update_CheckBackupExist()
 {
         if [ ! -f "${hosts_file_backup_path}" ]; then
@@ -190,7 +193,7 @@ update_FetchSources()
 
         done < "${tmp_dir_path}/sourceslist-filtered"
 
-	unset _domain
+        unset _domain
 
         if [ "${ignore_download_error}" = "false" ] && [ "${_successful_count}" -ne "${_total_count}" ]; then
                 printf "%bCouldn't fetch all hosts sources [%d/%d]. Aborting ...\\n" "${prefix_warning}" "${_successful_count}" "${_total_count}" 1>&2
@@ -273,7 +276,7 @@ update_ApplyWhiteList()
 
                 done < "${tmp_dir_path}/whitelist-sorted"
 
-		unset _domain
+                unset _domain
 
                 cp "${tmp_dir_path}/applied-whitelist" "${tmp_dir_path}/cache"
         fi
@@ -309,7 +312,7 @@ update_IsCacheEmpty()
 }
 
 
-update_BuildHostsFile()
+update_CreateAdsorberLines()
 {
         {
                 # Replace #@...@# with variables
@@ -317,17 +320,6 @@ update_BuildHostsFile()
                         | sed "s|#@date@#|$(date +'%b %e %X')|g" \
                         | sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
-
-                echo
-
-                # Add hosts.original
-                cat "${hosts_file_backup_path}" \
-                        || echo "${prefix}You may want to add your hostname to ${hosts_file_path}" 1>&2
-
-                echo
-
-                # Add hosts_title
-                sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" "${shareable_dir_path}/components/hosts_title"
 
                 echo
 
@@ -342,7 +334,7 @@ update_BuildHostsFile()
                         | sed "s|#@blocked@#|$(wc -l < "${tmp_dir_path}/cache")|g" \
                         | sed "s|#@hosts_file_backup_path@#|${hosts_file_backup_path}|g"
 
-        } > "${tmp_dir_path}/hosts"
+        } > "${tmp_dir_path}/adsorber.lines"
 }
 
 
@@ -352,10 +344,10 @@ update_PreviousHostsFile()
         if [ "${hosts_file_previous_enable}" = "true" ]; then
                 echo "${prefix}Creating previous hosts file ..."
 
-                 # Copy current hosts file to /etc/hosts.previous before the new hosts file will be applied
+                # Copy current hosts file to /etc/hosts.previous before the new hosts file will be applied
                 cp "${hosts_file_path}" "${hosts_file_previous_path}" \
                         || {
-                                printf "%bCouldn't create previous hosts file at %s%b\\n" "${prefix_fatal}" "${hosts_file_previous_path}" "${prefix_reset}"
+                                printf "%bCouldn't create previous hosts file to %s%b\\n" "${prefix_fatal}" "${hosts_file_previous_path}" "${prefix_reset}"
                                 errorCleanUp
                                 exit 1
                         }
@@ -366,12 +358,35 @@ update_PreviousHostsFile()
 }
 
 
+update_RemoveAdsorberLines()
+{
+        sed "/${begin_section}/,/${end_section}/d" "${tmp_dir_path}/hosts.old" > "${tmp_dir_path}/hosts.clean"
+}
+
+
+update_AddAdsorberLines()
+{
+        update_RemoveAdsorberLines
+
+        {
+                cat "${tmp_dir_path}/hosts.clean"
+                echo "${begin_section}"
+                cat "${tmp_dir_path}/adsorber.lines"
+                echo "${end_section}"
+        } >> "${tmp_dir_path}/hosts.new"
+}
+
+
 update_ApplyHostsFile()
 {
         echo "${prefix}Applying new hosts file ..."
+        
+        cp "${hosts_file_path}" "${tmp_dir_path}/hosts.old"
+
+        update_AddAdsorberLines
 
         # Replace systems hosts file with the modified version from /tmp/adsorber
-        cp "${tmp_dir_path}/hosts" "${hosts_file_path}" \
+        cp "${tmp_dir_path}/hosts.new" "${hosts_file_path}" \
                 || {
                         printf "%b" "${prefix_fatal}Couldn't apply hosts file. Aborting.${prefix_reset}\\n" 1>&2
                         errorCleanUp
@@ -395,13 +410,13 @@ update()
 
         if update_ReadSourceList; then
                 if update_FetchSources; then
-			update_FilterDomains "fetched" "fetched-filtered"
-			update_SortDomains "fetched-filtered" "fetched-sorted"
-			cp "${tmp_dir_path}/fetched-sorted" "${tmp_dir_path}/cache"
-		else
-			# Create empty cache file for the ad-domains.
-			touch "${tmp_dir_path}/cache"
-		fi
+                        update_FilterDomains "fetched" "fetched-filtered"
+                        update_SortDomains "fetched-filtered" "fetched-sorted"
+                        cp "${tmp_dir_path}/fetched-sorted" "${tmp_dir_path}/cache"
+                else
+                        # Create empty cache file for the ad-domains.
+                        touch "${tmp_dir_path}/cache"
+                fi
         else
                 # Create empty cache file for the ad-domains.
                 touch "${tmp_dir_path}/cache"
@@ -424,8 +439,8 @@ update()
         esac
 
         update_IsCacheEmpty
-        update_BuildHostsFile
+        update_CreateAdsorberLines
         update_PreviousHostsFile
         update_ApplyHostsFile
-        cleanUp
+        #cleanUp
 }
