@@ -1,5 +1,5 @@
 # Adsorber
-[![Latest version](https://img.shields.io/badge/latest-v0.5.2-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
+[![Latest version](https://img.shields.io/badge/latest-v1.0.0-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
 [![License](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/stargazers)
 
@@ -84,11 +84,12 @@ The script also works on [portable mode](#portable-mode) setups. However running
 
 #### Manual removal
 If you prefer manual removal, here you go:
-1. copy:
-* `/etc/hosts.original` to `/etc/hosts`, overwriting it
+1. delete inline:
+* `/etc/hosts`    
+  Delete everything between the lines:
+  `# BEGIN OF ADSORBER SECTION` and `# END OF ADSORBER SECTION`
 2. remove:
 * `/etc/hosts.original`
-* `/etc/hosts.previous`
 * `/usr/local/bin/adsorber`
 * `/usr/local/etc/adsorber/`
 * `/usr/local/lib/adsorber/`
@@ -99,7 +100,8 @@ If you prefer manual removal, here you go:
 * `/etc/cron.daily/80adsorber`
 * `/etc/cron.weekly/80adsorber`
 * `/etc/cron.monthly/80adsorber`
-* **`/var/log/adsorber.log`**
+* `/var/cache/adsorber`
+* **`/var/log/adsorber.log`** <- won't be removed automatically
 * `/tmp/adsorber/`
   
 Not all files of the above will exist, so dont worry if they are not found.
@@ -207,9 +209,9 @@ Possible options are:
 Reverts the last applied hosts-file by Adsorber.
  
 The command will:
-* copy `/etc/hosts.previous` to `/etc/hosts`, overwriting the newest `/etc/hosts`.
+* downgrade the `/etc/hosts` with ad-domains applied previously
 
-This is useful if the newest hosts file contains less or no ad-domains, because a source
+This is useful if the newest hosts file contains less or no ad-domains, because a source     
 was unreachable and you don't want to loose the ad-servers supplied previously from this source.
 
 Possible option:
@@ -238,7 +240,7 @@ To completely uninstall see [removal](#removal).
 The command will:
 * disable all schedulers (systemd, cronjob)
 * restore the hosts file to it's original state
-* remove all leftovers (previous hosts file, etc)
+* remove all leftovers (cache, etc)
 
 Possible options are:
 * [`-y`, `--yes`, `--assume-yes`](#-y---yes---assume-yes)
