@@ -209,7 +209,7 @@ Possible options are:
 Reverts the last applied hosts-file by Adsorber.
  
 The command will:
-* downgrade the `/etc/hosts` with ad-domains applied previously
+* downgrade `/etc/hosts` with ad-domains applied previously
 
 This is useful if the newest hosts file contains less or no ad-domains, because a source     
 was unreachable and you don't want to loose the ad-servers supplied previously from this source.

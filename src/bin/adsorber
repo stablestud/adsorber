@@ -96,7 +96,7 @@ showHelp()
         echo "  update  - update hosts file with newest ad-domains"
         echo "  restore - restore hosts file to its original state"
         echo "           (it does not remove the scheduler, this should be used temporary)"
-        echo "  revert  - reverts the hosts file to the last applied (previous) host file."
+        echo "  revert  - reverts the hosts file to the last applied (previous) ad-domains"
         echo "  disable - completely remove changes made by Adsorber"
         echo "              e.g., disable scheduler (if set)"
         echo "                    restore hosts file to its original state"
@@ -201,11 +201,11 @@ showSpecificHelp()
                 revert )
                         printf "\\033[4;37madsorber revert [<options>]\\033[0m:\\n"
                         echo
-                        echo "Revert the current hosts file to the previously applied hosts file."
+                        echo "Revert the current hosts file to the previously applied ad-domains"
                         echo "Use it if the current host file has been corrupted or misses previously applied ad-domains."
                         echo
                         echo "The command will:"
-                        echo " - copy /etc/hosts.previous to /etc/hosts, overwriting the current host file."
+                        echo " - downgrade /etc/hosts with ad-domains applied previously"
                         echo
                         echo "To get the latest ad-domains run 'adsorber update'."
                         echo
@@ -221,7 +221,7 @@ showSpecificHelp()
                         echo "The command will:"
                         echo " - disable/remove all schedulers (systemd, cronjob)"
                         echo " - restore the hosts file to it's original state"
-                        echo " - remove all leftovers (e.g. /tmp/adsorber, previous hosts files, etc)"
+                        echo " - remove all leftovers (e.g. /tmp/adsorber, cache, etc)"
                         echo
                         echo "It'll not remove/uninstall the 'adsorber' command from the system."
                         echo "To do this you need to run the 'remove_files_from_system.sh' script."
