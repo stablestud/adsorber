@@ -48,9 +48,22 @@ revert_HostsFile()
                 cp "${tmp_dir_path}/adsorber.hosts" "${cache_dir_path}/adsorber.hosts"
 
                 printf "%bSuccessfully reverted %s.\\n" "${prefix}" "${hosts_file_path}"
-        else
+        elif [ -f "${cache_dir_path}/adsorber.hosts" ]; then
+		# Fallback if actual previous ad-domains save does not exist
+		update_CreateTmpDir \
+                        && cp "${hosts_file_path}" "${tmp_dir_path}/hosts.old" \
+                        && update_RemoveAdsorberLines \
+                        && cp "${cache_dir_path}/adsorber.hosts" "${tmp_dir_path}/adsorber.hosts" \
+                        && update_AddAdsorberLines \
+                        && cp "${tmp_dir_path}/hosts.new" "${hosts_file_path}" \
+                        || {
+                                printf "%bCouldn't revert %s.%b" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}"
+                                errorCleanUp
+                                exit 1
+                        }
+	else
                 # If /etc/hosts.previous was not found, abort and call error clean-up function
-                printf "%bCan't revert to previous hosts domains.. Previous hosts '${cache_dir_path}/adsorber.hosts.old' does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bCannot revert to previous ad-domains.. Previous save '${cache_dir_path}/adsorber.hosts.old' does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 errorCleanUp
                 exit 1
         fi

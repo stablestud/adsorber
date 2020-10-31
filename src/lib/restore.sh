@@ -30,7 +30,7 @@
 
 restore_Error()
 {
-        printf "%bCouldn't restore %s.%b" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
+        printf "%bCannot restore %s.%b" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
         errorCleanUp
         exit 1
 }
