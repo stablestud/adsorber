@@ -12,6 +12,7 @@
 # shellcheck disable=SC2154
 
 readonly tmp_dir_path="/tmp/adsorber"
+readonly cache_dir_path="/var/cache/adsorber"
 readonly debug="false"
 
 
@@ -29,7 +30,7 @@ readonly log_file_path="/var/log/adsorber.log"
 
 
 
-readonly version="0.5.2"
+readonly version="1.0.0"
 readonly operation="${1}"
 
 if [ "${#}" -ne 0 ]; then
@@ -42,12 +43,12 @@ checkRoot()
 {
         # Changing the hosts file requires root rights!
         if [ "$(id -g)" -ne 0 ]; then
-        	echo "$(id -un), I require way more more power then this! How about .. root ..? ;)" 1>&2
+                echo "$(id -un), I require way more more power then this! How about .. root ..? ;)" 1>&2
                 exit 126
         fi
 
         checkPaths
-	sourceFiles
+        sourceFiles
 }
 
 
@@ -95,7 +96,7 @@ showHelp()
         echo "  update  - update hosts file with newest ad-domains"
         echo "  restore - restore hosts file to its original state"
         echo "           (it does not remove the scheduler, this should be used temporary)"
-	echo "  revert  - reverts the hosts file to the last applied (previous) host file."
+        echo "  revert  - reverts the hosts file to the last applied (previous) ad-domains"
         echo "  disable - completely remove changes made by Adsorber"
         echo "              e.g., disable scheduler (if set)"
         echo "                    restore hosts file to its original state"
@@ -107,20 +108,20 @@ showHelp()
         echo "  -f,  --force             - force the update if no /etc/hosts backup"
         echo "                             has been created (dangerous!)"
         echo "  -h,  --help              - show specific help of specified operations"
-	echo "                             (e.g 'adsorber update --help)"
-	echo "  --noformatting           - turn off coloured and formatted output"
-	echo
-	echo "Scheduler options (use with 'setup'):"
+        echo "                             (e.g 'adsorber update --help)"
+        echo "  --noformatting           - turn off coloured and formatted output"
+        echo
+        echo "Scheduler options (use with 'setup'):"
         echo "  -ns, --no-scheduler      - skip scheduler creation"
         echo "  -s,  --systemd           - setup Systemd as scheduler"
         echo "  -c,  --cron              - setup Cronjob ..."
-	echo "  -H,  --hourly            - run scheduler once hourly"
-	echo "  -D,  --daily                              ... daily"
-	echo "  -W,  --weekly                             ... weekly"
-	echo "  -M,  --monthly                            ... monthly"
-	echo "  -Q,  --quarterly                          ... quarterly (4x a year)"
-	echo "  -S,  --semiannually                       ... semiannually (2x a year)"
-	echo "  -Y,  --yearly                             ... yearly"
+        echo "  -H,  --hourly            - run scheduler once hourly"
+        echo "  -D,  --daily                              ... daily"
+        echo "  -W,  --weekly                             ... weekly"
+        echo "  -M,  --monthly                            ... monthly"
+        echo "  -Q,  --quarterly                          ... quarterly (4x a year)"
+        echo "  -S,  --semiannually                       ... semiannually (2x a year)"
+        echo "  -Y,  --yearly                             ... yearly"
         echo
         echo "Config files are located at: $(cd "${config_dir_path}" && pwd)/"
         echo
@@ -154,16 +155,16 @@ showSpecificHelp()
                         echo " -c,  --cron               - use Cronjob as scheduler"
                         echo " -ns, --no-scheduler       - skip scheduler creation"
                         echo " -h,  --help               - show this help screen"
-	                echo " -H,  --hourly             - run scheduler once hourly"
-			echo " -D,  --daily                               ... daily"
-			echo " -W,  --weekly                              ... weekly"
-			echo " -M,  --monthly                             ... monthly"
-			echo " -Q,  --quarterly                           ... quarterly (4x a year)"
-			echo " -S,  --semiannually                        ... semiannually (2x a year)"
-			echo " -Y,  --yearly                              ... yearly"
-	                echo " --noformatting            - turn off coloured and formatted output"
-			echo
-			echo "Note: Cron supports only hourly, daily, weekly and monthly."
+                        echo " -H,  --hourly             - run scheduler once hourly"
+                        echo " -D,  --daily                               ... daily"
+                        echo " -W,  --weekly                              ... weekly"
+                        echo " -M,  --monthly                             ... monthly"
+                        echo " -Q,  --quarterly                           ... quarterly (4x a year)"
+                        echo " -S,  --semiannually                        ... semiannually (2x a year)"
+                        echo " -Y,  --yearly                              ... yearly"
+                        echo " --noformatting            - turn off coloured and formatted output"
+                        echo
+                        echo "Note: Cron supports only hourly, daily, weekly and monthly."
                         ;;
                 update )
                         printf "\\033[4;37madsorber update [<options>]\\033[0m:\\n"
@@ -177,7 +178,7 @@ showSpecificHelp()
                         echo " -f, --force      - force the update if no /etc/hosts backup"
                         echo "                    has been created (dangerous)"
                         echo " -h, --help       - show this help screen"
-	                echo " --noformatting   - turn off coloured and formatted output"
+                        echo " --noformatting   - turn off coloured and formatted output"
                         ;;
                 restore )
                         printf "\\033[4;37madsorber restore [<options>]\\033[0m:\\n"
@@ -191,48 +192,48 @@ showSpecificHelp()
                         echo "For this reason this command should be used to temporary disable Adsorber."
                         echo "(e.g. when it's blocking some sites you need access for a short period of time)"
                         echo
-			echo "To re-apply run 'adsorber revert' (for previous host file) or 'adsorber update' (for updated version)."
+                        echo "To re-apply run 'adsorber revert' (for previous host file) or 'adsorber update' (for updated version)."
                         echo
                         echo "Possible options:"
                         echo " -h, --help       - show this help screen"
-	                echo " --noformatting   - turn off coloured and formatted output"
+                        echo " --noformatting   - turn off coloured and formatted output"
                         ;;
                 revert )
                         printf "\\033[4;37madsorber revert [<options>]\\033[0m:\\n"
                         echo
-			echo "Revert the current hosts file to the previously applied hosts file."
+                        echo "Revert the current hosts file to the previously applied ad-domains"
                         echo "Use it if the current host file has been corrupted or misses previously applied ad-domains."
                         echo
                         echo "The command will:"
-                        echo " - copy /etc/hosts.previous to /etc/hosts, overwriting the current host file."
+                        echo " - downgrade /etc/hosts with ad-domains applied previously"
                         echo
                         echo "To get the latest ad-domains run 'adsorber update'."
                         echo
                         echo "Possible options:"
                         echo " -h, --help       - show this help screen"
-	                echo " --noformatting   - turn off coloured and formatted output"
+                        echo " --noformatting   - turn off coloured and formatted output"
                         ;;
                 disable )
                         printf "\\033[4;37madsorber disable [<options>]\\033[0m:\\n"
                         echo
-			echo "Completely disable all background tasks (schedulers) and remove all changes made by Adsorber."
+                        echo "Completely disable all background tasks (schedulers) and remove all changes made by Adsorber."
                         echo
                         echo "The command will:"
                         echo " - disable/remove all schedulers (systemd, cronjob)"
                         echo " - restore the hosts file to it's original state"
-                        echo " - remove all leftovers (e.g. /tmp/adsorber, previous hosts files, etc)"
-			echo
-			echo "It'll not remove/uninstall the 'adsorber' command from the system."
-			echo "To do this you need to run the 'remove_files_from_system.sh' script."
+                        echo " - remove all leftovers (e.g. /tmp/adsorber, cache, etc)"
+                        echo
+                        echo "It'll not remove/uninstall the 'adsorber' command from the system."
+                        echo "To do this you need to run the 'remove_files_from_system.sh' script."
                         echo
                         echo "Possible options:"
                         echo " -y, --yes, --assume-yes  - answer all prompts with 'yes'"
                         echo " -h, --help               - show this help screen"
-	                echo " --noformatting           - turn off coloured and formatted output"
+                        echo " --noformatting           - turn off coloured and formatted output"
                         ;;
-		* )
-			showHelp
-			;;
+                * )
+                        showHelp
+                        ;;
         esac
 
         exit 0
@@ -264,16 +265,16 @@ duplicateOption()
                 echo "  -c,  --cron          - use Cronjob ..."
                 echo "  -ns, --no-scheduler  - skip scheduler creation"
         elif [ "${1}" = "frequency" ]; then
-		echo "Adsorber: Duplicate option for schedulers frequency: '${2}'" 1>&2
-		echo "You may select only one:"
-		echo "  -H,  --hourly        - run scheduler once hourly"
-		echo "  -D,  --daily                          ... daily"
-		echo "  -W,  --weekly                         ... weekly"
-		echo "  -M,  --monthly                        ... monthly"
-		echo "  -Q,  --quarterly                      ... quarterly (4x a year)"
-		echo "  -S,  --semiannually                   ... semiannually (2x a year)"
-		echo "  -Y,  --yearly                         ... yearly"
-	else
+                echo "Adsorber: Duplicate option for schedulers frequency: '${2}'" 1>&2
+                echo "You may select only one:"
+                echo "  -H,  --hourly        - run scheduler once hourly"
+                echo "  -D,  --daily                          ... daily"
+                echo "  -W,  --weekly                         ... weekly"
+                echo "  -M,  --monthly                        ... monthly"
+                echo "  -Q,  --quarterly                      ... quarterly (4x a year)"
+                echo "  -S,  --semiannually                   ... semiannually (2x a year)"
+                echo "  -Y,  --yearly                         ... yearly"
+        else
                 echo "Adsorber: Duplicate option: '${2}'" 1>&2
                 showUsage
         fi
@@ -316,8 +317,8 @@ sourceFiles()
 {
         # shellcheck source=../src/lib/colours.sh
         . "${library_dir_path}/colours.sh"
-	# shellcheck source=../src/lib/cleanup.sh
-	. "${library_dir_path}/cleanup.sh"
+        # shellcheck source=../src/lib/cleanup.sh
+        . "${library_dir_path}/cleanup.sh"
         # shellcheck source=../src/lib/setup.sh
         . "${library_dir_path}/setup.sh"
         # shellcheck source=../src/lib/disable.sh
@@ -377,63 +378,63 @@ for _option in "${@}"; do
                                 duplicateOption
                         fi
                         ;;
-		-H | --hourly )
+                -H | --hourly )
                         if [ -z "${frequency}" ]; then
                                 readonly frequency="hourly"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
-			;;
-		-D | --daily )
+                        ;;
+                -D | --daily )
                         if [ -z "${frequency}" ]; then
                                 readonly frequency="daily"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
-			;;
-		-W | --weekly )
+                        ;;
+                -W | --weekly )
                         if [ -z "${frequency}" ]; then
                                 readonly frequency="weekly"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
-			;;
-		-M | --monthly )
+                        ;;
+                -M | --monthly )
                         if [ -z "${frequency}" ]; then
                                 readonly frequency="monthly"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
-			;;
-		-Q | --quarterly )
+                        ;;
+                -Q | --quarterly )
                         if [ -z "${frequency}" ]; then
                                 readonly frequency="quarterly"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
-			;;
-		-S | --semi | --semiannually )
+                        ;;
+                -S | --semi | --semiannually )
                         if [ -z "${frequency}" ]; then
                                 readonly frequency="semiannually"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
-			;;
-		-Y | --yearly | --annually )
+                        ;;
+                -Y | --yearly | --annually )
                         if [ -z "${frequency}" ]; then
                                 readonly frequency="yearly"
                         else
                                 duplicateOption "frequency" "${_option}"
                         fi
-			;;
+                        ;;
                 -h | --help | help )
                         _option_help="true"
                         ;;
-		--noformatting )
-			if [ -z "${use_formatting}" ]; then
-				readonly use_formatting="false"
-			fi
-			;;
+                --noformatting )
+                        if [ -z "${use_formatting}" ]; then
+                                readonly use_formatting="false"
+                        fi
+                        ;;
                 * )
                         _wrong_option="${_option}" 2>/dev/null
                         ;;

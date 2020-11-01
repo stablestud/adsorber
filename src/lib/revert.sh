@@ -21,30 +21,50 @@
 
 # The following functions are defined in different files.
 # If you run this file independently following functions need to be emulated:
-# --function:--  ---function defined in:---
-# cleanUp        src/lib/cleanup.sh
-# errorCleanUp   src/lib/cleanup.sh
+# --function:--------------  ---function defined in:---
+# cleanUp                    src/lib/cleanup.sh
+# errorCleanUp               src/lib/cleanup.sh
+# update_CreateTmpDir        src/lib/update.sh
+# update_RemoveAdsorberLines src/lib/update.sh
 
 # shellcheck disable=SC2154
 
 revert_HostsFile()
 {
-        if [ -f "${hosts_file_previous_path}" ]; then
-                # Copy /etc/hosts.previous to /etc/hosts, replacing the current one
-                cp "${hosts_file_previous_path}" "${hosts_file_path}" \
+        if [ -f "${cache_dir_path}/adsorber.hosts.old" ]; then
+                update_CreateTmpDir \
+                        && cp "${hosts_file_path}" "${tmp_dir_path}/hosts.old" \
+                        && update_RemoveAdsorberLines \
+                        && cp "${cache_dir_path}/adsorber.hosts.old" "${tmp_dir_path}/adsorber.hosts" \
+                        && update_AddAdsorberLines \
+                        && cp "${tmp_dir_path}/hosts.new" "${hosts_file_path}" \
                         || {
                                 printf "%bCouldn't revert %s.%b" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}"
                                 errorCleanUp
                                 exit 1
                         }
 
-                # Remove previous host file notice from /etc/hosts.previous in /etc/hosts and also the line before
-                sed -n -i '/^## This was the hosts file/{n; $p; x; d}; x; 1!p; ${x;p;}' "${hosts_file_path}"
+                cp "${cache_dir_path}/adsorber.hosts" "${cache_dir_path}/adsorber.hosts.old"
+                cp "${tmp_dir_path}/adsorber.hosts" "${cache_dir_path}/adsorber.hosts"
 
-                printf "%bSuccessfully reverted %s.\\n" "${prefix}" "${hosts_file_path}"
-        else
+                printf "%bSuccessfully reverted %s with %s\\n" "${prefix}" "${hosts_file_path}" "${cache_dir_path}/adsorber.hosts.old"
+        elif [ -f "${cache_dir_path}/adsorber.hosts" ]; then
+		# Fallback if actual previous ad-domains save does not exist
+		update_CreateTmpDir \
+                        && cp "${hosts_file_path}" "${tmp_dir_path}/hosts.old" \
+                        && update_RemoveAdsorberLines \
+                        && cp "${cache_dir_path}/adsorber.hosts" "${tmp_dir_path}/adsorber.hosts" \
+                        && update_AddAdsorberLines \
+                        && cp "${tmp_dir_path}/hosts.new" "${hosts_file_path}" \
+                        || {
+                                printf "%bCouldn't revert %s.%b" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}"
+                                errorCleanUp
+                                exit 1
+                        }
+                printf "%bSuccessfully reverted %s with %s\\n" "${prefix}" "${hosts_file_path}" "${cache_dir_path}/adsorber.hosts"
+	else
                 # If /etc/hosts.previous was not found, abort and call error clean-up function
-                printf "%bCan't revert to previous hosts file. Previous hosts file does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                printf "%bCannot revert to previous ad-domains.. Previous save '${cache_dir_path}/adsorber.hosts.old' does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                 errorCleanUp
                 exit 1
         fi
@@ -54,7 +74,7 @@ revert_HostsFile()
 # Main function of revert.sh
 revert()
 {
-        printf "%bReverting %s with %s ...%b\\n" "${prefix_title}" "${hosts_file_path}" "${hosts_file_previous_path}" "${prefix_reset}"
+        printf "%bReverting %s with previous ad-domains ...%b\\n" "${prefix_title}" "${hosts_file_path}" "${prefix_reset}"
         revert_HostsFile
         cleanUp
 }
