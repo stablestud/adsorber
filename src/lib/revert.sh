@@ -47,7 +47,7 @@ revert_HostsFile()
                 cp "${cache_dir_path}/adsorber.hosts" "${cache_dir_path}/adsorber.hosts.old"
                 cp "${tmp_dir_path}/adsorber.hosts" "${cache_dir_path}/adsorber.hosts"
 
-                printf "%bSuccessfully reverted %s.\\n" "${prefix}" "${hosts_file_path}"
+                printf "%bSuccessfully reverted %s with %s\\n" "${prefix}" "${hosts_file_path}" "${cache_dir_path}/adsorber.hosts.old"
         elif [ -f "${cache_dir_path}/adsorber.hosts" ]; then
 		# Fallback if actual previous ad-domains save does not exist
 		update_CreateTmpDir \
@@ -61,6 +61,7 @@ revert_HostsFile()
                                 errorCleanUp
                                 exit 1
                         }
+                printf "%bSuccessfully reverted %s with %s\\n" "${prefix}" "${hosts_file_path}" "${cache_dir_path}/adsorber.hosts"
 	else
                 # If /etc/hosts.previous was not found, abort and call error clean-up function
                 printf "%bCannot revert to previous ad-domains.. Previous save '${cache_dir_path}/adsorber.hosts.old' does not exist.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
@@ -73,7 +74,7 @@ revert_HostsFile()
 # Main function of revert.sh
 revert()
 {
-        printf "%bReverting %s with %s ...%b\\n" "${prefix_title}" "${hosts_file_path}" "${hosts_file_previous_path}" "${prefix_reset}"
+        printf "%bReverting %s with previous ad-domains ...%b\\n" "${prefix_title}" "${hosts_file_path}" "${prefix_reset}"
         revert_HostsFile
         cleanUp
 }
