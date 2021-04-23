@@ -29,6 +29,7 @@ You can consider it as [AdAway](https://github.com/AdAway/AdAway) for non Androi
 * White- and blacklist specific domains
 
 ### Confirmed working on:
+* `arch linux`
 * `debian` on `jessie` and `buster`
 * `ubuntu` on `bionic`
 * `gentoo`
