@@ -186,7 +186,7 @@ showSpecificHelp()
                         echo "Restore the hosts file to its operating system default, without removing the backup or scheduler."
                         echo
                         echo "The command will:"
-                        echo " - copy /etc/hosts.original to /etc/hosts, overwriting the modified /etc/hosts by adsorber."
+                        echo " - Remove lines inserted by Adsorber from `/etc/hosts`"
                         echo
                         echo "Note: If you have a scheduler set it'll re-apply ad-domains to your hosts file when triggered."
                         echo "For this reason this command should be used to temporary disable Adsorber."
