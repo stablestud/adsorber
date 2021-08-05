@@ -223,7 +223,7 @@ Possible option:
 Restores the hosts file to its original state, without removing its backup and scheduler.
 
 The command will:
-* copy `/etc/hosts.original` to `/etc/hosts`, overwriting the modified `/etc/hosts` by Adsorber.
+* Remove Adsorber's inserted lines from `/etc/hosts`.
 
 Note: If Adsorber's scheduler was set-up, it'll re-apply ad-server domains to your hosts file when triggered.     
 For this reason this command is used to temporary disable Adsorber,    
