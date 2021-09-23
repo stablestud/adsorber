@@ -34,6 +34,7 @@ You can consider it as [AdAway](https://github.com/AdAway/AdAway) for non Androi
 * `ubuntu` on `bionic`
 * `gentoo`
 * `solus` on `fortitude`
+* `fedora`
 
 Adsorber will very likely work on every distribution, as it runs on POSIX shell.
 
