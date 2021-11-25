@@ -271,7 +271,7 @@ config_IsVariableSet()
         if [ -z "${hosts_file_path}" ] || [ -z "${hosts_file_backup_path}" ] \
         || [ -z "${systemd_dir_path}" ]; then
                 printf "%bMissing setting(s) in adsorber.conf%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
-                printf "%bPlease delete adsorber.conf in %s and run 'adsorber setup' to create a new config file.\\n" \
+                printf "%bPlease delete adsorber.conf in %s and run 'adsorber enable' to create a new config file.\\n" \
                         "${prefix_warning}" "${config_dir_path}" 1>&2
 
                 errorCleanUp

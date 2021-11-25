@@ -86,22 +86,33 @@ showHelp()
         echo "Usage: adsorber <operation> [<options>|--help]"
         echo
         echo "(Ad)sorber blocks ads by \"absorbing\" and dumbing them into void."
-        echo "           (with the help of the hosts file)"
+        echo "     (with the help of the hosts file)"
         echo
-        echo "Operation (required):"
-        echo "  setup   - setup necessary things needed for Adsorber"
-        echo "              e.g., create backup file of hosts file,"
-        echo "                    create scheduler which updates the host file once a week"
-#       echo "            However this should've been done automatically."
-        echo "  update  - update hosts file with newest ad-domains"
-        echo "  restore - restore hosts file to its original state"
-        echo "           (it does not remove the scheduler, this should be used temporary)"
-        echo "  revert  - reverts the hosts file to the last applied (previous) ad-domains"
-        echo "  disable - completely remove changes made by Adsorber"
-        echo "              e.g., disable scheduler (if set)"
-        echo "                    restore hosts file to its original state"
-        echo "  version - show version of this shell script"
-        echo "  help    - show this help"
+        echo "Operations (required):"
+        echo "  - enable, setup"
+        echo "      setup necessary things needed for Adsorber"
+        echo "        e.g., create backup file of hosts file,"
+        echo "              create scheduler which updates the host file once a week"
+#       echo "      However this should've been done automatically."
+	echo
+        echo "  - start, update"
+	echo "      update hosts file with newest ad-domains"
+	echo
+        echo "  - stop, restore"
+        echo "      restore hosts file to its original state"
+        echo "      (it does not remove the scheduler, this should be used temporary)"
+	echo
+        echo "  - revert"
+        echo "      reverts the hosts file to the last applied (previous) ad-domains"
+	echo
+        echo "  - disable"
+        echo "      completely remove changes made by Adsorber"
+        echo "         e.g., disable scheduler (if set)"
+        echo "               restore hosts file to its original state"
+        echo "  - version"
+        echo "      show version of this shell script"
+        echo "  - help"
+        echo "      show this help"
         echo
         echo "Options (optional):"
         echo "  -y,  --yes, --assume-yes - answer all prompts with 'yes'"
@@ -111,7 +122,7 @@ showHelp()
         echo "                             (e.g 'adsorber update --help)"
         echo "  --noformatting           - turn off coloured and formatted output"
         echo
-        echo "Scheduler options (use with 'setup'):"
+        echo "Scheduler options (use with 'enable'):"
         echo "  -ns, --no-scheduler      - skip scheduler creation"
         echo "  -s,  --systemd           - setup Systemd as scheduler"
         echo "  -c,  --cron              - setup Cronjob ..."
@@ -135,8 +146,8 @@ showHelp()
 showSpecificHelp()
 {
         case "${operation}" in
-                setup )
-                        printf "\\033[4;37madsorber setup [<options>]\\033[0m:\\n"
+                setup | enable )
+                        printf "\\033[4;37madsorber ${operation} [<options>]\\033[0m:\\n"
                         echo
                         echo "You should run this command first."
                         echo "  (e.g. after files have been placed onto the system)"
@@ -166,8 +177,8 @@ showSpecificHelp()
                         echo
                         echo "Note: Cron supports only hourly, daily, weekly and monthly."
                         ;;
-                update )
-                        printf "\\033[4;37madsorber update [<options>]\\033[0m:\\n"
+                update | start )
+                        printf "\\033[4;37madsorber ${operation} [<options>]\\033[0m:\\n"
                         echo
                         echo "Updates your hosts files with the newest ad-domains fetched from the sources specified in 'sources.list'."
                         echo
@@ -180,26 +191,26 @@ showSpecificHelp()
                         echo " -h, --help       - show this help screen"
                         echo " --noformatting   - turn off coloured and formatted output"
                         ;;
-                restore )
-                        printf "\\033[4;37madsorber restore [<options>]\\033[0m:\\n"
+                restore | stop )
+                        printf "\\033[4;37madsorber ${operation} [<options>]\\033[0m:\\n"
                         echo
                         echo "Restore the hosts file to its operating system default, without removing the backup or scheduler."
                         echo
                         echo "The command will:"
-                        echo " - Remove lines inserted by Adsorber from `/etc/hosts`"
+                        echo " - Remove lines inserted by Adsorber from '/etc/hosts'"
                         echo
                         echo "Note: If you have a scheduler set it'll re-apply ad-domains to your hosts file when triggered."
                         echo "For this reason this command should be used to temporary disable Adsorber."
                         echo "(e.g. when it's blocking some sites you need access for a short period of time)"
                         echo
-                        echo "To re-apply run 'adsorber revert' (for previous host file) or 'adsorber update' (for updated version)."
+                        echo "To re-apply run 'adsorber revert' (for previous host file) or 'adsorber start' (for updated version)."
                         echo
                         echo "Possible options:"
                         echo " -h, --help       - show this help screen"
                         echo " --noformatting   - turn off coloured and formatted output"
                         ;;
                 revert )
-                        printf "\\033[4;37madsorber revert [<options>]\\033[0m:\\n"
+                        printf "\\033[4;37madsorber ${operation} [<options>]\\033[0m:\\n"
                         echo
                         echo "Revert the current hosts file to the previously applied ad-domains"
                         echo "Use it if the current host file has been corrupted or misses previously applied ad-domains."
@@ -207,7 +218,7 @@ showSpecificHelp()
                         echo "The command will:"
                         echo " - downgrade /etc/hosts with ad-domains applied previously"
                         echo
-                        echo "To get the latest ad-domains run 'adsorber update'."
+                        echo "To get the latest ad-domains run 'adsorber start'."
                         echo
                         echo "Possible options:"
                         echo " -h, --help       - show this help screen"
@@ -443,7 +454,7 @@ for _option in "${@}"; do
 done
 
 case "${operation}" in
-        setup )
+        setup | enable )
                 checkForWrongParameters
                 checkRoot
                 config
@@ -456,13 +467,13 @@ case "${operation}" in
                 config
                 disable
                 ;;
-        update )
+        update | start )
                 checkForWrongParameters
                 checkRoot
                 config
                 update
                 ;;
-        restore )
+        restore | stop )
                 checkForWrongParameters
                 checkRoot
                 config

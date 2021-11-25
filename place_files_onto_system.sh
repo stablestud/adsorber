@@ -133,7 +133,7 @@ cp "${script_dir_path}/src/share/default/default-sources.list" "${config_dir_pat
 
 echo
 echo "Adsorber files have been successfully placed onto the system."
-printf "\\033[1;37mTo start (setup the scheduler and backup the hosts file) run 'adsorber setup'\\033[0m\\n"
+printf "\\033[1;37mTo begin (setup the scheduler and backup the hosts file) run 'adsorber enable'\\033[0m\\n"
 
 ## We don't run Adsorber after installation yet
 #adsorber setup --noformatting \

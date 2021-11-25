@@ -52,6 +52,6 @@ restore()
         printf "%bRestoring %s ...%b\\n" "${prefix_title}" "${hosts_file_path}" "${prefix_reset}"
         restore_HostsFile
         printf "%bSuccessfully purged adsorber section from %s.\\n" "${prefix}" "${hosts_file_path}"
-        printf "%bTo reapply please run 'adsorber update'.\\n" "${prefix}"
+        printf "%bTo reapply please run 'adsorber start'.\\n" "${prefix}"
         cleanUp
 }

@@ -52,7 +52,7 @@ update_CheckBackupExist()
                 # hostname association with 127.0.0.1 and localhost will be lost.
                 # The user may interactively decide here wheter to proceed or not.
                 if [ -z "${reply_to_force_prompt}" ]; then
-                        printf "%bBackup of %s does not exist. To backup run 'adsorber setup'.%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
+                        printf "%bBackup of %s does not exist. To backup run 'adsorber enable'.%b\\n" "${prefix_fatal}" "${hosts_file_path}" "${prefix_reset}" 1>&2
                         printf "%bIgnore issue and continue? (May break your hostfile, not recommended) [y/N]: %b" "${prefix_input}" "${prefix_reset}"
                         read -r reply_to_force_prompt
                 fi
@@ -109,7 +109,7 @@ update_ReadSourceList()
         if [ ! -s "${config_dir_path}/sources.list" ]; then
 
                 if [ ! -s "${config_dir_path}/blacklist" ]; then
-                        printf "%bMissing 'sources.list' and blacklist. To fix run 'adsorber setup'.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
+                        printf "%bMissing 'sources.list' and blacklist. To fix run 'adsorber enable'.%b\\n" "${prefix_fatal}" "${prefix_reset}" 1>&2
                         exit 127
                 fi
 
