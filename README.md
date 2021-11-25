@@ -34,7 +34,7 @@ You can consider it as [AdAway](https://github.com/AdAway/AdAway) for non Androi
 * `ubuntu` on `bionic`
 * `gentoo`
 * `solus` on `fortitude`
-* `fedora`
+* `fedora` on v30+
 
 Adsorber will very likely work on every distribution, as it runs on POSIX shell.
 
@@ -56,7 +56,7 @@ __Two possibilites:__
 Adsorber will be placed onto your system (to `/usr/local/`).
 
 1. Execute the file `./place_files_onto_system.sh` as `root`
-2. Run the command `adsorber setup`
+2. Run the command `adsorber enable`
 3. Answer the prompts to configure Adsorber
 4. Finished! You can remove the downloaded files.
 
@@ -72,11 +72,12 @@ To reverse the steps (complete uninstall) see [removal](#removal)
 This mode will only download the recent ad-domains and merges them into your hosts file.     
 Note: You won't be able to set a scheduler.
 
-1. Execute `./portable_adsorber.sh setup` to generate the config files
-2. Execute `./portable_adsorber.sh setup` again to continue
+1. Execute `./portable_adsorber.sh enable` to generate the config files
+2. Execute `./portable_adsorber.sh enable` again to continue
 3. Finished!
 
-If you want to update your hosts file you need to do it yourself by running `./portable_adsorber.sh update`
+If you want to update your hosts file you need to do it yourself by running `./portable_adsorber.sh start`
+If you want to restore your hosts file to its default run `./portable_adsorber.sh stop`
 
 Portable-mode won't touch the system except for `/etc/hosts` which is required to block ad-domains. A backup will be created at `/etc/hosts.original`.
 
@@ -105,6 +106,7 @@ If you prefer manual removal, here you go:
 * `/etc/cron.monthly/80adsorber`
 * `/var/cache/adsorber`
 * **`/var/log/adsorber.log`** <- won't be removed automatically
+* **`/etc/hosts.original`** <- won't be removed automatically
 * `/tmp/adsorber/`
   
 Not all files of the above will exist, so dont worry if they are not found.
@@ -121,31 +123,38 @@ Note: if you use portable mode, use `./portable_adsorber.sh` instead of `adsorbe
 Usage: adsorber <operation> [<options>|--help]
 
 (Ad)sorber blocks ads by "absorbing" and dumbing them into void.
-           (with the help of the hosts file)
+     (with the help of the hosts file)
 
-Operation (required):
-  setup   - setup necessary things needed for Adsorber
-              e.g., create backup file of hosts file,
-                    create scheduler which updates the host file once a week
-  update  - update hosts file with the newest ad-domains
-  restore - restore hosts file to its original state
-           (it does not remove the scheduler, this should be used temporary)
-  revert  - reverts the hosts file to the last applied (previous) host file.
-  disable - completely remove changes made by Adsorber
-              e.g., disable scheduler (if set)
-                    restore hosts file to its original state
-  version - show version of this shell script
-  help    - show this help
+Operations (required):
+  - enable, setup
+      setup necessary things needed for Adsorber
+        e.g., create backup file of hosts file,
+              create scheduler which updates the host file once a week
+  - disable
+      completely remove changes made by Adsorber
+         e.g., disable scheduler (if set)
+               restore hosts file to its original state
+  - start, update
+      update hosts file with newest ad-domains
+  - stop, restore
+      restore hosts file to its original state
+      (it does not remove the scheduler, this should be used temporary)
+  - revert
+      reverts the hosts file to the last applied (previous) ad-domains
+  - version
+      show version of this shell script
+  - help
+      show this help
 
 Options (optional):
   -y,  --yes, --assume-yes - answer all prompts with 'yes'
   -f,  --force             - force the update if no /etc/hosts backup
-                             has been created (dangerous)
+                             has been created (dangerous!)
   -h,  --help              - show specific help of specified operations
                              (e.g 'adsorber update --help)
   --noformatting           - turn off coloured and formatted output
 
-Scheduler options (use with 'setup'):
+Scheduler options (use with 'enable'):
   -ns, --no-scheduler      - skip scheduler creation
   -s,  --systemd           - setup Systemd as scheduler
   -c,  --cron              - setup Cronjob ...
@@ -159,22 +168,22 @@ Scheduler options (use with 'setup'):
 
 Config files are located at: /usr/local/etc/adsorber/
 
-Documentation: https://github.com/stablestud/adsorber
+Documentation: https://github.com/stablestud/adsorber/README.md
 If you encounter any issues please report them to the Github repository.
 ```
 
 ### Operations (required):
 To run Adsorber one of the following operations must be given:
-* [`setup`](#adsorber-setup-options)
-* [`update`](#adsorber-update-options)
-* [`revert`](#adsorber-revert-options)
-* [`restore`](#adsorber-restore-options)
+* [`enable`](#adsorber-enable-setup-options)
 * [`disable`](#adsorber-disable-options)
+* [`start`](#adsorber-start-update-options)
+* [`stop`](#adsorber-stop-restore-options)
+* [`revert`](#adsorber-revert-options)
 
 **Note:** to get further information about a operation run it with `--help`,    
-e.g.: `adsorber update --help`
+e.g.: `adsorber start --help`
 
-### `adsorber` `setup {options}`:
+### `adsorber` `enable/setup {options}`:
 You should run this command first. It is required to make Adsorber functional.    
 
 The command will:
@@ -195,45 +204,6 @@ Possible options are:
 * `-Q`,  `--quarterly`
 * `-S`,  `--semiannually`
 * `-Y`,  `--yearly`
-
-### `adsorber` `update {options}`:
-Updates the hosts file with the latest ad-domains.
-
-The command will:
-* copy the current `/etc/hosts` to `/etc/hosts.previous`, if not disabled in `adsorber.conf`
-* download ad-server domains from servers listed in `sources.list`
-* filter those and apply them to the systems hosts file `/etc/hosts`
-
-Possible options are:
-* [`-f`, `--force`](#-f---force)
-* [`-h`, `--help`](#-h---help)
-
-### `adsorber` `revert {options}`:
-Reverts the last applied hosts-file by Adsorber.
- 
-The command will:
-* downgrade `/etc/hosts` with ad-domains applied previously
-
-This is useful if the newest hosts file contains less or no ad-domains, because a source     
-was unreachable and you don't want to loose the ad-servers supplied previously from this source.
-
-Possible option:
-* [`-h`, `--help`](#-h---help)
-
-### `adsorber` `restore {options}`:
-Restores the hosts file to its original state, without removing its backup and scheduler.
-
-The command will:
-* Remove Adsorber's inserted lines from `/etc/hosts`.
-
-Note: If Adsorber's scheduler was set-up, it'll re-apply ad-server domains to your hosts file when triggered.     
-For this reason this command is used to temporary disable Adsorber,    
-e.g. when it's blocking some sites you need to access for a short period of time.     
-
-To re-apply run [`adsorber revert`](#adsorber-revert-options) (for previous host file) or [`adsorber update`](#adsorber-update-options) (for updated version).
-
-Possible option:
-* [`-h`, `--help`](#-h---help)
 
 ### `adsorber` `disable {options}`:
 Completely disable all background tasks (schedulers) and remove all changes made by Adsorber.    
@@ -257,6 +227,45 @@ Possible options are:
 * [`-f`, `--force`](#-f---force)
 * [`-h`, `--help`](#-h---help)
 * [`--noformatting`](#--noformatting)
+
+### `adsorber` `stop/revert {options}`:
+Reverts the last applied hosts-file by Adsorber.
+ 
+The command will:
+* downgrade `/etc/hosts` with ad-domains applied previously
+
+This is useful if the newest hosts file contains less or no ad-domains, because a source     
+was unreachable and you don't want to loose the ad-servers supplied previously from this source.
+
+Possible option:
+* [`-h`, `--help`](#-h---help)
+
+### `adsorber` `start/restore {options}`:
+Updates the hosts file with the latest ad-domains.
+
+The command will:
+* copy the current `/etc/hosts` to `/etc/hosts.previous`, if not disabled in `adsorber.conf`
+* download ad-server domains from servers listed in `sources.list`
+* filter those and apply them to the systems hosts file `/etc/hosts`
+
+Possible options are:
+* [`-f`, `--force`](#-f---force)
+* [`-h`, `--help`](#-h---help)
+
+### `adsorber` `stop/restore {options}`:
+Restores the hosts file to its original state, without removing its backup and scheduler.
+
+The command will:
+* Remove Adsorber's inserted lines from `/etc/hosts`.
+
+Note: If Adsorber's scheduler was set-up, it'll re-apply ad-server domains to your hosts file when triggered.     
+For this reason this command is used to temporary disable Adsorber,    
+e.g. when it's blocking some sites you need to access for a short period of time.     
+
+To re-apply run [`adsorber revert`](#adsorber-revert-options) (for previous host file) or [`adsorber update`](#adsorber-update-options) (for updated version).
+
+Possible option:
+* [`-h`, `--help`](#-h---help)
 
 #### `-s`, `--systemd`:
 
@@ -334,7 +343,7 @@ Schedulers (systemd service or cronjob) will pass their output to the Syslog pro
 The syslog can be examined at `/var/log/syslog`.
 
 ## Todo for future releases
-You're free to implement things listed -or- not listed in [`TODO.md`](https://github.com/stablestud/adsorber/blob/master/TODO.md)  to Adsorber.
+You're free to implement things listed *-or-* not listed in [`TODO.md`](https://github.com/stablestud/adsorber/blob/master/TODO.md)  to Adsorber.
 Any additions are always appreciated. :)
 
 ## License

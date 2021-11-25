@@ -74,7 +74,7 @@ showUsage()
                 echo "Adsorber: Invalid option: '${_wrong_option}'" 1>&2
         fi
 
-        echo "Usage: adsorber <setup|disable|update|restore|revert> [<options>|--help]"
+        echo "Usage: adsorber <enable|disable|start|stop|revert> [<options>|--help]"
         echo "Try 'help' for more information."
 
         exit 80
@@ -94,17 +94,13 @@ showHelp()
         echo "        e.g., create backup file of hosts file,"
         echo "              create scheduler which updates the host file once a week"
 #       echo "      However this should've been done automatically."
-	echo
         echo "  - start, update"
 	echo "      update hosts file with newest ad-domains"
-	echo
         echo "  - stop, restore"
         echo "      restore hosts file to its original state"
         echo "      (it does not remove the scheduler, this should be used temporary)"
-	echo
         echo "  - revert"
         echo "      reverts the hosts file to the last applied (previous) ad-domains"
-	echo
         echo "  - disable"
         echo "      completely remove changes made by Adsorber"
         echo "         e.g., disable scheduler (if set)"
