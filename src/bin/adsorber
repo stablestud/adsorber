@@ -132,7 +132,7 @@ showHelp()
         echo
         echo "Config files are located at: $(cd "${config_dir_path}" && pwd)/"
         echo
-        echo "Documentation: https://github.com/stablestud/adsorber/README.md"
+        echo "Documentation: https://github.com/stablestud/adsorber/blob/master/README.md
         echo "If you encounter any issues please report them to the Github repository."
 
         exit 0
