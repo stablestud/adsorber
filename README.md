@@ -168,7 +168,7 @@ Scheduler options (use with 'enable'):
 
 Config files are located at: /usr/local/etc/adsorber/
 
-Documentation: https://github.com/stablestud/adsorber/README.md
+Documentation: https://github.com/stablestud/adsorber/blob/master/README.md
 If you encounter any issues please report them to the Github repository.
 ```
 
