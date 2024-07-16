@@ -42,7 +42,7 @@ printLocation()
 
 printHelp()
 {
-        printf "\\033[4;37minstall_to_system.sh\\033[0m:\\n\\n"
+        printf "\\033[4;37minstall.sh\\033[0m:\\n\\n"
         echo "   Will place Adsorbers executables and other"
         echo "   files relevant to Adsorber into the system."
         echo

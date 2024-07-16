@@ -56,12 +56,12 @@ __Two possibilites:__
 ### Install (recommended)
 Adsorber will be placed onto your system (to `/usr/local/`).
 
-1. Execute the file `./place_files_onto_system.sh` as `root`
+1. Execute `./install.sh` as `root`
 2. Run the command `adsorber enable`
 3. Answer the prompts to configure Adsorber
 4. Finished! You can remove the downloaded files.
 
-If you have a super custom system you can configure where Adsorber should be placed, edit the relevant lines in `place_files_onto_system.sh` and `remove_files_from_system.sh`     
+If you have a super custom system you can configure where Adsorber should be placed, edit the relevant lines in `install.sh` and `remove.sh`     
 However the default path (`/usr/local/`) is the default for external scripts on Linux (see [here](http://refspecs.linuxfoundation.org/FHS_2.3/fhs-2.3.html#USRLOCALLOCALHIERARCHY)) and should be fine for most systems.
 
 Placing Adsorber has the advantage to run it independently from the user who downloaded it,
@@ -84,7 +84,7 @@ Portable-mode won't touch the system except for `/etc/hosts` which is required t
 
 ## Removal
 #### Automatic removal
-To completely remove Adsorber and all its changes run the script [`./remove_files_from_system.sh`](https://github.com/stablestud/adsorber/blob/master/remove_files_from_system.sh) as `root`.    
+To completely remove Adsorber and all its changes run the script [`./remove.sh`](https://github.com/stablestud/adsorber/blob/master/remove.sh) as `root`.    
 The script also works on [portable mode](#portable-mode) setups. However running `./portable_adsorber.sh disable` instead should suffice.
 
 #### Manual removal
@@ -143,7 +143,7 @@ Operations (required):
   - revert
       reverts the hosts file to the last applied (previous) ad-domains
   - version
-      show version of this shell script
+      show version of Adsorber
   - help
       show this help
 

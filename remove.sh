@@ -6,7 +6,7 @@
 
 # This file can run independently, no need to download the full repository to
 # remove an existing installation.
-# Note: only run this file if Adsorber was placed onto the system (via place_files_onto_system.sh)
+# Note: only run this file if Adsorber was placed onto the system (via install.sh)
 # and not if it was used with portable-mode (portable_adsorber.sh)
 
 ##########[ Edit to fit your system ]###########################################
@@ -53,7 +53,7 @@ printLocation()
 
 printHelp()
 {
-        printf "\\033[4;37mremove_from_system.sh\\033[0m:\\n\\n"
+        printf "\\033[4;37mremove.sh\\033[0m:\\n\\n"
         echo "   Will remove Adsorbers executables and other"
         echo "   files relevant to Adsorber from the system."
         echo
