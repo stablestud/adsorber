@@ -30,7 +30,7 @@ readonly log_file_path="/var/log/adsorber.log"
 
 
 
-readonly version="1.0.1"
+readonly version="1.0.2"
 readonly operation="${1}"
 
 if [ "${#}" -ne 0 ]; then

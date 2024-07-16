@@ -26,7 +26,7 @@ readonly log_file_path="/var/log/adsorber.log"
 
 # Resolve script directory.
 readonly script_dir_path="$(cd "$(dirname "${0}")" && pwd)"
-readonly version="1.0.1"
+readonly version="1.0.2"
 
 printLocation()
 {
