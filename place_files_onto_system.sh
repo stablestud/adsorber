@@ -124,11 +124,17 @@ echo "Copying config files (src/share/default/)  to ${config_dir_path}"
 
 mkdir -p "${config_dir_path}"
 
-sed "s|^#@ Config file for Adsorber v.*@#$|## Config file for Adsorber v${version}|g" "${script_dir_path}/src/share/default/default-adsorber.conf" \
-	> "${config_dir_path}/adsorber.conf"
-cp "${script_dir_path}/src/share/default/default-blacklist" "${config_dir_path}/blacklist"
-cp "${script_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/whitelist"
-cp "${script_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"
+# Only copy config if it does not exist yet, preventing overwrite
+[ ! -f "${config_dir_path}/adsorber.conf" ] && \
+	sed "s|^#@ Config file for Adsorber v.*@#$|## Config file for Adsorber v${version}|g" "${script_dir_path}/src/share/default/default-adsorber.conf" \
+		> "${config_dir_path}/adsorber.conf"
+
+[ ! -f "${config_dir_path}/blacklist" ] && \
+	cp "${script_dir_path}/src/share/default/default-blacklist" "${config_dir_path}/blacklist"
+[ ! -f "${config_dir_path}/whitelist" ] && \
+	cp "${script_dir_path}/src/share/default/default-whitelist" "${config_dir_path}/whitelist"
+[ ! -f "${config_dir_path}/sources.list" ] && \
+	cp "${script_dir_path}/src/share/default/default-sources.list" "${config_dir_path}/sources.list"
 
 
 echo
