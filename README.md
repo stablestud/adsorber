@@ -1,5 +1,5 @@
 # Adsorber
-[![Latest version](https://img.shields.io/badge/latest-v1.0.1-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
+[![Latest version](https://img.shields.io/badge/latest-v1.0.2-brightgreen.svg)](https://github.com/stablestud/adsorber/releases)
 [![License](https://img.shields.io/github/license/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/blob/master/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/stablestud/adsorber.svg)](https://github.com/stablestud/adsorber/stargazers)
 
@@ -35,6 +35,7 @@ You can consider it as [AdAway](https://github.com/AdAway/AdAway) for non Androi
 * `gentoo`
 * `solus` on `fortitude`
 * `fedora` on v30+
+* `fedora silberblue` on v40+
 
 Adsorber will very likely work on every distribution, as it runs on POSIX shell.
 
@@ -42,8 +43,8 @@ Adsorber will very likely work on every distribution, as it runs on POSIX shell.
 * `root` rights (e.g. with `sudo`)
 * The following should be supported on all distros by default:
   * `/bin/sh`
-  * `/etc/hosts`
-  * `curl` or `wget`
+  * `/etc/hosts` (writeable)
+  * `curl` or `wget` or `wget2`
 
 ## Installation
 Download Adsorber from [`releases`](https://github.com/stablestud/adsorber/releases) or clone it.

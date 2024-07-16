@@ -183,22 +183,30 @@ update_FetchSources()
                 _total_count=$((_total_count+1))
 
                 printf "%bGetting%b: %s\\n" "${prefix_info}" "${prefix_reset}" "${_domain}"
-
+                # Is curl installed? If yes download the hosts files.
+                if command -v curl 2>/dev/null 1>&2; then
+                        if curl "${_domain}" -sS -L --connect-timeout 30 --fail --retry 1 >> "${tmp_dir_path}/fetched"; then
+                                _successful_count=$((_successful_count+1))
+                        else
+                                printf "%bcurl couldn't fetch: %s\\n" "${prefix_warning}" "${_domain}" 1>&2
+                        fi
+		# Is wget2 installed? If yes download the hosts file.
+		# We check for wget2 first, because some distros symlink wget2 to wget,
+		# but it's not parameter compatible to wget v1, breaking download
+		elif command -v wget2 2>/dev/null 1>&2; then
+			if wget2 "${_domain}" --force-progress --timeout=30 --tries 1 --no-verbose --output-document=- >> "${tmp_dir_path}/fetched"; then
+				_successful_count=$((_successful_count+1))
+			else
+				printf "%bwget2 couldn't fetch: %s\\n" "${prefix_warning}" "${_domain}" 1>&2
+			fi
                 # Is wget installed? If yes download the hosts files.
-                if command -v wget 2>/dev/null 1>&2; then
+                elif command -v wget 2>/dev/null 1>&2; then
                         printf "%s" "${prefix}"
 
                         if wget "${_domain}" --show-progress -L --timeout=30 -t 1 -nv -O - >> "${tmp_dir_path}/fetched"; then
                                 _successful_count=$((_successful_count+1))
                         else
                                 printf "%bwget couldn't fetch: %s\\n" "${prefix_warning}" "${_domain}" 1>&2
-                        fi
-                # Is curl installed? If yes download the hosts files.
-                elif command -v curl 2>/dev/null 1>&2; then
-                        if curl "${_domain}" -sS -L --connect-timeout 30 --fail --retry 1 >> "${tmp_dir_path}/fetched"; then
-                                _successful_count=$((_successful_count+1))
-                        else
-                                printf "%bCurl couldn't fetch: %s\\n" "${prefix_warning}" "${_domain}" 1>&2
                         fi
                 # If neither wget nor curl is installed abort and clean up.
                 else
