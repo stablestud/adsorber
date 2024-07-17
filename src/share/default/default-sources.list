@@ -1,5 +1,9 @@
 # This file is used to read from what sources we should fetch the hosts files from.
 # All links must begin with either http:// or https://
+#
+# A good resource for additional hosts lists is:
+# https://github.com/StevenBlack/hosts
+# Feel free to add its "Raw hosts" or "Non GitHub mirror" links here
 
 https://adaway.org/hosts.txt
 https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext
