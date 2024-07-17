@@ -370,6 +370,7 @@ config_PrintVariables()
 config()
 {
         printf "%bReading configuration ...%b\\n" "${prefix_title}" "${prefix_reset}"
+        [ "${debug}" = "true" ] && config_PrintVariables
         config_CreateTmpDir
         config_CopySourceList
         config_CopyWhiteList

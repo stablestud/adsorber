@@ -171,6 +171,8 @@ Config files are located at: /usr/local/etc/adsorber/
 
 Documentation: https://github.com/stablestud/adsorber/blob/master/README.md
 If you encounter any issues please report them to the Github repository.
+If you create an issue please provide the debug output from Adsorber,
+it can be generated with the environment variable ADSORBER_DEBUG=true
 ```
 
 ### Operations (required):

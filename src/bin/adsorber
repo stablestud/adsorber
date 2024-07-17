@@ -13,11 +13,16 @@
 
 readonly tmp_dir_path="/tmp/adsorber"
 readonly cache_dir_path="/var/cache/adsorber"
-readonly debug="false"
-
 
 
 ############[ DO NOT EDIT ]#####################################################
+
+if [ -z "${ADSORBER_DEBUG+no}" ]; then
+	readonly debug="false"
+else
+	readonly debug="true"
+	set -x
+fi
 
 # NOTE: following values will be changed when installed with
 # 'install.sh', if you want to change them, change them there
@@ -106,7 +111,7 @@ showHelp()
         echo "         e.g., disable scheduler (if set)"
         echo "               restore hosts file to its original state"
         echo "  - version"
-        echo "      show version of this shell script"
+        echo "      show version of Adsorber"
         echo "  - help"
         echo "      show this help"
         echo
@@ -134,6 +139,8 @@ showHelp()
         echo
         echo "Documentation: https://github.com/stablestud/adsorber/blob/master/README.md"
         echo "If you encounter any issues please report them to the Github repository."
+        echo "If you create an issue please provide the debug output from Adsorber,"
+        echo "it can be generated with the environment variable ADSORBER_DEBUG=true"
 
         exit 0
 }
@@ -143,7 +150,7 @@ showSpecificHelp()
 {
         case "${operation}" in
                 setup | enable )
-                        printf "\\033[4;37madsorber ${operation} [<options>]\\033[0m:\\n"
+                        printf "\\033[4;37madsorber %s [<options>]\\033[0m:\\n" "${operation}"
                         echo
                         echo "You should run this command first."
                         echo "  (e.g. after files have been placed onto the system)"
@@ -174,7 +181,7 @@ showSpecificHelp()
                         echo "Note: Cron supports only hourly, daily, weekly and monthly."
                         ;;
                 update | start )
-                        printf "\\033[4;37madsorber ${operation} [<options>]\\033[0m:\\n"
+                        printf "\\033[4;37madsorber %s [<options>]\\033[0m:\\n" "${operation}"
                         echo
                         echo "Updates your hosts files with the newest ad-domains fetched from the sources specified in 'sources.list'."
                         echo
@@ -188,7 +195,7 @@ showSpecificHelp()
                         echo " --noformatting   - turn off coloured and formatted output"
                         ;;
                 restore | stop )
-                        printf "\\033[4;37madsorber ${operation} [<options>]\\033[0m:\\n"
+                        printf "\\033[4;37madsorber %s [<options>]\\033[0m:\\n" "${operation}"
                         echo
                         echo "Restore the hosts file to its operating system default, without removing the backup or scheduler."
                         echo
@@ -206,7 +213,7 @@ showSpecificHelp()
                         echo " --noformatting   - turn off coloured and formatted output"
                         ;;
                 revert )
-                        printf "\\033[4;37madsorber ${operation} [<options>]\\033[0m:\\n"
+                        printf "\\033[4;37madsorber %s [<options>]\\033[0m:\\n" "${operation}"
                         echo
                         echo "Revert the current hosts file to the previously applied ad-domains"
                         echo "Use it if the current host file has been corrupted or misses previously applied ad-domains."
@@ -221,7 +228,7 @@ showSpecificHelp()
                         echo " --noformatting   - turn off coloured and formatted output"
                         ;;
                 disable )
-                        printf "\\033[4;37madsorber disable [<options>]\\033[0m:\\n"
+                        printf "\\033[4;37madsorber %s [<options>]\\033[0m:\\n" "${operation}"
                         echo
                         echo "Completely disable all background tasks (schedulers) and remove all changes made by Adsorber."
                         echo

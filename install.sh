@@ -46,8 +46,6 @@ printHelp()
         echo "   Will place Adsorbers executables and other"
         echo "   files relevant to Adsorber into the system."
         echo
-        printf "\\033[4;37mNote\\033[0m: Adsorbers own 'setup' command will not do the same action as this script.\\n"
-        echo
         echo "Usage: ${0} [option]:"
         echo
         echo "Options:"
